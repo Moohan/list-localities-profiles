@@ -9,11 +9,6 @@
 
 ############# 1) PACKAGES, DIRECTORY, LOOKUPS, DATA IMPORT + CLEANING #############
 
-## load packages
-library(cowplot)
-library(gridExtra)
-library(png)
-
 # Determine locality (for testing only)
 # LOCALITY <- "Eastwood"
 # LOCALITY <- "Stirling City with the Eastern Villages Bridge of Allan and Dunblane"
@@ -637,9 +632,9 @@ ppl_faint_o85 <- readPNG(path(
 ))
 
 # LTC infographic waffle chart
-create_infographic <- function(
-  image1,
-  image2,
+waffle.u65 <- create_infographic_ch_general_health(
+  image1 = ppl_faint_u65,
+  image2 = ppl_bold_u65,
   perc_ltc,
   col,
   age_label1,
@@ -766,7 +761,7 @@ waffle.u65 <- create_infographic(
   age_label2 = "UNDER 65"
 )
 
-waffle.6574 <- create_infographic(
+waffle.6574 <- create_infographic_ch_general_health(
   image1 = ppl_faint_6574,
   image2 = ppl_bold_6574,
   perc_ltc = ltc.percent.6574,
@@ -775,7 +770,7 @@ waffle.6574 <- create_infographic(
   age_label2 = "65 - 74"
 )
 
-waffle.7584 <- create_infographic(
+waffle.7584 <- create_infographic_ch_general_health(
   image1 = ppl_faint_7584,
   image2 = ppl_bold_7584,
   perc_ltc = ltc.percent.7584,
@@ -784,7 +779,7 @@ waffle.7584 <- create_infographic(
   age_label2 = "75 - 84"
 )
 
-waffle.o85 <- create_infographic(
+waffle.o85 <- create_infographic_ch_general_health(
   image1 = ppl_faint_o85,
   image2 = ppl_bold_o85,
   perc_ltc = ltc.percent.o85,
@@ -1433,7 +1428,6 @@ scot_adp_presc <- hscp_scot_summary_table(
 # Main markdown, Summary Table, Excel data tables, SDC output.
 # TODO: Investigate if these can be removed earlier or not created at all.
 rm(
-  create_infographic,
   disease_hosp,
   early_deaths_cancer_rate_earliest,
   gen_health_data_dir,
