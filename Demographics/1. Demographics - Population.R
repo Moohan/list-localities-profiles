@@ -17,9 +17,6 @@
 ## Libraries
 library(scales)
 library(reshape2)
-library(phsmethods)
-library(tidyr)
-library(gtools)
 
 # Source in global functions/themes script
 # source("Master RMarkdown Document & Render Code/Global Script.R")
@@ -52,7 +49,7 @@ pop_min_year <- pop_max_year - 5
 # To create the new age bands, we first reshape the data from wide to long
 pop_long <- pop_raw_data %>%
   pivot_longer(
-    cols = age0:age90plus,
+    cols = starts_with("age"),
     names_to = "age_col",
     values_to = "population"
   ) %>%
@@ -81,8 +78,8 @@ pops_locality <- pop_banded %>%
         names_prefix = "Pop",
         values_fill = 0
       ) %>%
-      rename_with(~ gsub("-", "_", .x)) %>%
-      rename_with(~ gsub("\\+", "Plus", .x)),
+      rename_with(~ gsub("-", "_", .x, fixed = TRUE)) %>%
+      rename_with(~ gsub("+", "Plus", .x, fixed = TRUE)),
     by = c("year", "sex", "hscp2019name", "hscp_locality")
   )
 
@@ -94,7 +91,6 @@ pops <- pops_locality %>%
       select(-hscp_locality) %>%
       group_by(year, hscp2019name, sex) %>%
       summarise(across(everything(), sum, na.rm = TRUE), .groups = "drop") %>%
-      ungroup() %>%
       mutate(hscp_locality = "Partnership Total")
   ) %>%
   # Add a Scotland total
@@ -151,7 +147,22 @@ pop_breakdown <- pops %>%
 
 # Determine the appropriate maximum limit for the x-axis
 max_pop <- max(pop_breakdown$Population, na.rm = TRUE)
-max_limit <- ceiling(max_pop / 500) * 500
+
+# Function to determine the break interval
+get_break_interval <- function(max_val) {
+  if (max_val < 50) {
+    return(5)
+  } else if (max_val < 500) {
+    return(50)
+  } else if (max_val < 5000) {
+    return(500)
+  } else {
+    return(5000)
+  }
+}
+
+break_interval <- get_break_interval(max_pop)
+max_limit <- ceiling(max_pop / break_interval) * break_interval
 
 # Create the population pyramid plot
 pop_pyramid <- ggplot(
@@ -172,7 +183,7 @@ pop_pyramid <- ggplot(
   scale_x_continuous(
     labels = abs,
     limits = c(-max_limit, max_limit),
-    breaks = seq(-max_limit, max_limit, by = 500)
+    breaks = seq(-max_limit, max_limit, by = break_interval)
   ) +
   scale_fill_manual(values = palette) +
   theme_profiles() +
