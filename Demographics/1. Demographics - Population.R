@@ -115,7 +115,7 @@ gender_breakdown <- pops %>%
   select(sex, total_pop) %>%
   mutate(
     total = sum(total_pop),
-    perc = paste0(round_half_up(100 * total_pop / total, 1), "%")
+    perc = glue("{round_half_up(100 * total_pop / total, 1)}%")
   )
 
 ## Age & Gender
@@ -171,10 +171,12 @@ pop_pyramid <- ggplot(
   labs(
     x = "Population",
     y = "Age Group",
-    title = paste0(
+    title = glue(
       str_wrap(`LOCALITY`, 50),
       " population pyramid ",
-      pop_max_year
+      {
+        pop_max_year
+      }
     )
   )
 
@@ -222,13 +224,19 @@ hist_pop_change <- ggplot(
   labs(
     x = "Age Group",
     y = "Percent Change",
-    title = paste(
-      "Percent Change in Population from",
-      pop_max_year - 5,
-      "to",
-      pop_max_year,
-      "by Age and Sex in\n",
-      LOCALITY
+    title = glue(
+      "Percent Change in Population from ",
+      {
+        pop_max_year - 5
+      },
+      " to ",
+      {
+        pop_max_year
+      },
+      " by Age and Sex in\n",
+      {
+        LOCALITY
+      }
     ),
     caption = "Source: National Records Scotland"
   )
@@ -344,7 +352,7 @@ pop_ts_plot <- ggplot(pop_plot_dat, aes(x = year, y = pop)) +
   labs(
     y = "Population",
     x = "Year",
-    title = paste0("Population Over Time in ", str_wrap(`LOCALITY`, 45)),
+    title = glue("Population Over Time in {str_wrap(LOCALITY, 45)}"),
     caption = "Source: National Records Scotland"
   )
 
@@ -394,36 +402,39 @@ pop_graph_text <- ifelse(
   pval < 0.05,
 
   # if the pvalue is less than .05 then return:
-  paste0(
+  glue(
     "The population has been ",
 
     # determine whether its rising or falling:
-    ifelse(coef < 0, "falling", "rising"),
+    {
+      ifelse(coef < 0, "falling", "rising")
+    },
 
     # could have trend that has changed in recent years
-    ifelse(
-      coef < 0 & pop_latest > pop_last,
-      " in general, however it has risen since last year.",
+    {
       ifelse(
-        coef > 0 & pop_latest < pop_last,
-        " in general, however it has fallen since last year.",
-        "."
+        coef < 0 & pop_latest > pop_last,
+        " in general, however it has risen since last year.",
+        ifelse(
+          coef > 0 & pop_latest < pop_last,
+          " in general, however it has fallen since last year.",
+          "."
+        )
       )
-    )
+    }
   ),
 
   # if the pvalue is not significant then return:
-  paste0(
-    paste(
-      "There is no significant linear trend in population.",
-      "However, it has",
-      pop_change,
+  glue(
+    "There is no significant linear trend in population. However, it has ",
+    pop_change,
+    " ",
+    {
       change_point
-    ),
+    },
     "."
   )
-) %>%
-  paste()
+)
 
 ## Pop projection
 pop_proj_change <- 100 *
@@ -431,23 +442,31 @@ pop_proj_change <- 100 *
   pop_proj_dat[1, 2]
 pop_proj_change <- round_half_up(pop_proj_change, 1) %>% as.character()
 
-pop_proj_text <- paste(
-  "The population in",
-  LOCALITY,
-  "is estimated to",
-  ifelse(
-    pop_proj_dat[1, 2] < pop_proj_dat[6, 2],
-    paste0("increase by ", pop_proj_change, "%"),
+pop_proj_text <- glue(
+  "The population in ",
+  {
+    LOCALITY
+  },
+  " is estimated to ",
+  {
     ifelse(
-      pop_proj_dat[1, 2] == pop_proj_dat[6, 2],
-      "remain the same",
-      paste0("decrease by ", pop_proj_change, "%")
+      pop_proj_dat[1, 2] < pop_proj_dat[6, 2],
+      glue("increase by {pop_proj_change}%"),
+      ifelse(
+        pop_proj_dat[1, 2] == pop_proj_dat[6, 2],
+        "remain the same",
+        glue("decrease by {pop_proj_change}%")
+      )
     )
-  ),
-  "from ",
-  pop_proj_dat[1, 1],
+  },
+  " from ",
+  {
+    pop_proj_dat[1, 1]
+  },
   " to ",
-  pop_proj_dat[6, 1]
+  {
+    pop_proj_dat[6, 1]
+  }
 )
 
 
@@ -516,7 +535,7 @@ other_locs_gender_ratio <- pops %>%
   select(hscp_locality, sex, total_pop) %>%
   pivot_wider(names_from = sex, values_from = total_pop) %>%
   mutate(ratio = round_half_up(`F` / `M`, 2)) %>%
-  mutate(ratio = paste0("1:", ratio)) %>%
+  mutate(ratio = glue("1:{ratio}")) %>%
   arrange(hscp_locality) %>%
   select(hscp_locality, ratio) %>%
   pivot_wider(names_from = hscp_locality, values_from = ratio)
@@ -543,13 +562,8 @@ pop_hscp <- filter(
 
 hscp_total_pop <- sum(pop_hscp$total_pop) %>%
   formatC(format = "d", big.mark = ",")
-hscp_gender_ratio <- paste0(
-  "1:",
-  round_half_up(
-    filter(pop_hscp, sex == "F")$total_pop /
-      filter(pop_hscp, sex == "M")$total_pop,
-    2
-  )
+hscp_gender_ratio <- glue(
+  "1:{round_half_up(filter(pop_hscp, sex == 'F')$total_pop / filter(pop_hscp, sex == 'M')$total_pop, 2)}"
 )
 hscp_over65 <- pop_hscp %>%
   group_by(hscp2019name) %>%
@@ -568,13 +582,8 @@ pop_scot <- filter(
 
 scot_total_pop <- sum(pop_scot$total_pop) %>%
   formatC(format = "d", big.mark = ",")
-scot_gender_ratio <- paste0(
-  "1:",
-  round_half_up(
-    filter(pop_scot, sex == "F")$total_pop /
-      filter(pop_scot, sex == "M")$total_pop,
-    2
-  )
+scot_gender_ratio <- glue(
+  "1:{round_half_up(filter(pop_scot, sex == 'F')$total_pop / filter(pop_scot, sex == 'M')$total_pop, 2)}"
 )
 scot_over65 <- pop_scot %>%
   group_by(hscp2019name) %>%

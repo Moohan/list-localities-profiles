@@ -17,34 +17,35 @@ lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality
 # Delete the full csv extract
 
 filt_and_save <- function(file_name) {
-  data <- read_csv(paste0(
+  data <- read_csv(fs::path(
     lp_path,
-    "Services/DATA ",
-    ext_year,
-    "/",
-    file_name,
-    ".csv"
+    "Services",
+    glue("DATA {ext_year}"),
+    glue("{file_name}.csv")
   ))
 
   write_rds(
     data,
-    paste0(lp_path, "Services/DATA ", ext_year, "/", file_name, ".RDS")
+    fs::path(
+      lp_path,
+      "Services",
+      glue("DATA {ext_year}"),
+      glue("{file_name}.RDS")
+    )
   )
 
-  file_delete(paste0(
+  file_delete(fs::path(
     lp_path,
-    "Services/DATA ",
-    ext_year,
-    "/",
-    file_name,
-    ".csv"
+    "Services",
+    glue("DATA {ext_year}"),
+    glue("{file_name}.csv")
   ))
 }
 
 # Extract all file names that have .csv within the services data folder (at any folder level)
 
 my_files <- list.files(
-  paste0(lp_path, "Services/DATA ", ext_year, "/CSV"),
+  fs::path(lp_path, "Services", glue("DATA {ext_year}"), "CSV"),
   pattern = ".csv",
   recursive = TRUE,
   full.names = TRUE
@@ -69,6 +70,11 @@ for (i in seq_along(csv_Files)) {
 
   saveRDS(
     data_i,
-    paste0(lp_path, "Services/DATA ", ext_year, "/", new_file_names[i])
+    fs::path(
+      lp_path,
+      "Services",
+      glue("DATA {ext_year}"),
+      new_file_names[i]
+    )
   )
 }
