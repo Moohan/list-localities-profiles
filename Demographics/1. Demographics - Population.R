@@ -17,6 +17,7 @@
 ## Libraries
 library(scales)
 library(reshape2)
+library(gtools)
 
 # Source in global functions/themes script
 # source("Master RMarkdown Document & Render Code/Global Script.R")
@@ -84,24 +85,19 @@ pops_locality <- pop_banded %>%
   )
 
 # Aggregate and add partnership + Scotland totals
-pops <- pops_locality %>%
-  # Add a partnership total
-  bind_rows(
-    pops_locality %>%
-      select(-hscp_locality) %>%
-      group_by(year, hscp2019name, sex) %>%
-      summarise(across(everything(), sum, na.rm = TRUE), .groups = "drop") %>%
-      mutate(hscp_locality = "Partnership Total")
-  ) %>%
-  # Add a Scotland total
-  bind_rows(
-    pops_locality %>%
-      select(-hscp_locality, -hscp2019name) %>%
-      group_by(year, sex) %>%
-      summarise(across(everything(), sum, na.rm = TRUE), .groups = "drop") %>%
-      ungroup() %>%
-      mutate(hscp_locality = "Scotland Total", hscp2019name = "Scotland")
-  )
+pops <- bind_rows(
+  pops_locality,
+  pops_locality %>%
+    select(-hscp_locality) %>%
+    group_by(year, hscp2019name, sex) %>%
+    summarise(across(everything(), \(x) sum(x, na.rm = TRUE)), .groups = "drop") %>%
+    mutate(hscp_locality = "Partnership Total"),
+  pops_locality %>%
+    select(-hscp_locality, -hscp2019name) %>%
+    group_by(year, sex) %>%
+    summarise(across(everything(), \(x) sum(x, na.rm = TRUE)), .groups = "drop") %>%
+    mutate(hscp_locality = "Scotland Total", hscp2019name = "Scotland")
+)
 
 
 ## Gender
@@ -150,15 +146,12 @@ max_pop <- max(pop_breakdown$Population, na.rm = TRUE)
 
 # Function to determine the break interval
 get_break_interval <- function(max_val) {
-  if (max_val < 50) {
-    return(5)
-  } else if (max_val < 500) {
-    return(50)
-  } else if (max_val < 5000) {
-    return(500)
-  } else {
-    return(5000)
-  }
+  case_when(
+    max_val < 50 ~ 5,
+    max_val < 500 ~ 50,
+    max_val < 5000 ~ 500,
+    TRUE ~ 5000
+  )
 }
 
 break_interval <- get_break_interval(max_pop)
@@ -504,17 +497,10 @@ gender_ratio <- round_half_up(
     filter(gender_breakdown, sex == "M")$total_pop,
   2
 )
-# To calculate the over 65 population, we need to use the un-banded data
-over65_pop <- pop_long %>%
-  filter(
-    hscp_locality == LOCALITY,
-    year == max(year),
-    age >= 65
-  ) %>%
-  summarise(total = sum(population, na.rm = TRUE)) %>%
-  pull(total)
 over65 <- round_half_up(
-  (over65_pop / gender_breakdown$total[1]) * 100,
+  sum(filter(pop_breakdown, Age %in% c("65-74", "75-84", "85+"))$Population) /
+    gender_breakdown$total[1] *
+    100,
   1
 )
 
