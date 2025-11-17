@@ -14,9 +14,6 @@ fy <- "2324"
 # Source in functions code
 source("Master RMarkdown Document & Render Code/Global Script.R")
 
-# Additional packages
-library(slfhelper)
-
 # Set file path
 lp_path <- path(
   "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles"

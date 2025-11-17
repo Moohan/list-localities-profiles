@@ -21,9 +21,27 @@ library(glue)
 library(fs)
 library(arrow)
 library(phsstyles)
+library(scales)
+library(reshape2)
+library(ggrepel)
+library(sf)
+library(slfhelper)
+library(cowplot)
+library(gridExtra)
+library(png)
+library(readxl)
+library(ggmap)
+library(patchwork)
+library(lubridate)
+library(odbc)
 
 # Prefer dplyr functions if there's a conflict
 conflicted::conflict_prefer_all("dplyr", quiet = TRUE)
+conflicted::conflict_prefer("filter", "dplyr")
+conflicted::conflict_prefer("lag", "dplyr")
+conflicted::conflict_prefer("melt", "reshape2")
+conflicted::conflict_prefer("year", "lubridate")
+conflicted::conflict_prefer("discard", "purrr")
 
 #### Colours & Formatting #### ----
 
@@ -82,6 +100,12 @@ get_article <- function(number) {
 # Differences include smaller text (to ensure names of areas always fit regardless of length)
 # Code taken from phsstyles Github page
 # https://github.com/Public-Health-Scotland/phsstyles/blob/master/R/theme_phs.R
+
+filt_and_save <- function(file_name, dir_path) {
+  data <- read_csv(file.path(dir_path, paste0(file_name, ".csv")))
+  write_rds(data, file.path(dir_path, paste0(file_name, ".RDS")))
+  file_delete(file.path(dir_path, paste0(file_name, ".csv")))
+}
 
 theme_profiles <- function() {
   fontStyle <- "sans"
@@ -681,4 +705,224 @@ save_dataframes_to_excel <- function(dataframes, sheet_names, file_path) {
 
   # Save the workbook to a file
   openxlsx2::wb_save(wb, file = file_path, overwrite = TRUE)
+}
+
+# LTC infographic waffle chart
+create_infographic_ch_general_health <- function(
+  image1,
+  image2,
+  perc_ltc,
+  col,
+  age_label1,
+  age_label2
+) {
+  ggplot() +
+    scale_x_continuous(name = "x") +
+    scale_y_continuous(name = "y") +
+    geom_rect(
+      data = data.frame(x1 = 0, x2 = 1, y1 = 0, y2 = 1.3),
+      mapping = aes(xmin = x1, xmax = x2, ymin = y1, ymax = y2),
+      color = "white",
+      fill = "white"
+    ) +
+    theme_void() +
+    theme(
+      panel.background = element_rect(fill = "transparent", colour = NA),
+      plot.background = element_rect(fill = "transparent", colour = NA),
+      legend.background = element_rect(fill = "transparent", colour = NA),
+      legend.box.background = element_rect(fill = "transparent", colour = NA)
+    ) +
+    annotation_raster(
+      image1,
+      ymin = 0.02,
+      ymax = 0.99,
+      xmin = 0.99 * perc_ltc,
+      xmax = 0.99
+    ) +
+    annotation_raster(
+      image2,
+      ymin = 0.02,
+      ymax = 0.99,
+      xmin = 0.01,
+      xmax = 0.99 * perc_ltc
+    ) +
+    coord_fixed(ratio = 0.3) +
+    annotate(
+      geom = "text",
+      x = 0.5,
+      y = 0.02,
+      size = 3.8,
+      label = paste0(
+        round_half_up(10 * perc_ltc, 1),
+        " in 10 people aged ",
+        age_label1,
+        " have at least 1 LTC"
+      )
+    ) +
+    annotate(
+      geom = "text",
+      x = 0.5,
+      y = 1.08,
+      size = 4,
+      colour = col,
+      fontface = "bold",
+      label = paste0(age_label2, " YEARS OLD")
+    )
+}
+
+# Functions for aggregating data
+# For this function to work, the main variable of the data (ex: number of admissions) must be renamed "n"
+
+aggregate_usc_area_data_ch_unscheduled_care <- function(data) {
+  pts_locality <- data %>%
+    filter(hscp_locality == LOCALITY) %>%
+    mutate(location = hscp_locality) %>%
+    group_by(financial_year, location) %>%
+    summarise(n = sum(n)) %>%
+    ungroup() %>%
+    mutate(area_type = "Locality")
+
+  pts_hscp <- data %>%
+    filter(hscp2019name == HSCP) %>%
+    mutate(location = hscp2019name) %>%
+    group_by(financial_year, location) %>%
+    summarise(n = sum(n)) %>%
+    ungroup() %>%
+    mutate(area_type = "HSCP")
+
+  pts_hb <- data %>%
+    left_join(
+      select(localities, hscp_locality, hb2019name),
+      by = join_by(hscp_locality)
+    ) %>%
+    filter(hb2019name == HB) %>%
+    mutate(location = hb2019name) %>%
+    group_by(financial_year, location) %>%
+    summarise(n = sum(n)) %>%
+    ungroup() %>%
+    mutate(area_type = "HB")
+
+  pts_scot <- data %>%
+    group_by(financial_year) %>%
+    summarise(n = sum(n)) %>%
+    ungroup() %>%
+    mutate(
+      location = "Scotland",
+      area_type = "Scotland"
+    )
+
+  bind_rows(pts_locality, pts_hscp, pts_hb, pts_scot) %>%
+    mutate(
+      area_type = factor(
+        area_type,
+        levels = c("Locality", "HSCP", "HB", "Scotland")
+      )
+    )
+}
+
+# Functions for creating time trends
+age_group_trend_usc_ch_unscheduled_care <- function(
+  data_for_plot,
+  plot_title,
+  yaxis_title,
+  source
+) {
+  data_for_plot %>%
+    ggplot(aes(
+      x = financial_year,
+      y = data,
+      group = age_group,
+      color = age_group
+    )) +
+    geom_line(linewidth = 1) +
+    geom_point() +
+    scale_colour_manual(values = c(palette)) +
+    scale_x_discrete(breaks = data_for_plot$financial_year) +
+    scale_y_continuous(
+      labels = comma,
+      limits = c(0, 1.1 * max(data_for_plot$data))
+    ) +
+    theme_profiles() +
+    labs(
+      title = plot_title,
+      y = yaxis_title,
+      x = "Financial Year",
+      color = "Age Group",
+      caption = source
+    ) +
+    theme(plot.title = element_text(hjust = 0.5, size = 12))
+}
+
+area_trend_usc_ch_unscheduled_care <- function(data_for_plot, plot_title, yaxis_title, source) {
+  data_for_plot %>%
+    mutate(
+      location = fct_reorder(
+        as.factor(str_wrap(location, 23)),
+        as.numeric(area_type)
+      )
+    ) %>%
+    ggplot() +
+    aes(
+      x = financial_year,
+      y = data,
+      group = location,
+      fill = location,
+      linetype = area_type
+    ) +
+    geom_line(aes(colour = location), linewidth = 1) +
+    geom_point(aes(colour = location), size = 2) +
+    scale_fill_manual(values = palette) +
+    scale_colour_manual(values = palette) +
+    theme_profiles() +
+    expand_limits(y = 0) +
+    scale_x_discrete(breaks = data_for_plot$financial_year) +
+    scale_y_continuous(
+      labels = comma,
+      limits = c(0, 1.1 * max(data_for_plot$data))
+    ) +
+    labs(
+      title = plot_title,
+      y = yaxis_title,
+      x = "Financial Year",
+      caption = source
+    ) +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 12),
+      legend.title = element_blank()
+    ) +
+    guides(
+      linetype = "none",
+      shape = "none",
+      fill = "none",
+      colour = guide_legend(nrow = 1, byrow = TRUE)
+    )
+}
+
+# Functions for text variables
+
+percent_change_calc_ch_unscheduled_care <- function(numerator, denominator, digits = 1) {
+  round_half_up(
+    abs(numerator - denominator) / denominator * 100,
+    digits = digits
+  )
+}
+
+word_change_calc_ch_unscheduled_care <- function(latest, first) {
+  dplyr::case_when(
+    dplyr::near(latest, first) ~ "change",
+    latest > first ~ "increase",
+    latest < first ~ "decrease"
+  )
+}
+
+other_locs_summary_table_ch_lifestyle <- function(data, latest_year) {
+  data %>%
+    filter(year == latest_year) %>%
+    filter(area_type == "Locality") %>%
+    rename("hscp_locality" = "area_name") %>%
+    right_join(other_locs, by = join_by(hscp_locality)) %>%
+    arrange(hscp_locality) %>%
+    select(hscp_locality, measure) %>%
+    mutate(measure = round_half_up(measure, 1)) %>%
+    pivot_wider(names_from = hscp_locality, values_from = measure)
 }
