@@ -37,6 +37,11 @@ library(odbc)
 
 # Prefer dplyr functions if there's a conflict
 conflicted::conflict_prefer_all("dplyr", quiet = TRUE)
+conflicted::conflict_prefer("filter", "dplyr")
+conflicted::conflict_prefer("lag", "dplyr")
+conflicted::conflict_prefer("melt", "reshape2")
+conflicted::conflict_prefer("year", "lubridate")
+conflicted::conflict_prefer("discard", "purrr")
 
 #### Colours & Formatting #### ----
 
