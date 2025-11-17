@@ -29,7 +29,7 @@ source("Master RMarkdown Document & Render Code/Global Script.R")
 # Sys.getenv("R_ZIPCMD", "zip")
 
 # Folder to export to
-exportfolder <- paste0(lp_path, "Unscheduled Care/DATA ", ext_year, "/")
+exportfolder <- fs::path(lp_path, "Unscheduled Care", glue("DATA {ext_year}"))
 
 
 ## Lookups ----
@@ -46,34 +46,39 @@ localities <- read_in_localities()
 ########################## SECTION 2: MSG Data ###############################
 
 # Read in MSG data
-msg_emerg_adm_raw <- read_parquet(paste0(
-  "/conf/LIST_analytics/MSG/",
+msg_emerg_adm_raw <- read_parquet(fs::path(
+  "/conf/LIST_analytics/MSG",
   latest_msg_folder,
-  "/Breakdowns/1a-Admissions-breakdown.parquet"
+  "Breakdowns",
+  "1a-Admissions-breakdown.parquet"
 ))
 
-msg_beddays_raw <- read_parquet(paste0(
-  "/conf/LIST_analytics/MSG/",
+msg_beddays_raw <- read_parquet(fs::path(
+  "/conf/LIST_analytics/MSG",
   latest_msg_folder,
-  "/Breakdowns/2a-Acute-Beddays-breakdown.parquet"
+  "Breakdowns",
+  "2a-Acute-Beddays-breakdown.parquet"
 ))
 
-msg_ae_raw <- read_parquet(paste0(
-  "/conf/LIST_analytics/MSG/",
+msg_ae_raw <- read_parquet(fs::path(
+  "/conf/LIST_analytics/MSG",
   latest_msg_folder,
-  "/Breakdowns/3-A&E-Breakdowns.parquet"
+  "Breakdowns",
+  "3-A&E-Breakdowns.parquet"
 ))
 
-msg_dd_raw <- read_parquet(paste0(
-  "/conf/LIST_analytics/MSG/",
+msg_dd_raw <- read_parquet(fs::path(
+  "/conf/LIST_analytics/MSG",
   latest_msg_folder,
-  "/Breakdowns/4-Delayed-Discharge-Breakdowns.parquet"
+  "Breakdowns",
+  "4-Delayed-Discharge-Breakdowns.parquet"
 ))
 
-msg_mh_beddays_raw <- read_parquet(paste0(
-  "/conf/LIST_analytics/MSG/",
+msg_mh_beddays_raw <- read_parquet(fs::path(
+  "/conf/LIST_analytics/MSG",
   latest_msg_folder,
-  "/Breakdowns/2c-MH-Beddays-breakdown.parquet"
+  "Breakdowns",
+  "2c-MH-Beddays-breakdown.parquet"
 ))
 
 
@@ -167,20 +172,20 @@ msg_dd <- msg_dd_raw %>%
 # Emergency admissions
 write_parquet(
   msg_emergency_adm,
-  paste0(exportfolder, "emergency_admissions_msg.parquet")
+  fs::path(exportfolder, "emergency_admissions_msg.parquet")
 )
 
 # Bed days
-write_parquet(msg_bed_days, paste0(exportfolder, "bed_days_msg.parquet"))
+write_parquet(msg_bed_days, fs::path(exportfolder, "bed_days_msg.parquet"))
 
 # Bed days MH
-write_parquet(msg_bed_days_mh, paste0(exportfolder, "bed_days_mh_msg.parquet"))
+write_parquet(msg_bed_days_mh, fs::path(exportfolder, "bed_days_mh_msg.parquet"))
 
 # A&E
-write_parquet(msg_ae, paste0(exportfolder, "ae_attendances_msg.parquet"))
+write_parquet(msg_ae, fs::path(exportfolder, "ae_attendances_msg.parquet"))
 
 # Delayed discharges
-write_parquet(msg_dd, paste0(exportfolder, "delayed_discharges_msg.parquet"))
+write_parquet(msg_dd, fs::path(exportfolder, "delayed_discharges_msg.parquet"))
 
 
 ############################# SECTION 3: SMR Data ###################################
@@ -958,13 +963,13 @@ ppa <- ppa_id %>%
 # _________________________________________________________________________
 
 # Falls
-write_parquet(smr_falls, paste0(exportfolder, "falls_smr.parquet"))
+write_parquet(smr_falls, fs::path(exportfolder, "falls_smr.parquet"))
 
 # Readmissions
 write_parquet(
   smr_readmissions,
-  paste0(exportfolder, "readmissions_smr.parquet")
+  fs::path(exportfolder, "readmissions_smr.parquet")
 )
 
 # PPA
-write_parquet(ppa, paste0(exportfolder, "ppa_smr.parquet"))
+write_parquet(ppa, fs::path(exportfolder, "ppa_smr.parquet"))

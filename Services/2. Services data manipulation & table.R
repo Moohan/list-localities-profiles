@@ -66,14 +66,19 @@ postcode_lkp <- read_in_postcodes() %>%
 ## Read in all data in services folder
 
 services_file_names <- list.files(
-  paste0(lp_path, "Services/DATA ", ext_year),
+  fs::path(lp_path, "Services", glue("DATA {ext_year}")),
   pattern = "RDS"
 )
 
 for (file in services_file_names) {
   name <- substr(x = file, 1, 4)
 
-  data <- readRDS(paste0(lp_path, "Services/DATA ", ext_year, "/", file)) %>%
+  data <- readRDS(fs::path(
+    lp_path,
+    "Services",
+    glue("DATA {ext_year}"),
+    file
+  )) %>%
     clean_names()
 
   assign(name, data)
