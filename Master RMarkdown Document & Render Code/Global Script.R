@@ -21,6 +21,7 @@ library(glue)
 library(fs)
 library(arrow)
 library(phsstyles)
+library(phsmethods)
 
 # Prefer dplyr functions if there's a conflict
 conflicted::conflict_prefer_all("dplyr", quiet = TRUE)
