@@ -180,7 +180,7 @@ service_map <- ggmap(service_map_background) +
     alpha = 0.5,
     inherit.aes = FALSE
   ) +
-  scale_linewidth(range = c(0.2, 1)) +
+  scale_linewidth(range = c(0.2, 1), guide = "none") +
   labs(fill = "Locality")
 
 # check if services markers exist for locality
@@ -296,7 +296,7 @@ service_map_1 <- ggmap(service_map_background) +
     alpha = 0.5,
     inherit.aes = FALSE
   ) +
-  scale_linewidth(range = c(0.2, 1)) +
+  scale_linewidth(range = c(0.2, 1), guide = "none") +
   labs(fill = "Locality") +
   theme(legend.title = element_blank()) +
   scale_fill_manual(values = col_palette) +
