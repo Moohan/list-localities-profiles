@@ -22,7 +22,7 @@ In `r pop_max_year`, the total population of `r LOCALITY` locality was `r total_
 
 <!-- <Div custom-style = "Table or chart caption"></Div> -->
 
-`r ftext("Figure \\@ref(fig:pop-pyramid): Population by age and sex.", table_heading_style)`
+`r ftext(paste0("Figure \\@ref(fig:pop-pyramid): Population by age and sex."),table_heading_style)`
 
 ```{r pop-pyramid, fig.width = 7, fig.height = 4, warning = FALSE, fig.cap = "A bar chart showing the population distribution of the locality grouped by age and sex"}
 pop_pyramid
@@ -34,7 +34,7 @@ Figure \@ref(fig:pop-ts-plot) shows the historical population of `r LOCALITY`, a
 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:pop-ts-plot): Population time trend and projection.</Div> -->
 
-`r ftext("Figure \\@ref(fig:pop-ts-plot): Population time trend and projection.", table_heading_style)`
+`r ftext(paste0("Figure \\@ref(fig:pop-ts-plot): Population time trend and projection."),table_heading_style)`
 
 ```{r pop-ts-plot, fig.width = 7.5, fig.height = 4, warning = FALSE, fig.cap= "A line graph showing the trend in population over time"}
 pop_ts_plot
@@ -46,7 +46,7 @@ Figure \@ref(fig:hist-pop-change) shows how the population structure has changed
 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:hist-pop-change): Change in population structure over the last five years.</Div> -->
 
-`r ftext("Figure \\@ref(fig:hist-pop-change): Change in population structure over the last five years.", table_heading_style)`
+`r ftext(paste0("Figure \\@ref(fig:hist-pop-change): Change in population structure over the last five years."),table_heading_style)`
 
 ```{r hist-pop-change, fig.width = 9, fig.height = 4, warning = FALSE, fig.cap= "A bar chart showing the percentage change in population structure, split by age and sex, over the last five years"}
 hist_pop_change
@@ -97,7 +97,7 @@ Source: Scottish Government, Public Health Scotland, National Records Scotland. 
 
 `r ftext(paste0("Figure \\@ref(fig:simd-domains-plot): Proportion of the population that reside in each 2020 SIMD quintile by domain in ",pop_max_year,"."),table_heading_style)`
 
-```{r simd-domains-plot, fig.width = 8, fig.height = 5, warning = FALSE, fig.cap = 'A bar graph showing the proportion of the population in each SIMD decile for each SIMD domain.'}
+```{r simd-domains-plot, fig.width = 8, fig.height = 5, fig.cap = 'A bar graph showing the proportion of the population in each SIMD decile for each SIMD domain.'}
 simd_domains
 ```
 
