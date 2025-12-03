@@ -27,7 +27,7 @@ Figure \@ref(fig:alcohol-hosp-bar-chart) then compares different areas, includin
 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:alcohol-hosp-time-trend-plot): Alcohol-related hospital admission rates by area and over time.</Div> -->
 
-`r ftext(paste0("Figure \@ref(fig:alcohol-hosp-time-trend-plot): Alcohol-related hospital admission rates by area and over time."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:alcohol-hosp-time-trend-plot): Alcohol-related hospital admission rates by area and over time.", table_heading_style)`
 
 ```{r alcohol-hosp-time-trend-plot, fig.width = 8.5, fig.height = 4.5, warning = FALSE, fig.cap = "A line graph showing 10-year time trends for alcohol-related hospital admissions per 100,000 population for Locality, HSCP, Health Board and all Scotland."}
 alcohol_hosp_time_trend
@@ -35,7 +35,7 @@ alcohol_hosp_time_trend
 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:alcohol-hosp-bar-chart): Alcohol-related hospital admissions by area for the latest time period.</Div> -->
 
-`r ftext(paste0("Figure \@ref(fig:alcohol-hosp-bar-chart): Alcohol-related hospital admissions by area for the latest time period."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:alcohol-hosp-bar-chart): Alcohol-related hospital admissions by area for the latest time period.", table_heading_style)`
 
 ```{r alcohol-hosp-bar-chart, fig.width = 7.5, fig.height = 4.8, warning = FALSE, fig.cap = "A bar graph showing alcohol-related hospital admissions per 100,000 population for Locality, HSCP, Health Board and all Scotland and all other localities in the HSCP for the most recent financial year."}
 alcohol_hosp_bar
@@ -49,7 +49,7 @@ Data on alcohol-specific deaths is available as 5-year aggregates. In `r LOCALIT
 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:alcohol-deaths-time-trend-plot): Alcohol-specific deaths by area and over time.</Div> -->
 
-`r ftext(paste0("Figure \@ref(fig:alcohol-deaths-time-trend-plot): Alcohol-specific deaths by area and over time."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:alcohol-deaths-time-trend-plot): Alcohol-specific deaths by area and over time.", table_heading_style)`
 
 ```{r alcohol-deaths-time-trend-plot, fig.width = 8.5, fig.height = 4.5, warning = FALSE, fig.cap = "A line graph showing 10-year time trends for 5 year aggregate rates of alcohol-specific deaths per 100,000 population for Locality, HSCP, Health Board and all Scotland."}
 alcohol_deaths_time_trend
@@ -57,7 +57,7 @@ alcohol_deaths_time_trend
 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:alcohol-deaths-bar-chart): Alcohol-specific deaths by area for the latest time period available.</Div> -->
 
-`r ftext(paste0("Figure \@ref(fig:alcohol-deaths-bar-chart): Alcohol-specific deaths by area for the latest time period available."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:alcohol-deaths-bar-chart): Alcohol-specific deaths by area for the latest time period available.", table_heading_style)`
 
 ```{r alcohol-deaths-bar-chart, fig.width = 7.5, fig.height = 4.5, warning = FALSE, fig.cap =  "A bar graph showing the 5 year aggregate rate of alcohol-specific deaths per 100,000 population for Locality, HSCP, Health Board and all Scotland and all other localities in the HSCP for the most recent time period."}
 alcohol_deaths_bar
@@ -72,7 +72,7 @@ A comparison of areas at the most recent time period (`r latest_period_drug_hosp
 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:drug-hosp-time-trend-plot): Drug-related hospital admission rates by area and over time.</Div> -->
 
-`r ftext(paste0("Figure \@ref(fig:drug-hosp-time-trend-plot): Drug-related hospital admission rates by area and over time."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:drug-hosp-time-trend-plot): Drug-related hospital admission rates by area and over time.", table_heading_style)`
 
 ```{r drug-hosp-time-trend-plot, fig.width = 8.5, fig.height = 4.5, warning = FALSE, fig.cap = "A line graph showing time trends for 3 year aggregate rates of drug-related hospital admissions per 100,000 population for Locality, HSCP, Health Board and all Scotland."}
 drug_hosp_time_trend
@@ -80,7 +80,7 @@ drug_hosp_time_trend
 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:drug-hosp-bar-chart): Drug-related hospital admission rates by area for the latest time period available.</Div> -->
 
-`r ftext(paste0("Figure \@ref(fig:drug-hosp-bar-chart): Drug-related hospital admission rates by area for the latest time period available."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:drug-hosp-bar-chart): Drug-related hospital admission rates by area for the latest time period available.", table_heading_style)`
 
 ```{r drug-hosp-bar-chart, fig.width = 8, fig.height = 4.8, warning = FALSE, fig.cap= "A bar graph showing the 3 year rate of drug-related hospital admissions per 100,000 population for Locality, HSCP, Health Board and all Scotland and all other localities in the HSCP for the most recent time period."}
 drug_hosp_bar
@@ -96,7 +96,7 @@ A trend of the percentage uptake of bowel screening among the eligible populatio
 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:bowel-screening-time-trend-plot): Bowel screening uptake for eligible men and women, by area and over time.</Div> -->
 
-`r ftext(paste0("Figure \@ref(fig:bowel-screening-time-trend-plot): Bowel screening uptake for eligible men and women, by area and over time."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:bowel-screening-time-trend-plot): Bowel screening uptake for eligible men and women, by area and over time.", table_heading_style)`
 
 ```{r bowel-screening-time-trend-plot, fig.width = 8.5, fig.height = 4, warning = FALSE, fig.cap = "A line graph showing time trends for 3 year aggregate rates for bowel screening uptake by percentage of eligible population for Locality, HSCP, Health Board and all Scotland."}
 bowel_screening_time_trend
@@ -104,7 +104,7 @@ bowel_screening_time_trend
 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:bowel-screening-bar-chart): Bowel screening uptake by area for the latest time period available.</Div> -->
 
-`r ftext(paste0("Figure \@ref(fig:bowel-screening-bar-chart): Bowel screening uptake by area for the latest time period available."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:bowel-screening-bar-chart): Bowel screening uptake by area for the latest time period available.", table_heading_style)`
 
 ```{r bowel-screening-bar-chart, fig.width = 7.5, fig.height = 4.8, warning = FALSE, fig.cap = "A bar graph showing the most recent 3 year aggregate rates for bowel screening uptake by percentage of eligible population for Locality, HSCP, Health Board and all Scotland and for all localities within the HSCP."}
 bowel_screening_bar

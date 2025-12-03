@@ -6,7 +6,7 @@
 \newline
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:service-map-plot): Map of services by locality in `r HSCP` HSCP^2^</Div> -->
 
-`r ftext(paste0("Figure \@ref(fig:service-map-plot): Map of services by locality in ", HSCP," HSCP^2"),table_heading_style)`
+`r ftext(paste0("Figure \\@ref(fig:service-map-plot): Map of services by locality in ", HSCP," HSCP^2"),table_heading_style)`
 
 
 ```{r service-map-plot, fig.width=6, fig.cap= "A map of the health and social care partnership including a breakdown on localities with the locations of all the GP practices, care homes, emergency depertments and minor injury units."}
@@ -17,7 +17,7 @@ service_map
 \newline
 <!-- <Div custom-style = "Table or chart caption">Table \@ref(tab:services-table): Number of each type of service in `r LOCALITY` Locality^2^</Div> -->
 
-`r ftext(paste0("Table \@ref(tab:services-table): Number of each type of service in ",LOCALITY," Locality^2"),table_heading_style)`
+`r ftext(paste0("Table \\@ref(tab:services-table): Number of each type of service in ",LOCALITY," Locality^2"),table_heading_style)`
 
 
 ```{r services-table}

@@ -32,7 +32,7 @@ if (is.na(avg_life_exp_latest_male)) {
 
 <!-- <div class = "table-caption-heading">Figure \@ref(fig:life-exp-trend-plot): Average life expectancy in men and women over time.</div> -->
 
-`r ftext(paste0("Figure \@ref(fig:life-exp-trend-plot): Average life expectancy in men and women over time"),table_heading_style)`
+`r ftext("Figure \\@ref(fig:life-exp-trend-plot): Average life expectancy in men and women over time", table_heading_style)`
 
 ```{r life-exp-trend-plot, fig.width = 8, fig.height = 4.5, fig.cap = 'A line graph showing the trent for average life expectancy in the locality for male and female residents'}
 if (LOCALITY %in% check_missing_data_scotpho(life_exp)$area_name) {
@@ -48,7 +48,7 @@ Table \@ref(tab:life-exp-table) provides the average life expectancy for men and
 
 <!-- <div custom-style = "table-caption-heading">Table \@ref(tab:life-exp-table): Average life expectancy in years for the latest time periods (`r latest_period_life_exp_loc` aggregated years for the locality; `r latest_period_life_exp_otherareas` aggregated years for other areas).</div> -->
 
-`r ftext(paste0("Table \@ref(tab:life-exp-table): Average life expectancy in years for the latest time periods (",latest_period_life_exp_loc,"aggregated years for the locality; ",latest_period_life_exp_otherareas," aggregated years for other areas)."),table_heading_style)`
+`r ftext(paste0("Table \\@ref(tab:life-exp-table): Average life expectancy in years for the latest time periods (",latest_period_life_exp_loc,"aggregated years for the locality; ",latest_period_life_exp_otherareas," aggregated years for other areas)."),table_heading_style)`
 
 
 ```{r life-exp-table}
@@ -70,7 +70,7 @@ The following chart shows a trend of death rates among people aged 15 to 44 per 
 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:deaths-15-44-time-trend-plot): Deaths aged 15 to 44 years by geographical area and over time.</Div> -->
 
-`r ftext(paste0("Figure \@ref(fig:deaths-15-44-time-trend-plot): Deaths aged 15 to 44 years by geographical area and over time."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:deaths-15-44-time-trend-plot): Deaths aged 15 to 44 years by geographical area and over time.", table_heading_style)`
 
 
 ```{r deaths-15-44-time-trend-plot, fig.width = 8.5, fig.height = 4.2, fig.cap = 'A line graph showing the ten-year time trend for the 3-year aggregate rate of deaths per 100,000 population for 15 to 44 year olds by locality, HSCP, health board and all Scotland'}
@@ -82,7 +82,7 @@ Figure \@ref(fig:deaths-15-44-bar-chart) provides comparisons of deaths at ages 
 
 <!-- <div custom-style = "table-caption-heading">Figure \@ref(fig:deaths-15-44-bar-chart): Deaths at ages 15 to 44 by area for the latest time period available.</div> -->
 
-`r ftext(paste0("Figure \@ref(fig:deaths-15-44-bar-chart): Deaths at ages 15 to 44 by area for the latest time period available."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:deaths-15-44-bar-chart): Deaths at ages 15 to 44 by area for the latest time period available.", table_heading_style)`
 
 
 ```{r deaths-15-44-bar-chart, fig.width = 7.5, fig.height = 4.8, fig.cap = 'A bar graph showing the rate of deaths per 100,000 population for residents aged 15 to 44 by locality, HSCP, health board and all Scotland and for other localitiies in the HSCP between 2019 and 2021.'}
@@ -104,7 +104,7 @@ The co-occurrence of two or more conditions, known as multi-morbidity, is broken
 
 <!-- <div custom-style = "table-caption-heading">Table \@ref(tab:ltc-multimorbidity-table): Multi-morbidity of physical long-term conditions by age group in `r latest_year_ltc`.</div> -->
 
-`r ftext(paste0("Table \@ref(tab:ltc-multimorbidity-table): Multi-morbidity of physical long-term conditions by age group in",latest_year_ltc),table_heading_style)`
+`r ftext(paste0("Table \\@ref(tab:ltc-multimorbidity-table): Multi-morbidity of physical long-term conditions by age group in",latest_year_ltc),table_heading_style)`
 
 
 ```{r ltc-multimorbidity-table}
@@ -119,7 +119,7 @@ Below is a breakdown of the physical LTCs, for the financial year `r latest_year
 
 <!-- <div custom-style = "table-caption-heading">Figure \@ref(fig:ltc-types-plot): The percentage of people with each physical LTC by age group.</div> -->
 
-`r ftext(paste0("Figure \@ref(fig:ltc-types-plot): The percentage of people with each physical LTC by age group."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:ltc-types-plot): The percentage of people with each physical LTC by age group.", table_heading_style)`
 
 ```{r ltc-types-plot, fig.width = 7.5, fig.height = 5, fig.cap = "A graph showing the prevalence of physical long term conditions by percentage of population for Under 65s and for Over 65s."}
 ltc_types_plot
@@ -129,7 +129,7 @@ ltc_types_plot
 
 <!-- <div custom-style = "table-caption-heading">Table \@ref(tab:top5-ltc-table): Prevalence of the five most common physical LTCs as a percentage of the population across geographical areas (1 is the most prevalent).</div> -->
 
-`r ftext(paste0("Table \@ref(tab:top5-ltc-table): Prevalence of the five most common physical LTCs as a percentage of the population across geographical areas (1 is the most prevalent)."),table_heading_style)`
+`r ftext("Table \\@ref(tab:top5-ltc-table): Prevalence of the five most common physical LTCs as a percentage of the population across geographical areas (1 is the most prevalent).", table_heading_style)`
 
 
 ```{r top5-ltc-table, fig.width = 7.5, fig.height = 3.5}
@@ -144,7 +144,7 @@ For the period `r latest_period_cancer_reg`, there were **`r format_number_for_t
 
 <!-- <div custom-style = "table-caption-heading">Figure \@ref(fig:cancer-reg-time-trend-plot): Cancer registration rate over time and by area.</div> -->
 
-`r ftext(paste0("Figure \@ref(fig:cancer-reg-time-trend-plot): Cancer registration rate over time and by area."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:cancer-reg-time-trend-plot): Cancer registration rate over time and by area.", table_heading_style)`
 
 ```{r cancer-reg-time-trend-plot, fig.width = 8.5, fig.height = 3.7, fig.cap = "A line graph showing 10-year time trends for cancer registrations per 100,000 population for Locality, HSCP, Health Board and all Scotland."}
 cancer_reg_time_trend
@@ -152,7 +152,7 @@ cancer_reg_time_trend
 
 <!-- <div custom-style = "table-caption-heading">Figure \@ref(fig:early-deaths-cancer-time-trend-plot): Early deaths from cancer (\<75 years) over time and by area.</div> -->
 
-`r ftext(paste0("Figure \@ref(fig:early-deaths-cancer-time-trend-plot): Early deaths from cancer (<75 years) over time and by area."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:early-deaths-cancer-time-trend-plot): Early deaths from cancer (<75 years) over time and by area.", table_heading_style)`
 
 
 ```{r early-deaths-cancer-time-trend-plot, fig.width = 8.5, fig.height = 3.7, fig.cap = "A line graph showing 10-year time trends for early deaths from cancer per 100,000 population for Locality, HSCP, Health Board and all Scotland."}
@@ -166,7 +166,7 @@ Patient hospitalisations can indicate how certain diseases have varying impacts 
 
 <!-- <div custom-style = "table-caption-heading">Table \@ref(tab:disease-hosp-table): Patient hospitalisations by condition and geographical area, age-sex standardised rates per 100,000.</div> -->
 
-`r ftext(paste0("Table \@ref(tab:disease-hosp-table): Patient hospitalisations by condition and geographical area, age-sex standardised rates per 100,000."),table_heading_style)`
+`r ftext("Table \\@ref(tab:disease-hosp-table): Patient hospitalisations by condition and geographical area, age-sex standardised rates per 100,000.", table_heading_style)`
 
 
 ```{r disease-hosp-table}
@@ -183,7 +183,7 @@ In `r latest_period_adp_presc`, **`r format_number_for_text(adp_presc_latest)`%*
 
 <!-- <div custom-style = "table-caption-heading">Figure \@ref(fig:adp-presc-time-trend-plot): Anxiety, depression and psychosis prescriptions over time and by geographical area.</div> -->
 
-`r ftext(paste0("Figure \@ref(fig:adp-presc-time-trend-plot): Anxiety, depression and psychosis prescriptions over time and by geographical area."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:adp-presc-time-trend-plot): Anxiety, depression and psychosis prescriptions over time and by geographical area.", table_heading_style)`
 
 
 ```{r adp-presc-time-trend-plot, fig.width = 8.5, fig.height = 3.8, fig.cap = "A line graph showing 10-year time trends for anxiety, depression and psychosis prescriptions by percentage of population for Locality, HSCP, Health Board and all Scotland."}
@@ -195,7 +195,7 @@ In `r latest_period_adp_presc`, `r LOCALITY` had a `r adp_presc_diff_scot` propo
 
 <!-- <div custom-style = "table-caption-heading">Figure \@ref(fig:adp-presc-bar-chart): Percentage population prescribed medication for anxiety, depression and psychosis by area for the latest period available.</div> -->
 
-`r ftext(paste0("Figure \@ref(fig:adp-presc-bar-chart): Percentage population prescribed medication for anxiety, depression and psychosis by area for the latest period available."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:adp-presc-bar-chart): Percentage population prescribed medication for anxiety, depression and psychosis by area for the latest period available.", table_heading_style)`
 
 
 ```{r adp-presc-bar-chart, fig.width = 7.5, fig.height = 4.8, fig.cap = "A bar graph showing the percentage of the population prescribed anxiety, depression and psychosis medication in the most recent financial year for all Localities in the partnership and the total percentage for the HSCP, Health Board and all Scotland."}

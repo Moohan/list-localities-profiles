@@ -22,7 +22,7 @@ In `r pop_max_year`, the total population of `r LOCALITY` locality was `r total_
 
 <!-- <Div custom-style = "Table or chart caption"></Div> -->
 
-`r ftext(paste0("Figure \@ref(fig:pop-pyramid): Population by age and sex."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:pop-pyramid): Population by age and sex.", table_heading_style)`
 
 ```{r pop-pyramid, fig.width = 7, fig.height = 4, warning = FALSE, fig.cap = "A bar chart showing the population distribution of the locality grouped by age and sex"}
 pop_pyramid
@@ -34,7 +34,7 @@ Figure \@ref(fig:pop-ts-plot) shows the historical population of `r LOCALITY`, a
 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:pop-ts-plot): Population time trend and projection.</Div> -->
 
-`r ftext(paste0("Figure \@ref(fig:pop-ts-plot): Population time trend and projection."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:pop-ts-plot): Population time trend and projection.", table_heading_style)`
 
 ```{r pop-ts-plot, fig.width = 7.5, fig.height = 4, warning = FALSE, fig.cap= "A line graph showing the trend in population over time"}
 pop_ts_plot
@@ -46,7 +46,7 @@ Figure \@ref(fig:hist-pop-change) shows how the population structure has changed
 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:hist-pop-change): Change in population structure over the last five years.</Div> -->
 
-`r ftext(paste0("Figure \@ref(fig:hist-pop-change): Change in population structure over the last five years."),table_heading_style)`
+`r ftext("Figure \\@ref(fig:hist-pop-change): Change in population structure over the last five years.", table_heading_style)`
 
 ```{r hist-pop-change, fig.width = 9, fig.height = 4, warning = FALSE, fig.cap= "A bar chart showing the percentage change in population structure, split by age and sex, over the last five years"}
 hist_pop_change
@@ -60,7 +60,7 @@ Of the `r pop_max_year` population in `r LOCALITY`, **`r perc_bottom_quintile`%*
 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:simd-map): Map of Data Zones within `r LOCALITY` coloured by SIMD quintiles.</Div> -->
 
-`r ftext(paste0("Figure \@ref(fig:simd-map): Map of Data Zones within ",LOCALITY," coloured by SIMD quintiles."),table_heading_style)`
+`r ftext(paste0("Figure \\@ref(fig:simd-map): Map of Data Zones within ",LOCALITY," coloured by SIMD quintiles."),table_heading_style)`
 
 
 ```{r simd-map, fig.width = 8, warning = FALSE, fig.cap = 'A map of the locality which is broken down by data zones with the colouring showing the SIMD quintile for each.'}
@@ -73,7 +73,7 @@ Table \@ref(tab:simd-diff-overall-table) details the percentage of the locality'
 
 <!-- <Div custom-style = "Table or chart caption">Table \@ref(tab:simd-diff-overall-table): Percentage of the `r LOCALITY` population living in the 2016 and 2020 SIMD Datazone Quintiles in 2016 and `r pop_max_year` respectively.</Div> -->
 
-`r ftext(paste0("Table \@ref(tab:simd-diff-overall-table): Percentage of the ", LOCALITY," population living in the 2016 and 2020 SIMD Datazone Quintiles in 2016 and ", pop_max_year," respectively."),table_heading_style)`
+`r ftext(paste0("Table \\@ref(tab:simd-diff-overall-table): Percentage of the ", LOCALITY," population living in the 2016 and 2020 SIMD Datazone Quintiles in 2016 and ", pop_max_year," respectively."),table_heading_style)`
 
 
 
@@ -95,7 +95,7 @@ Source: Scottish Government, Public Health Scotland, National Records Scotland. 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:simd-domains-plot): Proportion of the population that reside in each 2020 SIMD quintile by domain in `r pop_max_year`.</Div> -->
 
 
-`r ftext(paste0("Figure \@ref(fig:simd-domains-plot): Proportion of the population that reside in each 2020 SIMD quintile by domain in ",pop_max_year,"."),table_heading_style)`
+`r ftext(paste0("Figure \\@ref(fig:simd-domains-plot): Proportion of the population that reside in each 2020 SIMD quintile by domain in ",pop_max_year,"."),table_heading_style)`
 
 ```{r simd-domains-plot, fig.width = 8, fig.height = 5, warning = FALSE, fig.cap = 'A bar graph showing the proportion of the population in each SIMD decile for each SIMD domain.'}
 simd_domains
@@ -108,7 +108,7 @@ Figure \@ref(fig:simd-diff-plot) presents a comparison between the 2016 SIMD ran
 
 <!-- <Div custom-style = "Table or chart caption">Figure \@ref(fig:simd-diff-plot): Percentage of population in 2016 and `r pop_max_year` living in the 2016 and the 2020 SIMD quintiles by domain.</Div> -->
 
-`r ftext(paste0("Figure \@ref(fig:simd-diff-plot): Percentage of population in 2016 and ",pop_max_year," living in the 2016 and the 2020 SIMD quintiles by domain."),table_heading_style)`
+`r ftext(paste0("Figure \\@ref(fig:simd-diff-plot): Percentage of population in 2016 and ",pop_max_year," living in the 2016 and the 2020 SIMD quintiles by domain."),table_heading_style)`
 
 
 \newline
