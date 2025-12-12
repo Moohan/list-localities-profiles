@@ -1,5 +1,8 @@
 ######################### GLOBAL LOCALITY PROFILES CODE ########################
 
+# Create a new environment to act as a cache
+.cache <- new.env()
+
 # Contains various settings and functions to be used in other locality profile scripts
 
 # How to use this script:
@@ -154,6 +157,15 @@ theme_profiles <- function() {
 # if changed to dz_level = TRUE, this shows all the datazones in each locality (6976 rows)
 
 read_in_localities <- function(dz_level = FALSE) {
+  # Define a cache key based on the function's arguments
+  cache_key <- paste0("localities_", dz_level)
+
+  # If the data is in the cache, return it
+  if (exists(cache_key, envir = .cache)) {
+    return(get(cache_key, envir = .cache))
+  }
+
+  # If the data is not in the cache, read it from disk
   data <- fs::dir_ls(
     path = "/conf/linkage/output/lookups/Unicode/Geography/HSCP Locality",
     regexp = "HSCP Localities_DZ11_Lookup_.+?\\.rds$"
@@ -182,6 +194,9 @@ read_in_localities <- function(dz_level = FALSE) {
     )
   }
 
+  # Store the data in the cache
+  assign(cache_key, data, envir = .cache)
+
   return(data)
 }
 
@@ -195,6 +210,12 @@ count_localities <- function(locality_lookup, hscp_name) {
 # The function pulls the latest "Scottish_Postcode_Directory_year_version.rds"
 
 read_in_postcodes <- function() {
+  # If the data is in the cache, return it
+  if (exists("postcodes", envir = .cache)) {
+    return(get("postcodes", envir = .cache))
+  }
+
+  # If the data is not in the cache, read it from disk
   data <- fs::dir_ls(
     path = "/conf/linkage/output/lookups/Unicode/Geography/Scottish Postcode Directory",
     regexp = "\\.parquet$"
@@ -212,6 +233,9 @@ read_in_postcodes <- function() {
     relationship = "many-to-one"
   )
 
+  # Store the data in the cache
+  assign("postcodes", data, envir = .cache)
+
   return(data)
 }
 
@@ -223,7 +247,13 @@ read_in_postcodes <- function() {
 # Then joins this with the localities lookup to match hscp_locality
 
 read_in_dz_pops <- function() {
-  fs::dir_ls(
+  # If the data is in the cache, return it
+  if (exists("dz_pops", envir = .cache)) {
+    return(get("dz_pops", envir = .cache))
+  }
+
+  # If the data is not in the cache, read it from disk
+  data <- fs::dir_ls(
     glue(
       "/conf/linkage/output/lookups/Unicode/",
       "Populations/Estimates/"
@@ -257,6 +287,11 @@ read_in_dz_pops <- function() {
       by = join_by(datazone2011)
     ) |>
     mutate(year = as.integer(year))
+
+  # Store the data in the cache
+  assign("dz_pops", data, envir = .cache)
+
+  return(data)
 }
 
 read_in_dz_pops_proxy_year <- function() {
@@ -273,6 +308,12 @@ read_in_dz_pops_proxy_year <- function() {
 # Then joins this with the hscp lookup to match hscp names
 
 read_in_pop_proj <- function() {
+  # If the data is in the cache, return it
+  if (exists("pop_proj", envir = .cache)) {
+    return(get("pop_proj", envir = .cache))
+  }
+
+  # If the data is not in the cache, read it from disk
   proj <- fs::dir_ls(
     glue(
       "/conf/linkage/output/lookups/Unicode/",
@@ -292,7 +333,12 @@ read_in_pop_proj <- function() {
     select(hscp2019, hscp2019name) |>
     distinct()
 
-  left_join(proj, hscp_lkp, by = join_by(hscp2019))
+  data <- left_join(proj, hscp_lkp, by = join_by(hscp2019))
+
+  # Store the data in the cache
+  assign("pop_proj", data, envir = .cache)
+
+  return(data)
 }
 
 #### Functions for ScotPHO data ####
