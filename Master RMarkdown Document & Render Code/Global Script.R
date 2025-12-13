@@ -2,6 +2,9 @@
 
 # Contains various settings and functions to be used in other locality profile scripts
 
+# Create a caching environment to store data that is repeatedly accessed
+cache <- new.env()
+
 # How to use this script:
 # source("Master RMarkdown Document & Render Code/Global Script.R)
 
@@ -154,6 +157,18 @@ theme_profiles <- function() {
 # if changed to dz_level = TRUE, this shows all the datazones in each locality (6976 rows)
 
 read_in_localities <- function(dz_level = FALSE) {
+  # ⚡ Bolt: Caching Optimization
+  # Define a cache key that is unique based on the function's arguments.
+  # This avoids re-reading the same data from disk if the function is called
+  # multiple times with the same arguments.
+  cache_key <- paste0("localities_", dz_level)
+
+  # If the result is already in our cache, return it to avoid file I/O.
+  if (exists(cache_key, envir = cache)) {
+    return(get(cache_key, envir = cache))
+  }
+
+  # If data is not in the cache, read it from the file system.
   data <- fs::dir_ls(
     path = "/conf/linkage/output/lookups/Unicode/Geography/HSCP Locality",
     regexp = "HSCP Localities_DZ11_Lookup_.+?\\.rds$"
@@ -182,6 +197,8 @@ read_in_localities <- function(dz_level = FALSE) {
     )
   }
 
+  # Store the result in the cache before returning.
+  assign(cache_key, data, envir = cache)
   return(data)
 }
 
@@ -223,7 +240,18 @@ read_in_postcodes <- function() {
 # Then joins this with the localities lookup to match hscp_locality
 
 read_in_dz_pops <- function() {
-  fs::dir_ls(
+  # ⚡ Bolt: Caching Optimization
+  # This cache key is for the raw population data. Caching this avoids
+  # repeatedly reading the same large file from disk in a loop.
+  cache_key <- "dz_pops"
+
+  # If the result is already in our cache, return it to avoid file I/O.
+  if (exists(cache_key, envir = cache)) {
+    return(get(cache_key, envir = cache))
+  }
+
+  # If data is not in the cache, read it from the file system.
+  data <- fs::dir_ls(
     glue(
       "/conf/linkage/output/lookups/Unicode/",
       "Populations/Estimates/"
@@ -257,6 +285,10 @@ read_in_dz_pops <- function() {
       by = join_by(datazone2011)
     ) |>
     mutate(year = as.integer(year))
+
+  # Store the result in the cache before returning.
+  assign(cache_key, data, envir = cache)
+  return(data)
 }
 
 read_in_dz_pops_proxy_year <- function() {
@@ -273,6 +305,17 @@ read_in_dz_pops_proxy_year <- function() {
 # Then joins this with the hscp lookup to match hscp names
 
 read_in_pop_proj <- function() {
+  # ⚡ Bolt: Caching Optimization
+  # This cache key is for the population projection data. Caching this avoids
+  # repeatedly reading the same large file from disk in a loop.
+  cache_key <- "pop_proj"
+
+  # If the result is already in our cache, return it to avoid file I/O.
+  if (exists(cache_key, envir = cache)) {
+    return(get(cache_key, envir = cache))
+  }
+
+  # If data is not in the cache, read it from the file system.
   proj <- fs::dir_ls(
     glue(
       "/conf/linkage/output/lookups/Unicode/",
@@ -292,7 +335,11 @@ read_in_pop_proj <- function() {
     select(hscp2019, hscp2019name) |>
     distinct()
 
-  left_join(proj, hscp_lkp, by = join_by(hscp2019))
+  data <- left_join(proj, hscp_lkp, by = join_by(hscp2019))
+
+  # Store the result in the cache before returning.
+  assign(cache_key, data, envir = cache)
+  return(data)
 }
 
 #### Functions for ScotPHO data ####
