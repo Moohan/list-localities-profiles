@@ -67,8 +67,9 @@ house_raw_dat <- map(
 ) |>
   list_rbind()
 
-# Global Script Function to read in Localities Lookup
-lookup <- read_in_localities(dz_level = TRUE) %>%
+# ⚡ Bolt: The `lookup_dz` object is now pre-loaded in the render script.
+# Using the pre-loaded lookup object.
+lookup <- lookup_dz %>%
   select(datazone2011, hscp_locality) %>%
   filter(hscp_locality == LOCALITY)
 
@@ -290,28 +291,21 @@ perc_houses_FH <- format_number_for_text(
 
 ## Relevant lookups for creating the table objects
 
-# Global Script Function to read in Localities Lookup
-lookup2 <- read_in_localities(dz_level = FALSE)
-
-# Determine HSCP and HB based on Loc
-HSCP <- as.character(filter(lookup2, hscp_locality == LOCALITY)$hscp2019name)
+# ⚡ Bolt: Using the pre-loaded lookup object.
+HSCP <- as.character(filter(lookup, hscp_locality == LOCALITY)$hscp2019name)
 
 # Determine other localities based on LOCALITY object
-other_locs <- lookup2 %>%
+other_locs <- lookup %>%
   select(hscp_locality, hscp2019name) %>%
   filter(hscp2019name == HSCP & hscp_locality != LOCALITY) %>%
   arrange(hscp_locality)
 
 # Find number of locs per partnership
-n_loc <- count_localities(lookup2, HSCP)
-
-rm(lookup2)
-
+n_loc <- count_localities(lookup, HSCP)
 
 # 1. Other localities
-
-# Global Script Function to read in Localities Lookup
-other_locs_dz <- read_in_localities(dz_level = TRUE) %>%
+# ⚡ Bolt: Using the pre-loaded lookup_dz object.
+other_locs_dz <- lookup_dz %>%
   arrange() %>%
   select(datazone2011, hscp_locality) %>%
   inner_join(other_locs, by = c("hscp_locality" = "hscp_locality"))
@@ -381,8 +375,8 @@ rm(house_dat2_otherlocs, house_dat_otherlocs, other_locs_dz)
 
 # 2. HSCP
 
-# Global Script Function to read in Localities Lookup
-hscp_dz <- read_in_localities(dz_level = TRUE) %>%
+# ⚡ Bolt: Using the pre-loaded lookup_dz object.
+hscp_dz <- lookup_dz %>%
   select(datazone2011, hscp2019name) %>%
   filter(hscp2019name == HSCP)
 

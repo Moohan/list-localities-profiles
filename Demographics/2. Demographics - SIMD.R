@@ -35,11 +35,9 @@ library(sf)
 
 # SECTION 2: Data Imports ----
 
-## Locality/DZ lookup
-lookup_dz <- read_in_localities(dz_level = TRUE)
-
-## Population data
-pop_raw_data <- read_in_dz_pops()
+# ⚡ Bolt: Data is now pre-loaded in the render script to avoid re-loading from disk in a loop.
+# The `lookup` and `pop_raw_data` objects are now available in the global environment.
+# The `lookup_dz` object is now available in the global environment.
 
 pop_max_year <- max(pop_raw_data$year)
 
@@ -465,8 +463,7 @@ simd_diff_overall <- simd_16_20_dom %>%
 
 ##################### SECTION 4: Objects for summary table #######################
 
-## Relevant lookups for creating the table objects
-lookup <- read_in_localities()
+# ⚡ Bolt: The `lookup` object is already available in the global environment, no need to reload it.
 
 ## Relevant lookups for creating the table objects
 HSCP <- as.character(filter(lookup, hscp_locality == LOCALITY)$hscp2019name)

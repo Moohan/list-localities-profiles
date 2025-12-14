@@ -29,14 +29,8 @@ library(reshape2)
 
 ########################## SECTION 2: Data Imports ###############################
 
-## Locality/DZ lookup
-lookup <- read_in_localities()
-
-## Population data
-pop_raw_data <- read_in_dz_pops()
-
-## Population Projection Data
-hscp_pop_proj <- read_in_pop_proj()
+# ⚡ Bolt: Data is now pre-loaded in the render script to avoid re-loading from disk in a loop.
+# The `lookup`, `pop_raw_data` and `hscp_pop_proj` objects are now available in the global environment.
 
 ## Set year
 pop_max_year <- max(pop_raw_data$year)

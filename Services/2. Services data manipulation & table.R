@@ -29,24 +29,20 @@ ext_year <- 2024
 
 ### Geographical lookups and objects ----
 
-# Locality lookup
-lookup <- read_in_localities(dz_level = TRUE)
-
-# Lookup without datazones
-lookup2 <- read_in_localities()
-
+# ⚡ Bolt: The `lookup` and `lookup_dz` objects are now pre-loaded in the render script.
+# Using the pre-loaded lookup objects.
 ## Determine HSCP
-HSCP <- as.character(filter(lookup2, hscp_locality == LOCALITY)$hscp2019name)
+HSCP <- as.character(filter(lookup, hscp_locality == LOCALITY)$hscp2019name)
 
 # Get number of localities in HSCP
-n_loc <- count_localities(lookup2, HSCP)
+n_loc <- count_localities(lookup, HSCP)
 
 
 ###### 2. Read in services data ######
 
 ## Read in Postcode file for latitudes and longitudes
-
-postcode_lkp <- read_in_postcodes() %>%
+# ⚡ Bolt: The `postcode_lkp` object is now pre-loaded in the render script.
+postcode_lkp <- postcode_lkp %>%
   mutate(postcode = gsub(" ", "", pc7, fixed = TRUE)) %>%
   select(
     postcode,

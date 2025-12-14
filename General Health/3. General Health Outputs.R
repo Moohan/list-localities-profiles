@@ -35,8 +35,8 @@ gen_health_data_dir <- path(lp_path, "General Health", glue("DATA {ext_year}"))
 
 ### Geographical lookups and objects ----
 
-# Locality lookup
-lookup <- read_in_localities()
+# ⚡ Bolt: The `lookup` object is now pre-loaded in the render script.
+# Using the pre-loaded lookup object.
 
 # Determine HSCP and HB based on Locality
 HSCP <- filter(lookup, hscp_locality == LOCALITY)[["hscp2019name"]]

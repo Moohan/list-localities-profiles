@@ -31,8 +31,8 @@ ext_year <- 2024
 
 ### Geographical lookups and objects ----
 
-# Locality lookup
-lookup <- read_in_localities()
+# ⚡ Bolt: The `lookup` object is now pre-loaded in the render script.
+# Using the pre-loaded lookup object.
 
 # Determine HSCP and HB based on Loc
 HSCP <- as.character(filter(lookup, hscp_locality == LOCALITY)$hscp2019name)
