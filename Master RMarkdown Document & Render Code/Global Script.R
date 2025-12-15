@@ -148,28 +148,39 @@ theme_profiles <- function() {
 
 #### Lookup #### ----
 
+# Create a caching environment to store data that is read from disk.
+# This avoids re-reading the same data in the rendering loop.
+.cache <- new.env()
+
 ## Import the latest locality lookup from cl-out ----
 # Argument dz_level: Allows you to choose whether lookup contains all datazones in localities
 # default is F - datazones are not imported, there is one line per locality (125 rows)
 # if changed to dz_level = TRUE, this shows all the datazones in each locality (6976 rows)
 
 read_in_localities <- function(dz_level = FALSE) {
-  data <- fs::dir_ls(
-    path = "/conf/linkage/output/lookups/Unicode/Geography/HSCP Locality",
-    regexp = "HSCP Localities_DZ11_Lookup_.+?\\.rds$"
-  ) |>
-    # Read in the most up to date lookup version
-    max() |>
-    readr::read_rds() |>
-    dplyr::select(
-      datazone2011,
-      hscp_locality,
-      hscp2019name,
-      hscp2019,
-      hb2019name,
-      hb2019
+  # Caching: if data already loaded, return it
+  if (exists("localities", envir = .cache)) {
+    data <- .cache$localities
+  } else {
+    # If data not loaded, read from disk and cache it
+    data <- fs::dir_ls(
+      path = "/conf/linkage/output/lookups/Unicode/Geography/HSCP Locality",
+      regexp = "HSCP Localities_DZ11_Lookup_.+?\\.rds$"
     ) |>
-    dplyr::mutate(hscp_locality = sub("&", "and", hscp_locality, fixed = TRUE))
+      # Read in the most up to date lookup version
+      max() |>
+      readr::read_rds() |>
+      dplyr::select(
+        datazone2011,
+        hscp_locality,
+        hscp2019name,
+        hscp2019,
+        hb2019name,
+        hb2019
+      ) |>
+      dplyr::mutate(hscp_locality = sub("&", "and", hscp_locality, fixed = TRUE))
+    .cache$localities <- data
+  }
 
   if (!dz_level) {
     data <- dplyr::distinct(
@@ -195,6 +206,12 @@ count_localities <- function(locality_lookup, hscp_name) {
 # The function pulls the latest "Scottish_Postcode_Directory_year_version.rds"
 
 read_in_postcodes <- function() {
+  # Caching: if data already loaded, return it
+  if (exists("postcodes", envir = .cache)) {
+    return(.cache$postcodes)
+  }
+
+  # If data not loaded, read from disk and cache it
   data <- fs::dir_ls(
     path = "/conf/linkage/output/lookups/Unicode/Geography/Scottish Postcode Directory",
     regexp = "\\.parquet$"
@@ -212,6 +229,7 @@ read_in_postcodes <- function() {
     relationship = "many-to-one"
   )
 
+  .cache$postcodes <- data
   return(data)
 }
 
@@ -223,7 +241,13 @@ read_in_postcodes <- function() {
 # Then joins this with the localities lookup to match hscp_locality
 
 read_in_dz_pops <- function() {
-  fs::dir_ls(
+  # Caching: if data already loaded, return it
+  if (exists("dz_pops", envir = .cache)) {
+    return(.cache$dz_pops)
+  }
+
+  # If data not loaded, read from disk and cache it
+  data <- fs::dir_ls(
     glue(
       "/conf/linkage/output/lookups/Unicode/",
       "Populations/Estimates/"
@@ -257,6 +281,9 @@ read_in_dz_pops <- function() {
       by = join_by(datazone2011)
     ) |>
     mutate(year = as.integer(year))
+
+  .cache$dz_pops <- data
+  return(data)
 }
 
 read_in_dz_pops_proxy_year <- function() {
@@ -273,6 +300,12 @@ read_in_dz_pops_proxy_year <- function() {
 # Then joins this with the hscp lookup to match hscp names
 
 read_in_pop_proj <- function() {
+  # Caching: if data already loaded, return it
+  if (exists("pop_proj", envir = .cache)) {
+    return(.cache$pop_proj)
+  }
+
+  # If data not loaded, read from disk and cache it
   proj <- fs::dir_ls(
     glue(
       "/conf/linkage/output/lookups/Unicode/",
@@ -292,7 +325,9 @@ read_in_pop_proj <- function() {
     select(hscp2019, hscp2019name) |>
     distinct()
 
-  left_join(proj, hscp_lkp, by = join_by(hscp2019))
+  data <- left_join(proj, hscp_lkp, by = join_by(hscp2019))
+  .cache$pop_proj <- data
+  return(data)
 }
 
 #### Functions for ScotPHO data ####
