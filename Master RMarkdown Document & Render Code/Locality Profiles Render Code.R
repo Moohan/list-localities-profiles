@@ -17,12 +17,6 @@ output_dir <- path(lp_path, "Master RMarkdown Document & Render Code", "Output")
 # Below creates locality list of all the localities in a chosen HSCP
 lookup <- read_in_localities()
 
-# ⚡ Bolt: Cache dataframes in memory to avoid re-loading from disk in the loop
-pop_raw_data <- read_in_dz_pops()
-hscp_pop_proj <- read_in_pop_proj()
-lookup_dz <- read_in_localities(dz_level = TRUE)
-postcode_lkp <- read_in_postcodes()
-
 # Specify HSCP(s) ----
 # use `unique(lookup$hscp2019name)` for all
 # or create a vector for multiple e.g. `c("Angus", "West Lothian")`

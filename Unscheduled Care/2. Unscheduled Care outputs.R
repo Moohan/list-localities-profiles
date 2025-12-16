@@ -40,8 +40,8 @@ max_fy <- "2023/24" # TODO Change this to be dynamic and move to general!
 ########################## SECTION 2: Lookups & Populations ###############################
 
 ## 1. Lookups ----
-# ⚡ Bolt: Using the pre-loaded lookup object.
-localities <- lookup
+
+localities <- read_in_localities()
 
 HSCP <- as.character(filter(localities, hscp_locality == LOCALITY)$hscp2019name)
 HB <- as.character(filter(localities, hscp_locality == LOCALITY)$hb2019name)
@@ -58,10 +58,9 @@ n_loc <- count_localities(localities, HSCP)
 
 ## 2. Populations (for rates) ----
 
-# ⚡ Bolt: Using the pre-loaded pop_raw_data object.
-populations <- pop_raw_data
+populations <- read_in_dz_pops()
 
-populations_proxy_year <- read_in_dz_pops_proxy_year() # This still needs to be called as it's not cached.
+populations_proxy_year <- read_in_dz_pops_proxy_year()
 
 populations <- rbind(populations, populations_proxy_year)
 

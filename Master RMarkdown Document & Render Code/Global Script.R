@@ -303,19 +303,20 @@ read_in_pop_proj <- function() {
 # Removes unwanted areas like council area and IZ
 
 clean_scotpho_dat <- function(data) {
-  data %>%
-    filter(area_type != "Council area" & area_type != "Intermediate zone") %>%
-    mutate(area_name = gsub("&", "and", area_name, fixed = TRUE)) %>%
+  # ⚡ Bolt: Use `str_replace_all` and `case_match` for more efficient string replacement.
+  data |>
+    filter(area_type != "Council area" & area_type != "Intermediate zone") |>
     mutate(
-      area_name = if_else(
-        area_name == "Renfrewshire West",
-        "West Renfrewshire",
-        area_name
+      area_name = str_replace_all(
+        area_name,
+        c("&" = "and", "Renfrewshire West" = "West Renfrewshire")
+      ),
+      area_type = case_match(
+        area_type,
+        "HSC partnership" ~ "HSCP",
+        "HSC locality" ~ "Locality",
+        .default = area_type
       )
-    ) %>%
-    mutate(
-      area_type = if_else(area_type == "HSC partnership", "HSCP", area_type),
-      area_type = if_else(area_type == "HSC locality", "Locality", area_type)
     )
 }
 
