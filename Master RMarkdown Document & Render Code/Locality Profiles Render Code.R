@@ -46,6 +46,12 @@ for (HSCP in hscp_list) {
 
   loop_env <- c(ls(), "loop_env")
 
+  # ⚡ Bolt: Moved HSCP map generation out of the locality loop.
+  # This map is the same for all localities in an HSCP, so it only needs
+  # to be generated once per HSCP. This avoids redundant computation and
+  # significantly speeds up the rendering process.
+  source("Services/3. Service HSCP map.R")
+
   # 1. Loop through each locality to create the main body of the profiles and the summary table
   for (LOCALITY in locality_list) {
     # 1a) Source in all the scripts for a given LOCALITY
@@ -59,7 +65,6 @@ for (HSCP in hscp_list) {
 
     # Services ----
     source("Services/2. Services data manipulation & table.R")
-    source("Services/3. Service HSCP map.R")
 
     # General Health ----
     source("General Health/3. General Health Outputs.R")
