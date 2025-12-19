@@ -153,7 +153,21 @@ theme_profiles <- function() {
 # default is F - datazones are not imported, there is one line per locality (125 rows)
 # if changed to dz_level = TRUE, this shows all the datazones in each locality (6976 rows)
 
+# Cache results to avoid expensive re-reading of files on subsequent calls
+.cached_localities <- NULL
+.cached_localities_dz <- NULL
+
 read_in_localities <- function(dz_level = FALSE) {
+  if (dz_level) {
+    if (!is.null(.cached_localities_dz)) {
+      return(.cached_localities_dz)
+    }
+  } else {
+    if (!is.null(.cached_localities)) {
+      return(.cached_localities)
+    }
+  }
+
   data <- fs::dir_ls(
     path = "/conf/linkage/output/lookups/Unicode/Geography/HSCP Locality",
     regexp = "HSCP Localities_DZ11_Lookup_.+?\\.rds$"
@@ -180,6 +194,12 @@ read_in_localities <- function(dz_level = FALSE) {
       hb2019name,
       hb2019
     )
+  }
+
+  if (dz_level) {
+    .cached_localities_dz <<- data
+  } else {
+    .cached_localities <<- data
   }
 
   return(data)
