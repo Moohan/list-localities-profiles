@@ -31,6 +31,9 @@ stopifnot(hscp_list %in% unique(lookup[["hscp2019name"]]))
 # Loop over HSCP ----
 # 'looping' over one HSCP is fine.
 for (HSCP in hscp_list) {
+  # Create a flag to track if the HSCP map has been generated
+  hscp_map_generated <- FALSE
+
   # Create list of localities in chosen HSCP
   locality_list <- lookup |>
     filter(hscp2019name == HSCP) |>
@@ -59,7 +62,11 @@ for (HSCP in hscp_list) {
 
     # Services ----
     source("Services/2. Services data manipulation & table.R")
-    source("Services/3. Service HSCP map.R")
+    # Generate the HSCP map only once per HSCP
+    if (!hscp_map_generated) {
+      source("Services/3. Service HSCP map.R")
+      hscp_map_generated <- TRUE
+    }
 
     # General Health ----
     source("General Health/3. General Health Outputs.R")
