@@ -46,6 +46,10 @@ for (HSCP in hscp_list) {
 
   loop_env <- c(ls(), "loop_env")
 
+  # Services ----
+  source("Services/2a. Services data manipulation.R", local = TRUE)
+  source("Services/3. Service HSCP map.R", local = TRUE)
+
   # 1. Loop through each locality to create the main body of the profiles and the summary table
   for (LOCALITY in locality_list) {
     # 1a) Source in all the scripts for a given LOCALITY
@@ -59,7 +63,6 @@ for (HSCP in hscp_list) {
 
     # Services ----
     source("Services/2. Services data manipulation & table.R")
-    source("Services/3. Service HSCP map.R")
 
     # General Health ----
     source("General Health/3. General Health Outputs.R")
@@ -93,4 +96,18 @@ for (HSCP in hscp_list) {
     # Force garbage collection to free up memory
     gc()
   }
+
+  # Tidy up HSCP-level objects at the end of each HSCP iteration
+  rm(
+    care_homes,
+    hosp_postcodes,
+    hosp_types,
+    markers_care_home,
+    markers_emergency_dep,
+    markers_gp,
+    markers_miu,
+    postcode_lkp,
+    service_map
+  )
+  gc()
 }
