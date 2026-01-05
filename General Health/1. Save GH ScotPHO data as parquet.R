@@ -5,12 +5,7 @@
 # Download the data as a parquet (file name should be ScotPHO_datatab_extract_***.parquet)
 # Put this file in the 'new' data folder e.g. 'General Health/DATA 20XX'
 
-library(fs)
-library(glue)
-library(purrr)
-library(arrow)
-library(dplyr)
-library(tidyr)
+source("Master RMarkdown Document & Render Code/Global Script.R")
 
 # Change year to be the year in the data folder name
 ext_year <- 2024

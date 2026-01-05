@@ -411,38 +411,24 @@ bowel_screening_diff_scot <- if_else(
 
 ## Make GH objects table for hscp, scot AND other localities in the partnership
 
-# Function to get latest data from scotpho for other localities
-
-other_locs_summary_table <- function(data, latest_year) {
-  data %>%
-    filter(year == latest_year) %>%
-    filter(area_type == "Locality") %>%
-    rename("hscp_locality" = "area_name") %>%
-    right_join(other_locs, by = join_by(hscp_locality)) %>%
-    arrange(hscp_locality) %>%
-    select(hscp_locality, measure) %>%
-    mutate(measure = round_half_up(measure, 1)) %>%
-    pivot_wider(names_from = hscp_locality, values_from = measure)
-}
-
 # 1. Other locs
 
-other_locs_drug_hosp <- other_locs_summary_table(
+other_locs_drug_hosp <- other_locs_summary_table_ch_lifestyle(
   drug_hosp,
   latest_year = max(drug_hosp$year)
 )
 
-other_locs_alcohol_hosp <- other_locs_summary_table(
+other_locs_alcohol_hosp <- other_locs_summary_table_ch_lifestyle(
   alcohol_hosp,
   latest_year = max(alcohol_hosp$year)
 )
 
-other_locs_alcohol_deaths <- other_locs_summary_table(
+other_locs_alcohol_deaths <- other_locs_summary_table_ch_lifestyle(
   alcohol_deaths,
   latest_year = max(alcohol_deaths$year)
 )
 
-other_locs_bowel_screening <- other_locs_summary_table(
+other_locs_bowel_screening <- other_locs_summary_table_ch_lifestyle(
   bowel_screening,
   latest_year = max(bowel_screening$year)
 )

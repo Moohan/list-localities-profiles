@@ -10,65 +10,18 @@ ext_year <- 2024
 
 lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
 
-# Create function to do the following:
-
-# Import services csv data extract
-# Save RDS version of the data
-# Delete the full csv extract
-
-filt_and_save <- function(file_name) {
-  data <- read_csv(paste0(
-    lp_path,
-    "Services/DATA ",
-    ext_year,
-    "/",
-    file_name,
-    ".csv"
-  ))
-
-  write_rds(
-    data,
-    paste0(lp_path, "Services/DATA ", ext_year, "/", file_name, ".RDS")
-  )
-
-  file_delete(paste0(
-    lp_path,
-    "Services/DATA ",
-    ext_year,
-    "/",
-    file_name,
-    ".csv"
-  ))
-}
-
-# Extract all file names that have .csv within the services data folder (at any folder level)
-
+# Extract all file names from the CSV folder
 my_files <- list.files(
   paste0(lp_path, "Services/DATA ", ext_year, "/CSV"),
-  pattern = ".csv",
-  recursive = TRUE,
-  full.names = TRUE
+  pattern = ".csv"
 )
 
-# save CSV information in list
+# Remove .csv from file names
+file_names <- as.list(gsub(".csv", "", my_files))
 
-csv_Files <- sapply(
-  X = my_files,
-  FUN = read_csv,
-  simplify = FALSE,
-  USE.NAMES = TRUE
+# Apply "filt_and_save" function to each element of the file_names list
+lapply(
+  file_names,
+  filt_and_save,
+  dir_path = paste0(lp_path, "Services/DATA ", ext_year, "/CSV")
 )
-
-# Get name of each CSV file (without the CSV bit)
-
-new_file_names <- path_file(path_ext_set(my_files, "RDS"))
-
-
-for (i in seq_along(csv_Files)) {
-  data_i <- csv_Files[[i]]
-
-  saveRDS(
-    data_i,
-    paste0(lp_path, "Services/DATA ", ext_year, "/", new_file_names[i])
-  )
-}

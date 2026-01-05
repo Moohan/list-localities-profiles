@@ -21,9 +21,28 @@ library(glue)
 library(fs)
 library(arrow)
 library(phsstyles)
+library(memoise)
+library(scales)
+library(reshape2)
+library(ggrepel)
+library(sf)
+library(slfhelper)
+library(cowplot)
+library(gridExtra)
+library(png)
+library(readxl)
+library(ggmap)
+library(patchwork)
+library(lubridate)
+library(odbc)
 
 # Prefer dplyr functions if there's a conflict
 conflicted::conflict_prefer_all("dplyr", quiet = TRUE)
+conflicted::conflict_prefer("filter", "dplyr")
+conflicted::conflict_prefer("lag", "dplyr")
+conflicted::conflict_prefer("melt", "reshape2")
+conflicted::conflict_prefer("year", "lubridate")
+conflicted::conflict_prefer("discard", "purrr")
 
 #### Colours & Formatting #### ----
 
@@ -65,12 +84,15 @@ format_number_for_text <- function(x) {
 # 7.2 -> an
 # To be used for "a xx increase" which could be "an xx increase"
 get_article <- function(number) {
-  if (identical(number, numeric(0))) {
+  # Cast as a character, so we are sure of the type
+  number_chr <- as.character(number)
+
+  if (identical(number_chr, character(0))) {
     # If the number wasn't calculated we still need to deal with it.
     return("-")
   }
 
-  if (startsWith(number, "8") || startsWith(number, "18")) {
+  if (startsWith(number_chr, "8") || startsWith(number_chr, "18")) {
     return("an")
   } else {
     return("a")
@@ -82,6 +104,12 @@ get_article <- function(number) {
 # Differences include smaller text (to ensure names of areas always fit regardless of length)
 # Code taken from phsstyles Github page
 # https://github.com/Public-Health-Scotland/phsstyles/blob/master/R/theme_phs.R
+
+filt_and_save <- function(file_name, dir_path) {
+  data <- read_csv(file.path(dir_path, paste0(file_name, ".csv")))
+  write_rds(data, file.path(dir_path, paste0(file_name, ".RDS")))
+  file_delete(file.path(dir_path, paste0(file_name, ".csv")))
+}
 
 theme_profiles <- function() {
   fontStyle <- "sans"
@@ -150,7 +178,7 @@ theme_profiles <- function() {
 # default is F - datazones are not imported, there is one line per locality (125 rows)
 # if changed to dz_level = TRUE, this shows all the datazones in each locality (6976 rows)
 
-read_in_localities <- function(dz_level = FALSE) {
+read_in_localities_raw <- function(dz_level = FALSE) {
   data <- fs::dir_ls(
     path = "/conf/linkage/output/lookups/Unicode/Geography/HSCP Locality",
     regexp = "HSCP Localities_DZ11_Lookup_.+?\\.rds$"
@@ -181,6 +209,7 @@ read_in_localities <- function(dz_level = FALSE) {
 
   return(data)
 }
+read_in_localities <- memoise(read_in_localities_raw)
 
 count_localities <- function(locality_lookup, hscp_name) {
   return(sum(locality_lookup[["hscp2019name"]] == hscp_name))
@@ -191,7 +220,7 @@ count_localities <- function(locality_lookup, hscp_name) {
 # No arguments needed, just use read_in_latest_postcodes()
 # The function pulls the latest "Scottish_Postcode_Directory_year_version.rds"
 
-read_in_postcodes <- function() {
+read_in_postcodes_raw <- function() {
   data <- fs::dir_ls(
     path = "/conf/linkage/output/lookups/Unicode/Geography/Scottish Postcode Directory",
     regexp = "\\.parquet$"
@@ -211,26 +240,26 @@ read_in_postcodes <- function() {
 
   return(data)
 }
+read_in_postcodes <- memoise(read_in_postcodes_raw)
 
-
-## Function to read in latest population file by DZ ----
+## Function to read in the latest population file by DZ ----
 
 # No arguments needed, just use read_in_latest_dz_pops()
 # Function pulls the latest DZ populations DataZone2011_pop_est_2011_Xyear.rds
 # Then joins this with the localities lookup to match hscp_locality
 
-read_in_dz_pops <- function() {
+read_in_dz_pops_raw <- function() {
   fs::dir_ls(
     glue(
       "/conf/linkage/output/lookups/Unicode/",
       "Populations/Estimates/"
     ),
     regexp = glue("DataZone2011_pop_est_2011_.+?\\.rds$")
-  ) %>%
-    # Read in the most up to date lookup version
-    max() %>%
-    read_rds() %>%
-    clean_names() %>%
+  ) |>
+    # Read in the most up-to-date lookup version
+    max() |>
+    read_rds() |>
+    clean_names() |>
     select(
       -c(
         intzone2011,
@@ -248,47 +277,51 @@ read_in_dz_pops <- function() {
         hb2018,
         hb2014
       )
-    ) %>%
+    ) |>
     left_join(
       read_in_localities(dz_level = TRUE),
       by = join_by(datazone2011)
-    )
+    ) |>
+    mutate(year = as.integer(year))
 }
+read_in_dz_pops <- memoise(read_in_dz_pops_raw)
 
 read_in_dz_pops_proxy_year <- function() {
   read_in_dz_pops() |>
-    filter(year == "2022") |>
+    filter(year == 2022L) |>
     select(-year) |>
-    mutate(year = 2023)
+    mutate(year = 2023L)
 }
 
 ## Function to read in latest population projections ----
 
 # No arguments needed, just use read_in_pop_proj()
 # Function pulls the latest projections HSCP2019_pop_proj....rds
-# Then joins this with hscp lookup to match hscp names
+# Then joins this with the hscp lookup to match hscp names
 
-read_in_pop_proj <- function() {
+read_in_pop_proj_raw <- function() {
   proj <- fs::dir_ls(
     glue(
       "/conf/linkage/output/lookups/Unicode/",
       "Populations/Projections/"
     ),
     regexp = glue("HSCP2019_pop_proj_20.+?_.+?\\.rds$")
-  ) %>%
-    # Read in the most up to date lookup version
-    max() %>%
-    read_rds() %>%
-    clean_names() %>%
-    select(year, hscp2019, age, sex, sex_name, pop)
+  ) |>
+    # Read in the most up-to-date lookup version
+    max() |>
+    read_rds() |>
+    clean_names() |>
+    select(year, hscp2019, age, sex, sex_name, pop) |>
+    mutate(year = as.integer(year))
 
   # join with lookup so all hscp2019 names are the same
-  hscp_lkp <- read_in_localities() %>%
-    select(hscp2019, hscp2019name) %>%
+  hscp_lkp <- read_in_localities() |>
+    select(hscp2019, hscp2019name) |>
     distinct()
 
   left_join(proj, hscp_lkp, by = join_by(hscp2019))
 }
+read_in_pop_proj <- memoise(read_in_pop_proj_raw)
 
 #### Functions for ScotPHO data ####
 
@@ -298,16 +331,16 @@ read_in_pop_proj <- function() {
 # Removes unwanted areas like council area and IZ
 
 clean_scotpho_dat <- function(data) {
-  data %>%
-    filter(area_type != "Council area" & area_type != "Intermediate zone") %>%
-    mutate(area_name = gsub("&", "and", area_name, fixed = TRUE)) %>%
+  data |>
+    filter(area_type != "Council area" & area_type != "Intermediate zone") |>
+    mutate(area_name = gsub("&", "and", area_name, fixed = TRUE)) |>
     mutate(
       area_name = if_else(
         area_name == "Renfrewshire West",
         "West Renfrewshire",
         area_name
       )
-    ) %>%
+    ) |>
     mutate(
       area_type = if_else(area_type == "HSC partnership", "HSCP", area_type),
       area_type = if_else(area_type == "HSC locality", "Locality", area_type)
@@ -346,14 +379,14 @@ scotpho_time_trend <- function(
   }
 
   # filter and reorder data
-  data %>%
+  data |>
     filter(
       (area_name == LOCALITY & area_type == "Locality") |
         (area_name == HSCP & area_type == "HSCP") |
         area_name == HB |
         area_name == "Scotland"
-    ) %>%
-    filter(year >= max(year) - trend_years) %>%
+    ) |>
+    filter(year >= max(year) - trend_years) |>
     mutate(
       area_type = factor(
         area_type,
@@ -363,7 +396,7 @@ scotpho_time_trend <- function(
         as.factor(str_wrap(area_name, 23)),
         as.numeric(area_type)
       )
-    ) %>%
+    ) |>
     # plot
     ggplot(aes(
       x = str_wrap(period_short, width = string_wrap),
@@ -419,13 +452,13 @@ scotpho_time_trend_HSCP <- function(
   }
 
   # filter and reorder data
-  data %>%
+  data |>
     filter(
       (area_name == HSCP & area_type == "HSCP") |
         area_name == HB |
         area_name == "Scotland"
-    ) %>%
-    filter(year >= max(year) - 10) %>%
+    ) |>
+    filter(year >= max(year) - 10) |>
     mutate(
       area_type = factor(
         area_type,
@@ -435,7 +468,7 @@ scotpho_time_trend_HSCP <- function(
         as.factor(str_wrap(area_name, 23)),
         as.numeric(area_type)
       )
-    ) %>%
+    ) |>
     # plot
     ggplot(aes(
       x = str_wrap(period_short, width = string_wrap),
@@ -486,8 +519,8 @@ scotpho_time_trend_HSCP <- function(
 # chart_title, xaxis_title : titles for chart and x axis
 
 scotpho_bar_chart <- function(data, chart_title, xaxis_title) {
-  data_for_plot <- data %>%
-    filter(year == max(year)) %>%
+  data_for_plot <- data |>
+    filter(year == max(year)) |>
     filter(
       (area_name %in%
         c(LOCALITY, other_locs$hscp_locality) &
@@ -495,7 +528,7 @@ scotpho_bar_chart <- function(data, chart_title, xaxis_title) {
         (area_name == HSCP & area_type == "HSCP") |
         area_name == HB |
         area_name == "Scotland"
-    ) %>%
+    ) |>
     mutate(
       text_highlight = area_name == LOCALITY,
       area_type = factor(
@@ -503,7 +536,7 @@ scotpho_bar_chart <- function(data, chart_title, xaxis_title) {
         levels = c("Locality", "HSCP", "Health board", "Scotland")
       ),
       area_name = fct_reorder(as.factor(str_wrap(area_name, 28)), measure)
-    ) %>%
+    ) |>
     arrange(area_name)
 
   ggplot(data_for_plot) +
@@ -533,14 +566,14 @@ scotpho_bar_chart <- function(data, chart_title, xaxis_title) {
 
 
 scotpho_bar_chart_HSCP <- function(data, chart_title, xaxis_title) {
-  data_for_plot <- data %>%
-    filter(year == max(year)) %>%
+  data_for_plot <- data |>
+    filter(year == max(year)) |>
     filter(
       (area_name %in% c(other_locs$hscp_locality) & area_type == "Locality") |
         (area_name == HSCP & area_type == "HSCP") |
         area_name == HB |
         area_name == "Scotland"
-    ) %>%
+    ) |>
     mutate(
       text_highlight = area_name == HSCP,
       area_type = factor(
@@ -548,7 +581,7 @@ scotpho_bar_chart_HSCP <- function(data, chart_title, xaxis_title) {
         levels = c("Locality", "HSCP", "Health board", "Scotland")
       ),
       area_name = fct_reorder(as.factor(str_wrap(area_name, 28)), measure)
-    ) %>%
+    ) |>
     arrange(area_name)
 
   ggplot(data_for_plot) +
@@ -577,11 +610,11 @@ scotpho_bar_chart_HSCP <- function(data, chart_title, xaxis_title) {
 
 ## Checking for missing data
 check_missing_data_scotpho <- function(data) {
-  data %>%
-    filter(area_type == "Locality") %>%
-    filter(year == max(year)) %>%
-    right_join(read_in_localities(), by = c("area_name" = "hscp_locality")) %>%
-    filter(is.na(indicator)) %>%
+  data |>
+    filter(area_type == "Locality") |>
+    filter(year == max(year)) |>
+    right_join(read_in_localities(), by = c("area_name" = "hscp_locality")) |>
+    filter(is.na(indicator)) |>
     select(area_name, hscp2019name)
 }
 
@@ -681,4 +714,224 @@ save_dataframes_to_excel <- function(dataframes, sheet_names, file_path) {
 
   # Save the workbook to a file
   openxlsx2::wb_save(wb, file = file_path, overwrite = TRUE)
+}
+
+# LTC infographic waffle chart
+create_infographic_ch_general_health <- function(
+  image1,
+  image2,
+  perc_ltc,
+  col,
+  age_label1,
+  age_label2
+) {
+  ggplot() +
+    scale_x_continuous(name = "x") +
+    scale_y_continuous(name = "y") +
+    geom_rect(
+      data = data.frame(x1 = 0, x2 = 1, y1 = 0, y2 = 1.3),
+      mapping = aes(xmin = x1, xmax = x2, ymin = y1, ymax = y2),
+      color = "white",
+      fill = "white"
+    ) +
+    theme_void() +
+    theme(
+      panel.background = element_rect(fill = "transparent", colour = NA),
+      plot.background = element_rect(fill = "transparent", colour = NA),
+      legend.background = element_rect(fill = "transparent", colour = NA),
+      legend.box.background = element_rect(fill = "transparent", colour = NA)
+    ) +
+    annotation_raster(
+      image1,
+      ymin = 0.02,
+      ymax = 0.99,
+      xmin = 0.99 * perc_ltc,
+      xmax = 0.99
+    ) +
+    annotation_raster(
+      image2,
+      ymin = 0.02,
+      ymax = 0.99,
+      xmin = 0.01,
+      xmax = 0.99 * perc_ltc
+    ) +
+    coord_fixed(ratio = 0.3) +
+    annotate(
+      geom = "text",
+      x = 0.5,
+      y = 0.02,
+      size = 3.8,
+      label = paste0(
+        round_half_up(10 * perc_ltc, 1),
+        " in 10 people aged ",
+        age_label1,
+        " have at least 1 LTC"
+      )
+    ) +
+    annotate(
+      geom = "text",
+      x = 0.5,
+      y = 1.08,
+      size = 4,
+      colour = col,
+      fontface = "bold",
+      label = paste0(age_label2, " YEARS OLD")
+    )
+}
+
+# Functions for aggregating data
+# For this function to work, the main variable of the data (ex: number of admissions) must be renamed "n"
+
+aggregate_usc_area_data_ch_unscheduled_care <- function(data) {
+  pts_locality <- data %>%
+    filter(hscp_locality == LOCALITY) %>%
+    mutate(location = hscp_locality) %>%
+    group_by(financial_year, location) %>%
+    summarise(n = sum(n)) %>%
+    ungroup() %>%
+    mutate(area_type = "Locality")
+
+  pts_hscp <- data %>%
+    filter(hscp2019name == HSCP) %>%
+    mutate(location = hscp2019name) %>%
+    group_by(financial_year, location) %>%
+    summarise(n = sum(n)) %>%
+    ungroup() %>%
+    mutate(area_type = "HSCP")
+
+  pts_hb <- data %>%
+    left_join(
+      select(localities, hscp_locality, hb2019name),
+      by = join_by(hscp_locality)
+    ) %>%
+    filter(hb2019name == HB) %>%
+    mutate(location = hb2019name) %>%
+    group_by(financial_year, location) %>%
+    summarise(n = sum(n)) %>%
+    ungroup() %>%
+    mutate(area_type = "HB")
+
+  pts_scot <- data %>%
+    group_by(financial_year) %>%
+    summarise(n = sum(n)) %>%
+    ungroup() %>%
+    mutate(
+      location = "Scotland",
+      area_type = "Scotland"
+    )
+
+  bind_rows(pts_locality, pts_hscp, pts_hb, pts_scot) %>%
+    mutate(
+      area_type = factor(
+        area_type,
+        levels = c("Locality", "HSCP", "HB", "Scotland")
+      )
+    )
+}
+
+# Functions for creating time trends
+age_group_trend_usc_ch_unscheduled_care <- function(
+  data_for_plot,
+  plot_title,
+  yaxis_title,
+  source
+) {
+  data_for_plot %>%
+    ggplot(aes(
+      x = financial_year,
+      y = data,
+      group = age_group,
+      color = age_group
+    )) +
+    geom_line(linewidth = 1) +
+    geom_point() +
+    scale_colour_manual(values = c(palette)) +
+    scale_x_discrete(breaks = data_for_plot$financial_year) +
+    scale_y_continuous(
+      labels = comma,
+      limits = c(0, 1.1 * max(data_for_plot$data))
+    ) +
+    theme_profiles() +
+    labs(
+      title = plot_title,
+      y = yaxis_title,
+      x = "Financial Year",
+      color = "Age Group",
+      caption = source
+    ) +
+    theme(plot.title = element_text(hjust = 0.5, size = 12))
+}
+
+area_trend_usc_ch_unscheduled_care <- function(data_for_plot, plot_title, yaxis_title, source) {
+  data_for_plot %>%
+    mutate(
+      location = fct_reorder(
+        as.factor(str_wrap(location, 23)),
+        as.numeric(area_type)
+      )
+    ) %>%
+    ggplot() +
+    aes(
+      x = financial_year,
+      y = data,
+      group = location,
+      fill = location,
+      linetype = area_type
+    ) +
+    geom_line(aes(colour = location), linewidth = 1) +
+    geom_point(aes(colour = location), size = 2) +
+    scale_fill_manual(values = palette) +
+    scale_colour_manual(values = palette) +
+    theme_profiles() +
+    expand_limits(y = 0) +
+    scale_x_discrete(breaks = data_for_plot$financial_year) +
+    scale_y_continuous(
+      labels = comma,
+      limits = c(0, 1.1 * max(data_for_plot$data))
+    ) +
+    labs(
+      title = plot_title,
+      y = yaxis_title,
+      x = "Financial Year",
+      caption = source
+    ) +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 12),
+      legend.title = element_blank()
+    ) +
+    guides(
+      linetype = "none",
+      shape = "none",
+      fill = "none",
+      colour = guide_legend(nrow = 1, byrow = TRUE)
+    )
+}
+
+# Functions for text variables
+
+percent_change_calc_ch_unscheduled_care <- function(numerator, denominator, digits = 1) {
+  round_half_up(
+    abs(numerator - denominator) / denominator * 100,
+    digits = digits
+  )
+}
+
+word_change_calc_ch_unscheduled_care <- function(latest, first) {
+  dplyr::case_when(
+    dplyr::near(latest, first) ~ "change",
+    latest > first ~ "increase",
+    latest < first ~ "decrease"
+  )
+}
+
+other_locs_summary_table_ch_lifestyle <- function(data, latest_year) {
+  data %>%
+    filter(year == latest_year) %>%
+    filter(area_type == "Locality") %>%
+    rename("hscp_locality" = "area_name") %>%
+    right_join(other_locs, by = join_by(hscp_locality)) %>%
+    arrange(hscp_locality) %>%
+    select(hscp_locality, measure) %>%
+    mutate(measure = round_half_up(measure, 1)) %>%
+    pivot_wider(names_from = hscp_locality, values_from = measure)
 }

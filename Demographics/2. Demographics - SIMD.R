@@ -15,14 +15,6 @@
 
 # SECTION 1: Packages, file paths, etc ----
 
-## Libraries
-library(reshape2)
-library(ggrepel)
-library(sf)
-
-# Source in global functions/themes script
-# source("Master RMarkdown Document & Render Code/Global Script.R")
-
 ## Final document will loop through a list of localities
 # Create placeholder for for loop
 # LOCALITY <- "Skye, Lochalsh and West Ross"
