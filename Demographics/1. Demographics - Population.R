@@ -17,6 +17,7 @@
 ## Libraries
 library(scales)
 library(reshape2)
+library(gtools)
 
 # Source in global functions/themes script
 # source("Master RMarkdown Document & Render Code/Global Script.R")
@@ -46,64 +47,57 @@ pop_min_year <- pop_max_year - 5
 ######################## SECTION 3: Gender and Age #############################
 
 ## Population data manipulation
+# To create the new age bands, we first reshape the data from wide to long
+pop_long <- pop_raw_data %>%
+  pivot_longer(
+    cols = starts_with("age"),
+    names_to = "age_col",
+    values_to = "population"
+  ) %>%
+  mutate(age = as.numeric(gsub("age|plus", "", age_col)))
 
-# compute age bands
-pop_raw_data$"Pop0_4" <- rowSums(subset(pop_raw_data, select = age0:age4))
-pop_raw_data$"Pop5_17" <- rowSums(subset(pop_raw_data, select = age5:age17))
-pop_raw_data$"Pop18_44" <- rowSums(subset(pop_raw_data, select = age18:age44))
-pop_raw_data$"Pop45_64" <- rowSums(subset(pop_raw_data, select = age45:age64))
-pop_raw_data$"Pop65_74" <- rowSums(subset(pop_raw_data, select = age65:age74))
-pop_raw_data$"Pop75_84" <- rowSums(subset(pop_raw_data, select = age75:age84))
-pop_raw_data$"Pop85Plus" <- rowSums(subset(
-  pop_raw_data,
-  select = age85:age90plus
-))
-pop_raw_data$"Pop65Plus" <- rowSums(subset(
-  pop_raw_data,
-  select = age65:age90plus
-))
+# Create the 10-year age bands
+pop_banded <- pop_long %>%
+  mutate(age_group = create_age_groups(age, by = 10, from = 0, to = 90))
 
-pops <- select(
-  pop_raw_data,
-  year,
-  sex,
-  hscp2019name,
-  hscp_locality,
-  Pop0_4,
-  Pop5_17,
-  Pop18_44,
-  Pop45_64,
-  Pop65_74,
-  Pop75_84,
-  Pop85Plus,
-  Pop65Plus,
-  total_pop
-)
-
+# Aggregate population for new age bands and calculate 65+ and total population
+pops_locality <- pop_banded %>%
+  group_by(year, sex, hscp2019name, hscp_locality) %>%
+  summarise(
+    Pop65Plus = sum(population[age >= 65], na.rm = TRUE),
+    total_pop = sum(population, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  # Join back the population data for each age group
+  left_join(
+    pop_banded %>%
+      group_by(year, sex, hscp2019name, hscp_locality, age_group) %>%
+      summarise(population = sum(population, na.rm = TRUE), .groups = "drop") %>%
+      pivot_wider(
+        names_from = age_group,
+        values_from = population,
+        names_prefix = "Pop",
+        values_fill = 0
+      ) %>%
+      rename_with(~ gsub("-", "_", .x, fixed = TRUE)) %>%
+      rename_with(~ gsub("+", "Plus", .x, fixed = TRUE)),
+    by = c("year", "sex", "hscp2019name", "hscp_locality")
+  )
 
 # Aggregate and add partnership + Scotland totals
-pops <- pops %>%
-  group_by(year, sex, hscp2019name, hscp_locality) %>%
-  summarise(across(everything(), sum)) %>%
-  ungroup() %>%
-  # Add a partnership total
-  bind_rows(
-    pops %>%
-      select(-hscp_locality) %>%
-      group_by(year, hscp2019name, sex) %>%
-      summarise(across(everything(), sum)) %>%
-      ungroup() %>%
-      mutate(hscp_locality = "Partnership Total")
-  ) %>%
-  # Add a Scotland total
-  bind_rows(
-    pops %>%
-      select(-hscp_locality, -hscp2019name) %>%
-      group_by(year, sex) %>%
-      summarise(across(everything(), sum)) %>%
-      ungroup() %>%
-      mutate(hscp_locality = "Scotland Total", hscp2019name = "Scotland")
-  )
+pops <- bind_rows(
+  pops_locality,
+  pops_locality %>%
+    select(-hscp_locality) %>%
+    group_by(year, hscp2019name, sex) %>%
+    summarise(across(everything(), \(x) sum(x, na.rm = TRUE)), .groups = "drop") %>%
+    mutate(hscp_locality = "Partnership Total"),
+  pops_locality %>%
+    select(-hscp_locality, -hscp2019name) %>%
+    group_by(year, sex) %>%
+    summarise(across(everything(), \(x) sum(x, na.rm = TRUE)), .groups = "drop") %>%
+    mutate(hscp_locality = "Scotland Total", hscp2019name = "Scotland")
+)
 
 
 ## Gender
@@ -147,10 +141,27 @@ pop_breakdown <- pops %>%
     )
   )
 
+# Determine the appropriate maximum limit for the x-axis
+max_pop <- max(pop_breakdown$Population, na.rm = TRUE)
+
+# Function to determine the break interval
+get_break_interval <- function(max_val) {
+  case_when(
+    max_val < 50 ~ 5,
+    max_val < 500 ~ 50,
+    max_val < 5000 ~ 500,
+    TRUE ~ 5000
+  )
+}
+
+break_interval <- get_break_interval(max_pop)
+max_limit <- ceiling(max_pop / break_interval) * break_interval
+
+# Create the population pyramid plot
 pop_pyramid <- ggplot(
   pop_breakdown,
   aes(
-    y = factor(Age, levels = unique(pop_breakdown$Age)),
+    y = factor(Age, levels = mixedsort(unique(pop_breakdown$Age))),
     fill = Gender
   )
 ) +
@@ -164,7 +175,8 @@ pop_pyramid <- ggplot(
   ) +
   scale_x_continuous(
     labels = abs,
-    limits = max(pop_breakdown$Population) * c(-1, 1)
+    limits = c(-max_limit, max_limit),
+    breaks = seq(-max_limit, max_limit, by = break_interval)
   ) +
   scale_fill_manual(values = palette) +
   theme_profiles() +
@@ -203,7 +215,7 @@ hist_pop_breakdown <- pops %>%
   ungroup() %>%
   mutate(Gender = ifelse(Gender == "F", "Female", "Male"))
 
-ord <- c("0-4", "5-17", "18-44", "45-64", "65-74", "75-84", "85+")
+ord <- mixedsort(unique(pop_breakdown$Age))
 
 hist_pop_change <- ggplot(
   hist_pop_breakdown,
@@ -262,15 +274,12 @@ loc_pops <- pops %>%
 # hscp population projection data
 hscp_pop_proj_weight <- hscp_pop_proj %>%
   mutate(
-    age_group = case_when(
-      age %in% 0:4 ~ "Pop0_4",
-      age %in% 5:17 ~ "Pop5_17",
-      age %in% 18:44 ~ "Pop18_44",
-      age %in% 45:64 ~ "Pop45_64",
-      age %in% 65:74 ~ "Pop65_74",
-      age %in% 75:84 ~ "Pop75_84",
-      age > 84 ~ "Pop85Plus"
-    )
+    age_group = create_age_groups(age, by = 10, from = 0, to = 90)
+  ) %>%
+  # rename age group to match pops data
+  mutate(
+    age_group = paste0("Pop", gsub("-", "_", age_group)),
+    age_group = gsub("\\+", "Plus", age_group)
   ) %>%
   # projection until 2028
   filter(year %in% pop_max_year:2028) %>%
@@ -312,13 +321,14 @@ pop_proj_dat <- locality_pop_proj %>%
 
 ## 4b) Time trend plot ----
 
-pop_plot_dat <- rbind(
-  clean_names(mutate(locality_pop_trend, data = "HISTORICAL")),
-  clean_names(mutate(pop_proj_dat, data = "PROJECTION"))
-) %>%
+pop_plot_dat <- bind_rows(
+  HISTORICAL = clean_names(locality_pop_trend),
+  PROJECTION = clean_names(pop_proj_dat),
+  .id = "data"
+) |>
   mutate(
     plot_lab = if_else(
-      as.numeric(year) %% 2 == 0,
+      year %% 2 == 0,
       format(pop, big.mark = ","),
       ""
     )
