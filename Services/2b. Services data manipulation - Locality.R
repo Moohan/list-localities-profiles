@@ -21,7 +21,6 @@
 # - markers_emergency_dep: data frame with emergency department information
 # - markers_miu: data frame with minor injury unit information
 
-
 ###### 2. Table ######
 
 # Subset care which is not Elderly care for table
