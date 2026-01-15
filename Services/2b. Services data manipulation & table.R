@@ -17,17 +17,17 @@ HSCP <- as.character(filter(lookup2, hscp_locality == LOCALITY)$hscp2019name)
 ###### 2. Table ######
 
 # Subset care which is not Elderly care for table
-other_care_type <- care_homes %>%
+other_care_type <- care_homes |>
   select(
     type = care_service,
     subtype,
     name = service_name,
     service_postcode
-  ) %>%
-  filter(type == "Care Home Service") %>%
-  filter(subtype != "Older People") %>%
-  mutate(postcode = gsub(" ", "", service_postcode, fixed = TRUE)) %>%
-  left_join(postcode_lkp, by = "postcode") %>%
+  ) |>
+  filter(type == "Care Home Service") |>
+  filter(subtype != "Older People") |>
+  mutate(postcode = gsub(" ", "", service_postcode, fixed = TRUE)) |>
+  left_join(postcode_lkp, by = "postcode") |>
   filter(hscp_locality == LOCALITY)
 
 # Create table

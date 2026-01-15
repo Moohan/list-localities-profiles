@@ -309,18 +309,18 @@ leg1 <- cowplot::get_legend(service_map_1)
 
 # Create Map of Just the Locations in order to use its legend (of location colours and shapes) ----
 
-all_markers <- dplyr::select(markers_miu, name, latitude, longitude) %>%
-  mutate(type = "Minor Injury Unit") %>%
+all_markers <- dplyr::select(markers_miu, name, latitude, longitude) |>
+  mutate(type = "Minor Injury Unit") |>
   bind_rows(
-    dplyr::select(markers_care_home, name, latitude, longitude) %>%
+    dplyr::select(markers_care_home, name, latitude, longitude) |>
       mutate(type = "Care Home")
-  ) %>%
+  ) |>
   bind_rows(
-    dplyr::select(markers_emergency_dep, name, latitude, longitude) %>%
+    dplyr::select(markers_emergency_dep, name, latitude, longitude) |>
       mutate(type = "Emergency Department")
-  ) %>%
+  ) |>
   bind_rows(
-    dplyr::select(markers_gp, name = gp_practice_name, latitude, longitude) %>%
+    dplyr::select(markers_gp, name = gp_practice_name, latitude, longitude) |>
       mutate(type = "GP Practice")
   )
 
