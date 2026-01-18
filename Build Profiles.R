@@ -57,7 +57,6 @@ for (HSCP in hscp_list) {
   source("Services/1. Services data manipulation HSCP.R")
   source("Services/3. Service HSCP map.R")
 
-
   loop_env <- c(ls(), "loop_env")
 
   # 1. Loop through each locality to create the main body of the profiles and the summary table

@@ -18,7 +18,6 @@
 ## Set Locality (for testing only)
 # LOCALITY <- "Falkirk West"
 
-
 ###### 4. Table ######
 
 # Subset care which is not Elderly care for table
