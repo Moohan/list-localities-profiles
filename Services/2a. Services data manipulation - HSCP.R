@@ -14,6 +14,15 @@
 # Change year to be the year in the data folder name
 ext_year <- 2024
 
+## Set Locality (for testing only)
+# LOCALITY <- "Falkirk West"
+
+## Set file path
+# lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
+
+# Source in functions code
+# source("Master RMarkdown Document & Render Code/Global Script.R")
+
 ### Geographical lookups and objects ----
 
 # Locality lookup

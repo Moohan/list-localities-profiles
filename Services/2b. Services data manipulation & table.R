@@ -12,7 +12,7 @@
 ###### 1. Set up ######
 
 ## Determine HSCP
-HSCP <- as.character(filter(lookup2, hscp_locality == LOCALITY)$hscp2019name)
+# HSCP <- as.character(filter(lookup2, hscp_locality == LOCALITY)$hscp2019name)
 
 ###### 2. Table ######
 

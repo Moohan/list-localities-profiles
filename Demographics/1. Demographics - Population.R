@@ -15,6 +15,7 @@
 ####################### SECTION 1: Packages, file paths, etc #########################
 
 ## Libraries
+library(scales)
 library(reshape2)
 
 # Source in global functions/themes script
@@ -45,33 +46,6 @@ pop_min_year <- pop_max_year - 5
 ######################## SECTION 3: Gender and Age #############################
 
 ## Population data manipulation
-pop_10y_groups <- pop_raw_data |>
-  filter(
-    hscp_locality == LOCALITY,
-    year == max(year)
-  ) |>
-  select(sex, starts_with("age")) |>
-  pivot_longer(
-    cols = starts_with("age"),
-    names_to = "age_label",
-    names_transform = \(age_label) {
-      str_sub(string = age_label, start = 4, end = 5)
-    },
-    names_ptypes = character(),
-    values_to = "pop",
-    values_ptypes = integer()
-  ) |>
-  mutate(
-    age_group = create_age_groups(
-      as.integer(age_label),
-      by = 10,
-      as_factor = TRUE
-    ),
-    sex = factor(sex, levels = c("F", "M"), labels = c("Female", "Male"))
-  ) |>
-  group_by(sex, age_group) |>
-  summarise(pop = sum(pop)) |>
-  ungroup()
 
 # compute age bands
 pop_raw_data$"Pop0_4" <- rowSums(subset(pop_raw_data, select = age0:age4))
@@ -174,37 +148,39 @@ pop_breakdown <- pops %>%
   )
 
 pop_pyramid <- ggplot(
-  pop_10y_groups,
+  pop_breakdown,
   aes(
-    y = age_group,
-    fill = sex
+    y = factor(Age, levels = unique(pop_breakdown$Age)),
+    fill = Gender
   )
 ) +
   geom_col(
-    data = subset(pop_10y_groups, sex == "Female"),
-    aes(x = pop * -1)
+    data = subset(pop_breakdown, Gender == "Male"),
+    aes(x = Population)
   ) +
   geom_col(
-    data = subset(pop_10y_groups, sex == "Male"),
-    aes(x = pop)
+    data = subset(pop_breakdown, Gender == "Female"),
+    aes(x = Population * (-1))
   ) +
   scale_x_continuous(
-    labels = \(x) label_comma()(abs(x)),
-    limits = max(pop_10y_groups$pop) * c(-1, 1),
-    breaks = breaks_extended()
+    labels = abs,
+    limits = max(pop_breakdown$Population) * c(-1, 1)
   ) +
   scale_fill_manual(values = palette) +
   theme_profiles() +
   labs(
     x = "Population",
     y = "Age Group",
-    title = str_wrap(
-      glue("{LOCALITY} population pyramid {pop_max_year}"),
-      width = 50
+    title = paste0(
+      str_wrap(`LOCALITY`, 50),
+      " population pyramid ",
+      pop_max_year
     )
   )
 
+
 # Population Structure Changes
+
 hist_pop_breakdown <- pops %>%
   filter(
     hscp_locality == LOCALITY,
@@ -483,7 +459,6 @@ rm(
   pop_latest,
   pop_last,
   change_point,
-  pop_10y_groups,
   pop_change,
   pop_proj_change,
   locality_pop_trend,
