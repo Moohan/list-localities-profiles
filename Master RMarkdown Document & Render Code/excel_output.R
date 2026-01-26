@@ -185,11 +185,12 @@ for (HSCP in hscp_list) {
   # Save the workbook to a file
   saveWorkbook(
     wb,
-    paste0(
+    fs::path(
       lp_path,
-      "Master RMarkdown Document & Render Code/Output/background data/",
-      HSCP,
-      " - Locality Profile data.xlsx"
+      "Master RMarkdown Document & Render Code",
+      "Output",
+      "background data",
+      glue("{HSCP} - Locality Profile data.xlsx")
     ),
     overwrite = TRUE
   )

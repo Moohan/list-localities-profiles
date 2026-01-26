@@ -213,7 +213,7 @@ zones <- merge(zones, simd_map_data, by = "datazone2011")
 
 # set colours for simd
 simd_col <- RColorBrewer::brewer.pal(n = 5, name = "RdYlBu")
-simd_cats <- paste("SIMD", 1:5)
+simd_cats <- glue("SIMD {1:5}")
 
 # plot
 simd_map <- ggplot() +
@@ -279,7 +279,7 @@ simd_domains <- simd2020 %>%
   labs(
     x = "",
     y = "Proportion of Population",
-    title = paste0("Breakdown of the SIMD Domains in ", str_wrap(LOCALITY, 50)),
+    title = glue("Breakdown of the SIMD Domains in {str_wrap(LOCALITY, 50)}"),
     caption = "Source: Scottish Government, Public Health Scotland, National Records Scotland"
   ) +
   scale_fill_manual(
@@ -308,7 +308,7 @@ simd2020_dom <- simd2020 %>%
     housing
   )
 
-names(simd2020_dom)[2:9] <- paste0(names(simd2020_dom)[2:9], "_20")
+names(simd2020_dom)[2:9] <- glue("{names(simd2020_dom)[2:9]}_20")
 
 # Deprivation Data 2016
 simd2016_dom <- simd2016 %>%
@@ -325,7 +325,7 @@ simd2016_dom <- simd2016 %>%
     housing
   )
 
-names(simd2016_dom)[2:9] <- paste0(names(simd2016_dom)[2:9], "_16")
+names(simd2016_dom)[2:9] <- glue("{names(simd2016_dom)[2:9]}_16")
 
 # Get most up to date datazone populations
 
@@ -416,7 +416,7 @@ simd_diff_plot <- ggplot(
   ) +
   geom_text(
     aes(
-      label = paste0(format(round_half_up(100 * diff, 1), nsmall = 1), "%"),
+      label = glue("{format(round_half_up(100 * diff, 1), nsmall = 1)}%"),
       vjust = v_just
     ),
     color = "black",
@@ -441,12 +441,16 @@ simd_diff_plot <- ggplot(
   labs(
     x = "",
     y = "Difference from 2016",
-    title = paste0(
+    title = glue(
       "Difference in Population Living in Deprivation Quintiles by SIMD Domain\n",
       "in 2016 and ",
-      pop_max_year,
+      {
+        pop_max_year
+      },
       " in ",
-      str_wrap(LOCALITY, 50)
+      {
+        str_wrap(LOCALITY, 50)
+      }
     ),
     caption = "Source: Scottish Government, National Records Scotland"
   ) +
@@ -455,10 +459,10 @@ simd_diff_plot <- ggplot(
 simd_diff_overall <- simd_16_20_dom %>%
   filter(domain == "SIMD") %>%
   mutate(
-    Quintile = paste(domain, quintile),
-    perc_16 = paste0(format(round_half_up(100 * perc_16, 1), nsmall = 1), "%"),
-    perc_20 = paste0(format(round_half_up(100 * perc_20, 1), nsmall = 1), "%"),
-    Difference = paste0(format(round_half_up(100 * diff, 1), nsmall = 1), "%")
+    Quintile = glue("{domain} {quintile}"),
+    perc_16 = glue("{format(round_half_up(100 * perc_16, 1), nsmall = 1)}%"),
+    perc_20 = glue("{format(round_half_up(100 * perc_20, 1), nsmall = 1)}%"),
+    Difference = glue("{format(round_half_up(100 * diff, 1), nsmall = 1)}%")
   ) %>%
   select(Quintile, perc_16, perc_20, Difference)
 
