@@ -16,10 +16,6 @@ latest_msg_folder <- "2024-12 December"
 # Set locality profiles file path
 # lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
 
-## Packages
-library(lubridate)
-library(odbc)
-
 ## Functions
 source("Master RMarkdown Document & Render Code/Global Script.R")
 

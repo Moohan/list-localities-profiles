@@ -11,7 +11,7 @@
 # lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
 
 # Source in functions code (for testing only)
-# source("Master RMarkdown Document & Render Code/Global Script.R")
+source("Master RMarkdown Document & Render Code/Global Script.R")
 
 ## Select a locality based on the HSCP (for source code "2. Services Outputs" to run - it does not matter which one is chosen)
 # LOCALITY <- read_in_localities() |> filter(hscp2019name == HSCP) |> slice(1) |> pull(hscp_locality)
@@ -20,14 +20,6 @@
 # source("Services/2. Services data manipulation & table.R")
 
 # 1. Set up ----
-
-## Load packages
-library(readr)
-library(dplyr)
-library(sf)
-library(ggrepel)
-library(ggmap)
-library(patchwork)
 
 # 2. Read in locality shape files ----
 

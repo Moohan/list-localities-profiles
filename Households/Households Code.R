@@ -23,10 +23,6 @@
 
 ##################### Section 1 - Packages, working directory etc ########################
 
-# load in required packages
-library(readxl)
-library(reshape2)
-
 # Update Data Year (this is the maximum year available for both housing data sets from NRS)
 max_year_housing <- 2023
 # Update Publication Year (the year marked on the Data folder)
@@ -36,7 +32,7 @@ ext_year <- 2024
 # lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
 
 # Read in Global Script for RMarkdown (For testing only)
-# source("Master RMarkdown Document & Render Code/Global Script.R")
+source("Master RMarkdown Document & Render Code/Global Script.R")
 
 # Set locality (for testing only)
 # LOCALITY <- "Whalsay and Skerries"
