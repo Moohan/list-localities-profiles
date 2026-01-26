@@ -179,7 +179,10 @@ write_parquet(
 write_parquet(msg_bed_days, fs::path(exportfolder, "bed_days_msg.parquet"))
 
 # Bed days MH
-write_parquet(msg_bed_days_mh, fs::path(exportfolder, "bed_days_mh_msg.parquet"))
+write_parquet(
+  msg_bed_days_mh,
+  fs::path(exportfolder, "bed_days_mh_msg.parquet")
+)
 
 # A&E
 write_parquet(msg_ae, fs::path(exportfolder, "ae_attendances_msg.parquet"))
