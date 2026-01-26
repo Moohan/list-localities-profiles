@@ -795,19 +795,19 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
     source("Services/3. Service HSCP map.R")
   }
 
-  if ("General-Health.Rmd" %in% chapters_oi) {
+  if ("General_Health.Rmd" %in% chapters_oi) {
     # General Health ----
-    source("General Health/3. General Health Outputs.R")
+    source("General_Health/3_General_Health_Outputs.R")
   }
 
-  if ("Lifestyle-Risk-Factors.Rmd" %in% chapters_oi) {
+  if ("Lifestyle_Risk_Factors.Rmd" %in% chapters_oi) {
     # Lifestyle & Risk Factors ----
-    source("Lifestyle & Risk Factors/2. Lifestyle & Risk Factors Outputs.R")
+    source("Lifestyle_Risk_Factors/2_Lifestyle_Risk_Factors_Outputs.R")
   }
 
-  if ("Unscheduled-Care.Rmd" %in% chapters_oi) {
+  if ("Unscheduled_Care.Rmd" %in% chapters_oi) {
     # Unscheduled Care ----
-    source("Unscheduled Care/2. Unscheduled Care outputs.R")
+    source("Unscheduled_Care/2_Unscheduled_Care_outputs.R")
   }
 
   chapters_oi_name <- chapters_oi %>%

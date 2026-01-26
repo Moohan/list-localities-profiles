@@ -16,9 +16,9 @@ This is the code used to produce the Locality Profiles.
 
 - Both input and output data can be located on the stats drive at: `\\stats\LIST_analytics\West Hub\02 - Scaled Up Work\RMarkdown\Locality Profiles\`
 
-  - Each chapter has its folder used to save input data before a release. The folders include: `Demographics`, `General Health`, `Households`, `Lifestyle & Risk Factors`, `Services`, and `Unscheduled Care`.
+  - Each chapter has its folder used to save input data before a release. The folders include: `Demographics`, `General_Health`, `Households`, `Lifestyle_Risk_Factors`, `Services`, and `Unscheduled_Care`.
 
-  - The `Master RMarkdown Document & Render Code\Output` folder is designated for saving all outputs.
+  - The `Master_RMarkdown_Document_Render_Code\Output` folder is designated for saving all outputs.
 
   - The `Final Profiles` folder (and its subdirectories) is used to store completed profiles and related files that are ready for access by LIST colleagues.
 
@@ -26,19 +26,19 @@ This is the code used to produce the Locality Profiles.
 
 Here are some important files and scripts to be aware of:
 
-- **`Master RMarkdown Document & Render Code/Global Script.R`**: This script loads the necessary packages and declares custom functions. It is sourced by most other scripts.
+- **`Master_RMarkdown_Document_Render_Code/Global_Script.R`**: This script loads the necessary packages and declares custom functions. It is sourced by most other scripts.
   
-- **`Master RMarkdown Document & Render Code/Locality Profiles Render Code.R`**: This script runs the analyses and generates the indicators, as well as creates the main profile and summary table outputs. It is the simplest and most effective way to produce the profiles.
+- **`Build_Profiles.R`**: This script runs the analyses and generates the indicators, as well as creates the main profile and summary table outputs. It is the simplest and most effective way to produce the profiles.
 
-- **`Master RMarkdown Document & Render Code/Locality_Profiles_Master_Markdown.Rmd`**: This is the primary RMarkdown file that contains all the content for the profiles, excluding the summary table, which is generated separately.
+- **`lp_bookdown/index.Rmd`**: This is the primary RMarkdown file that contains all the content for the profiles, excluding the summary table, which is generated separately.
 
   - Note that there are corresponding RMarkdown documents for each chapter. The contents of each 'testing markdown' should mirror the relevant content in the main RMarkdown file exactly. These documents, such as `Demographics/Demographics-Testing-Markdown.Rmd`, are useful for quickly testing changes to an individual chapter.
 
-- **`Summary Table/Summary-Table-Markdown.Rmd`**: This script generates the Summary Table, which is produced separately because it is in landscape orientation, while the rest of the profiles are in portrait orientation.
+- **`lp_bookdown/Summary_Table.Rmd`**: This script generates the Summary Table, which is produced separately because it is in landscape orientation, while the rest of the profiles are in portrait orientation.
 
-- **`Master RMarkdown Document & Render Code/make_sdc_output.R`**: This script creates the Statistical Disclosure Control (SDC) Excel workbooks.
+- **`Master_RMarkdown_Document_Render_Code/make_sdc_output.R`**: This script creates the Statistical Disclosure Control (SDC) Excel workbooks.
 
-- **`Master RMarkdown Document & Render Code/excel_output.R`**: This script generates the background data Excel workbooks.
+- **`Master_RMarkdown_Document_Render_Code/excel_output.R`**: This script generates the background data Excel workbooks.
 
 ## Contributors ✨
 

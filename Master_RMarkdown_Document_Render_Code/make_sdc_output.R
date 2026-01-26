@@ -13,7 +13,7 @@ rm(list = ls())
 Sys.umask("006")
 
 # Load Global packages and functions
-source("Master RMarkdown Document & Render Code/Global Script.R")
+source("Master_RMarkdown_Document_Render_Code/Global_Script.R")
 
 # Set file path for output
 lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
@@ -64,7 +64,7 @@ for (HSCP in hscp_list) {
     ))
     # **Unscheduled Care Data Processing** ----
     # Extract and filter unscheduled care data for the current locality
-    source("Unscheduled Care/2. Unscheduled Care outputs.R")
+    source("Unscheduled_Care/2_Unscheduled_Care_outputs.R")
 
     # **Data Validation - Unscheduled Care**
     stopifnot(
@@ -147,7 +147,7 @@ for (HSCP in hscp_list) {
 
     # **General Health Data Processing** ----
     # Extract and filter general health data for the current locality
-    source("General Health/3. General Health Outputs.R")
+    source("General_Health/3_General_Health_Outputs.R")
 
     stopifnot(
       exists("ltc_multimorbidity"),
