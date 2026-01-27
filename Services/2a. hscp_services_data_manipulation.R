@@ -7,7 +7,7 @@
 ## Code used to manipulate services data for locality profiles.
 # This script prepares data at the HSCP level.
 # The map is created in script "3. Services HSCP Map".
-# The locality-specific table is created in "2. Services table.R".
+# The locality-specific table is created in "2b. locality_services_table.R".
 
 ## Written by C.Puech
 ## Created on 24/02/2020
