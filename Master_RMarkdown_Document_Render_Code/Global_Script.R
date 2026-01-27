@@ -3,7 +3,7 @@
 # Contains various settings and functions to be used in other locality profile scripts
 
 # How to use this script:
-# source("Master RMarkdown Document & Render Code/Global Script.R)
+# source("Master_RMarkdown_Document_Render_Code/Global_Script.R")
 
 ## Packages for functions ----
 # (** note - should this contain all packages necessary for locality profiles?
