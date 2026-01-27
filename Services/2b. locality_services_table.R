@@ -5,7 +5,7 @@
 ############################################################################################# .
 
 ## Code used to produce a table of what services are in the locality.
-# The data manipulation is done in script "1. Services data manipulation".
+# The data manipulation is done in script "2a. hscp_services_data_manipulation.R".
 # The map is created in script "3. Services HSCP Map".
 
 ## Written by C.Puech
