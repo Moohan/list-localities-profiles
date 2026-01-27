@@ -17,6 +17,9 @@
 ## Set Locality (for testing only)
 # LOCALITY <- "Falkirk West"
 
+## Determine HSCP (for testing only)
+# HSCP <- as.character(filter(lookup2, hscp_locality == LOCALITY)$hscp2019name)
+
 # This script assumes that 'LOCALITY', 'care_homes', 'markers_gp',
 # 'markers_emergency_dep' and 'markers_miu' are objects available in the environment.
 
