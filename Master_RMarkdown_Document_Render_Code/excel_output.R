@@ -11,7 +11,7 @@ Sys.umask("006")
 lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
 
 # Source in functions code
-source("Master RMarkdown Document & Render Code/Global Script.R")
+source("Master_RMarkdown_Document_Render_Code/Global_Script.R")
 lookup <- read_in_localities()
 # Specify HSCP(s) ----
 # use `unique(lookup$hscp2019name)` for all
@@ -46,22 +46,22 @@ for (HSCP in hscp_list) {
   for (LOCALITY in locality_list) {
     ## 2a) Source in all the scripts for a given LOCALITY
     # demographics
-    source("Demographics/1. Demographics - Population.R")
-    source("Demographics/2. Demographics - SIMD.R")
+    source("Demographics/1_Demographics_Population.R")
+    source("Demographics/2_Demographics_SIMD.R")
     # lifestyle & risk factors
-    source("Lifestyle & Risk Factors/2. Lifestyle & Risk Factors Outputs.R")
+    source("Lifestyle_Risk_Factors/2_Lifestyle_Risk_Factors_Outputs.R")
 
     # unscheduled care
-    source("Unscheduled Care/2. Unscheduled Care outputs.R")
+    source("Unscheduled_Care/2_Unscheduled_Care_outputs.R")
 
     # general health
-    source("General Health/3. General Health Outputs.R")
+    source("General_Health/3_General_Health_Outputs.R")
 
     # housing
-    source("Households/Households Code.R")
+    source("Households/Households_Code.R")
 
     # services
-    source("Services/2. Services data manipulation & table.R")
+    source("Services/2_Services_data_manipulation_table.R")
 
     # Define data frames and their corresponding sheet names
     df <- list(

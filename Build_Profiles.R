@@ -14,7 +14,7 @@ rlang::check_installed(
 rm(list = ls())
 
 # Source in functions code
-source("Master RMarkdown Document & Render Code/Global Script.R")
+source("Master_RMarkdown_Document_Render_Code/Global_Script.R")
 
 # Set file path
 lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
@@ -27,7 +27,7 @@ lookup <- read_in_localities()
 # use `unique(lookup$hscp2019name)` for all
 # or create a vector for multiple e.g. `c("Angus", "West Lothian")`
 # For a larger test, use the below to produce profiles for HSCPs likely to cause issues.
-# source("Master RMarkdown Document & Render Code/find_hscp_outliers.R")
+# source("Master_RMarkdown_Document_Render_Code/find_hscp_outliers.R")
 # hscp_list <- outlier_hscps
 hscp_list <- "Falkirk"
 
@@ -57,27 +57,27 @@ for (HSCP in hscp_list) {
     # 1a) Source in all the scripts for a given LOCALITY
 
     # Demographics ----
-    source("Demographics/1. Demographics - Population.R")
-    source("Demographics/2. Demographics - SIMD.R")
+    source("Demographics/1_Demographics_Population.R")
+    source("Demographics/2_Demographics_SIMD.R")
 
     # Housing ----
-    source("Households/Households Code.R")
+    source("Households/Households_Code.R")
 
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
-    source("Services/3. Service HSCP map.R")
+    source("Services/2_Services_data_manipulation_table.R")
+    source("Services/3_Service_HSCP_map.R")
 
     # General Health ----
-    source("General Health/3. General Health Outputs.R")
+    source("General_Health/3_General_Health_Outputs.R")
 
     # Lifestyle & Risk Factors ----
-    source("Lifestyle & Risk Factors/2. Lifestyle & Risk Factors Outputs.R")
+    source("Lifestyle_Risk_Factors/2_Lifestyle_Risk_Factors_Outputs.R")
 
     # Unscheduled Care ----
-    source("Unscheduled Care/2. Unscheduled Care outputs.R")
+    source("Unscheduled_Care/2_Unscheduled_Care_outputs.R")
 
     # Appendices ----
-    source("Master RMarkdown Document & Render Code/Tables for Appendix.R")
+    source("Master_RMarkdown_Document_Render_Code/Tables_for_Appendix.R")
 
     main_title <- glue("{LOCALITY} - Locality Profile")
     output_doc_name <- path_ext_set(main_title, "docx")

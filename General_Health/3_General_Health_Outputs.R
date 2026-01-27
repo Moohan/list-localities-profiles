@@ -26,7 +26,7 @@ library(officer)
 ext_year <- 2024
 
 # Source in functions code
-# source("Master RMarkdown Document & Render Code/Global Script.R")
+source("Master_RMarkdown_Document_Render_Code/Global_Script.R")
 
 # Set file path
 # lp_path <- path("/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles")
