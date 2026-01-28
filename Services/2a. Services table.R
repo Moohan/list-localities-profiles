@@ -13,7 +13,6 @@
 ## Created on 24/02/2020
 ## Latest update August 2022 - rewrote parts of code for smoother process
 
-
 ###### 4. Table ######
 # Determine HSCP
 HSCP <- as.character(filter(lookup2, hscp_locality == LOCALITY)$hscp2019name)
