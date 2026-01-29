@@ -52,6 +52,11 @@ for (HSCP in hscp_list) {
 
   loop_env <- c(ls(), "loop_env")
 
+  # Services (HSCP level) ----
+  # These scripts are sourced once per HSCP to avoid redundant data loading and processing.
+  source("Services/1. Services data manipulation.R")
+  source("Services/3. Service HSCP map.R")
+
   # 1. Loop through each locality to create the main body of the profiles and the summary table
   for (LOCALITY in locality_list) {
     # 1a) Source in all the scripts for a given LOCALITY
@@ -63,9 +68,8 @@ for (HSCP in hscp_list) {
     # Housing ----
     source("Households/Households Code.R")
 
-    # Services ----
+    # Services (Locality level) ----
     source("Services/2. Services data manipulation & table.R")
-    source("Services/3. Service HSCP map.R")
 
     # General Health ----
     source("General Health/3. General Health Outputs.R")
