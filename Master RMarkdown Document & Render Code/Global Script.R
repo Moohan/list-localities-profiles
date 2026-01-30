@@ -791,7 +791,13 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("Services.Rmd" %in% chapters_oi) {
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
+    # Determine HSCP
+    HSCP <- as.character(filter(lookup, hscp_locality == LOCALITY)$hscp2019name)
+    # Source the data manipulation script (HSCP-level)
+    source("Services/1. Services data manipulation.R")
+    # Source the table script (Locality-level)
+    source("Services/2. Services table.R")
+    # Source the map script (HSCP-level)
     source("Services/3. Service HSCP map.R")
   }
 
