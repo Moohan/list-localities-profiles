@@ -1,0 +1,3 @@
+## 2024-10-24 - [HSCP-level Optimization in Loops]
+**Learning:** Sourcing scripts that perform HSCP-level data loading and map generation inside a locality-level loop (the inner loop of Build Profiles.R) causes extreme redundancy and performance degradation. Specifically, it leads to repeated RDS file reading and redundant API calls (e.g., to Stadia Maps for background tiles).
+**Action:** Always separate HSCP-level logic from locality-level logic. Move expensive, constant HSCP-level operations (data loading, heavy filtering, map rendering) to a dedicated script sourced in the outer loop, and ensure necessary objects are preserved in the loop environment for inner-loop scripts (e.g., table generation) to consume.

@@ -17,7 +17,7 @@
 # LOCALITY <- read_in_localities() |> filter(hscp2019name == HSCP) |> slice(1) |> pull(hscp_locality)
 
 # Source the data manipulation script for services
-# source("Services/2. Services data manipulation & table.R")
+# source("Services/2a. Services data manipulation.R")
 
 # 1. Set up ----
 
@@ -309,18 +309,18 @@ leg1 <- cowplot::get_legend(service_map_1)
 
 # Create Map of Just the Locations in order to use its legend (of location colours and shapes) ----
 
-all_markers <- dplyr::select(markers_miu, name, latitude, longitude) %>%
-  mutate(type = "Minor Injury Unit") %>%
+all_markers <- dplyr::select(markers_miu, name, latitude, longitude) |>
+  mutate(type = "Minor Injury Unit") |>
   bind_rows(
-    dplyr::select(markers_care_home, name, latitude, longitude) %>%
+    dplyr::select(markers_care_home, name, latitude, longitude) |>
       mutate(type = "Care Home")
-  ) %>%
+  ) |>
   bind_rows(
-    dplyr::select(markers_emergency_dep, name, latitude, longitude) %>%
+    dplyr::select(markers_emergency_dep, name, latitude, longitude) |>
       mutate(type = "Emergency Department")
-  ) %>%
+  ) |>
   bind_rows(
-    dplyr::select(markers_gp, name = gp_practice_name, latitude, longitude) %>%
+    dplyr::select(markers_gp, name = gp_practice_name, latitude, longitude) |>
       mutate(type = "GP Practice")
   )
 
@@ -398,19 +398,9 @@ service_map <- cowplot::plot_grid(
 # remove unnecessary objects
 rm(
   blank_leg,
-  Clacks_Royal,
-  data,
-  hosp_postcodes,
-  hosp_types,
   leg1,
   leg2,
   leg12,
-  markers_care_home,
-  markers_emergency_dep,
-  markers_gp,
-  markers_miu,
-  other_care_type,
-  postcode_lkp,
   service_map_1,
   service_map_2,
   service_map_background,
@@ -428,10 +418,8 @@ rm(
   all_markers,
   api_key,
   col_palette,
-  ext_year,
   hscp_loc,
   locality_map_id,
-  lookup2,
   max_lat,
   max_long,
   min_lat,
