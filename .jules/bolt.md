@@ -1,0 +1,3 @@
+## 2024-05-23 - [Optimization of Services Chapter Loop]
+**Learning:** Moving invariant operations (data loading, HSCP-level map generation) out of a nested locality loop significantly reduces redundant processing. However, it requires careful coordination with the environment management logic (like 'loop_env' in Build Profiles.R) and adjusting script-level housekeeping (rm() calls) to ensure data persistence across loop iterations.
+**Action:** Always check how the loop environment is managed (e.g., setdiff(ls(), loop_env)) and ensure prep scripts are sourced *before* the environment snapshot is taken.

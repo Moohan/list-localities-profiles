@@ -1,51 +1,22 @@
-############################################################################################# .
-#                                                                                           #
-#                         LOCALITY PROFILES SERVICES MAP & TABLE CODE                       #
-#                                                                                           #
-############################################################################################# .
+# HSCP-level Services Data Manipulation
+# This script loads data and prepares service markers for the whole HSCP.
+# It is sourced once per HSCP in Build Profiles.R to optimize performance.
 
-## Code used to manipulate services data for locality profiles.
-# Also produces a table of what services are in the locality.
-# The map is created in script "3. Services HSCP Map" - this is so that it does not have to run
-# for every locality
-
-## Written by C.Puech
-## Created on 24/02/2020
-## Latest update August 2022 - rewrote parts of code for smoother process
-
-###### 1. Set up ######
-
-# Change year to be the year in the data folder name
 ext_year <- 2024
 
-## Set Locality (for testing only)
-# LOCALITY <- "Falkirk West"
-
-## Set file path
-# lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
-
-# Source in functions code
-# source("Master RMarkdown Document & Render Code/Global Script.R")
-
-### Geographical lookups and objects ----
-
-# Locality lookup
-lookup <- read_in_localities(dz_level = TRUE)
+# Defensive logic to derive HSCP if not provided (e.g., when testing standalone)
+if (!exists("HSCP")) {
+  lookup2 <- read_in_localities()
+  HSCP <- as.character(dplyr::filter(lookup2, hscp_locality == LOCALITY)$hscp2019name)
+}
 
 # Lookup without datazones
 lookup2 <- read_in_localities()
 
-## Determine HSCP
-HSCP <- as.character(filter(lookup2, hscp_locality == LOCALITY)$hscp2019name)
-
 # Get number of localities in HSCP
 n_loc <- count_localities(lookup2, HSCP)
 
-
-###### 2. Read in services data ######
-
-## Read in Postcode file for latitudes and longitudes
-
+# 1. Read in Postcode file for latitudes and longitudes ----
 postcode_lkp <- read_in_postcodes() %>%
   mutate(postcode = gsub(" ", "", pc7, fixed = TRUE)) %>%
   select(
@@ -62,19 +33,17 @@ postcode_lkp <- read_in_postcodes() %>%
     hb2019
   )
 
-
-## Read in all data in services folder
-
+# 2. Read in all data in services folder ----
 services_file_names <- list.files(
-  paste0(lp_path, "Services/DATA ", ext_year),
+  fs::path(lp_path, "Services", paste0("DATA ", ext_year)),
   pattern = "RDS"
 )
 
 for (file in services_file_names) {
   name <- substr(x = file, 1, 4)
 
-  data <- readRDS(paste0(lp_path, "Services/DATA ", ext_year, "/", file)) %>%
-    clean_names()
+  data <- readRDS(fs::path(lp_path, "Services", paste0("DATA ", ext_year), file)) %>%
+    janitor::clean_names()
 
   assign(name, data)
 }
@@ -86,11 +55,9 @@ care_homes <- MDSF
 
 rm(curr, hosp, MDSF)
 
-
-###### 3. Manipulate services data ######
+# 3. Manipulate services data ----
 
 ## GP Practices ----
-
 prac <- prac %>%
   select(practice_code, gp_practice_name, practice_list_size, postcode) %>%
   mutate(postcode = gsub(" ", "", postcode, fixed = TRUE))
@@ -134,7 +101,6 @@ markers_emergency_dep <- hosp_lookup %>%
 Clacks_Royal <- filter(hosp_lookup, name == "Forth Valley Royal Hospital")
 
 # Ninewells hospital is incorrectly mapped even though postcode ok - so corrected coords here
-
 if (HSCP == "Dundee City") {
   markers_emergency_dep <- markers_emergency_dep %>%
     mutate(
@@ -162,11 +128,8 @@ markers_care_home <- care_homes %>%
   left_join(postcode_lkp, by = "postcode") %>%
   filter(hscp2019name == HSCP)
 
-
-###### 4. Table ######
-
-# Subset care which is not Elderly care for table
-other_care_type <- care_homes %>%
+# Pre-calculate other care types for the whole HSCP to avoid re-joining in the locality loop
+all_other_care_type <- care_homes %>%
   select(
     type = care_service,
     subtype,
@@ -177,34 +140,12 @@ other_care_type <- care_homes %>%
   filter(subtype != "Older People") %>%
   mutate(postcode = gsub(" ", "", service_postcode, fixed = TRUE)) %>%
   left_join(postcode_lkp, by = "postcode") %>%
-  filter(hscp_locality == LOCALITY)
+  filter(hscp2019name == HSCP)
 
-# Create table
-services_tibble <- tibble(
-  Type = c("Primary Care", "A&E", "", "Care Home", ""),
-  Service = c(
-    "GP Practice",
-    "Emergency Department",
-    "Minor Injuries Unit",
-    "Elderly Care",
-    "Other"
-  ),
-  Number = c(
-    sum(markers_gp[["hscp_locality"]] == LOCALITY),
-    sum(markers_emergency_dep[["hscp_locality"]] == LOCALITY),
-    sum(markers_miu[["hscp_locality"]] == LOCALITY),
-    sum(markers_care_home[["hscp_locality"]] == LOCALITY),
-    nrow(other_care_type)
-  )
-)
 
 # Housekeeping ----
-# These objects are left over after the script is run
-# but don't appear to be used in any 'downstream' process:
-# Main markdown, Summary Table, Excel data tables, SDC output.
-# TODO: Investigate if these can be removed earlier or not created at all.
+# Cleanup large objects that are no longer needed
 rm(
-  care_homes,
   Clacks_Royal,
   data,
   file,
@@ -212,9 +153,9 @@ rm(
   hosp_postcodes,
   hosp_types,
   name,
-  other_care_type,
   postcode_lkp,
   prac,
-  services_file_names
+  services_file_names,
+  care_homes
 )
 gc()
