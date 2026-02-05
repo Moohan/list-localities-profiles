@@ -30,6 +30,9 @@ for (HSCP in hscp_list) {
     distinct(hscp_locality) |>
     pull(hscp_locality)
 
+  # services
+  source("Services/2a. Services data manipulation.R")
+
   loop_env <- c(ls(), "loop_env")
 
   ## Loop to create the profiles for all the localities in the list
@@ -59,9 +62,6 @@ for (HSCP in hscp_list) {
 
     # housing
     source("Households/Households Code.R")
-
-    # services
-    source("Services/2. Services data manipulation & table.R")
 
     # Define data frames and their corresponding sheet names
     df <- list(

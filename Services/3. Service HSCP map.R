@@ -17,7 +17,7 @@
 # LOCALITY <- read_in_localities() |> filter(hscp2019name == HSCP) |> slice(1) |> pull(hscp_locality)
 
 # Source the data manipulation script for services
-# source("Services/2. Services data manipulation & table.R")
+# source("Services/2a. Services data manipulation.R")
 
 # 1. Set up ----
 
@@ -405,12 +405,6 @@ rm(
   leg1,
   leg2,
   leg12,
-  markers_care_home,
-  markers_emergency_dep,
-  markers_gp,
-  markers_miu,
-  other_care_type,
-  postcode_lkp,
   service_map_1,
   service_map_2,
   service_map_background,
