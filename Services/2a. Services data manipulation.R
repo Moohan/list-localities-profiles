@@ -15,7 +15,9 @@ ext_year <- 2024
 # Defensive logic for standalone use
 if (!exists("HSCP") && exists("LOCALITY")) {
   lookup_hscp <- read_in_localities()
-  HSCP <- as.character(dplyr::filter(lookup_hscp, hscp_locality == LOCALITY)$hscp2019name)
+  HSCP <- as.character(
+    dplyr::filter(lookup_hscp, hscp_locality == LOCALITY)$hscp2019name
+  )
   rm(lookup_hscp)
 }
 
