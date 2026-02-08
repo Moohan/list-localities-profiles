@@ -396,29 +396,31 @@ service_map <- cowplot::plot_grid(
 
 # 4 Cleanup ----
 # remove unnecessary objects
-rm(list = intersect(
-  c(
-    "all_markers",
-    "api_key",
-    "blank_leg",
-    "col_palette",
-    "hscp_loc",
-    "leg1",
-    "leg2",
-    "leg12",
-    "locality_map_id",
-    "max_lat",
-    "max_long",
-    "min_lat",
-    "min_long",
-    "places",
-    "service_map_1",
-    "service_map_2",
-    "service_map_background",
-    "shp",
-    "shp_hscp",
-    "zones_coord"
-  ),
-  ls()
-))
+rm(
+  list = intersect(
+    c(
+      "all_markers",
+      "api_key",
+      "blank_leg",
+      "col_palette",
+      "hscp_loc",
+      "leg1",
+      "leg2",
+      "leg12",
+      "locality_map_id",
+      "max_lat",
+      "max_long",
+      "min_lat",
+      "min_long",
+      "places",
+      "service_map_1",
+      "service_map_2",
+      "service_map_background",
+      "shp",
+      "shp_hscp",
+      "zones_coord"
+    ),
+    ls()
+  )
+)
 gc()

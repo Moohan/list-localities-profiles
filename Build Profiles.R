@@ -123,22 +123,24 @@ for (HSCP in hscp_list) {
     gc()
   }
   # Housekeeping after HSCP loop
-  rm(list = intersect(
-    c(
-      "service_map",
-      "markers_gp",
-      "markers_miu",
-      "markers_emergency_dep",
-      "markers_care_home",
-      "postcode_lkp",
-      "prac",
-      "hosp_lookup",
-      "hosp_postcodes",
-      "hosp_types",
-      "services_file_names",
-      "Clacks_Royal",
-      "care_homes"
-    ),
-    ls()
-  ))
+  rm(
+    list = intersect(
+      c(
+        "service_map",
+        "markers_gp",
+        "markers_miu",
+        "markers_emergency_dep",
+        "markers_care_home",
+        "postcode_lkp",
+        "prac",
+        "hosp_lookup",
+        "hosp_postcodes",
+        "hosp_types",
+        "services_file_names",
+        "Clacks_Royal",
+        "care_homes"
+      ),
+      ls()
+    )
+  )
 }
