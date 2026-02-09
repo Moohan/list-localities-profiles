@@ -791,7 +791,8 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("Services.Rmd" %in% chapters_oi) {
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
+    source("Services/2a. Services data manipulation.R")
+    source("Services/2b. Services table.R")
     source("Services/3. Service HSCP map.R")
   }
 
@@ -810,15 +811,14 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
     source("Unscheduled Care/2. Unscheduled Care outputs.R")
   }
 
-  chapters_oi_name <- chapters_oi %>%
-    gsub(".Rmd", "", .) %>%
+  chapters_oi_name <- gsub(".Rmd", "", chapters_oi) |>
     paste(collapse = " ")
 
   # read _bookdown.yaml file
   yaml_file <- yaml::read_yaml("lp_bookdown/_bookdown.yaml")
 
   # change included chapters to relevant chapter(s) only + index.Rmd (sets formatting)
-  yaml_file$rmd_files <- c("index.Rmd", chapters_oi)
+  yaml_file[["rmd_files"]] <- c("index.Rmd", chapters_oi)
 
   # write temporary yaml with relevant chapters to be used in rendering
   yaml::write_yaml(yaml_file, path(tempdir(), "_practice_chapter_temp.yaml"))

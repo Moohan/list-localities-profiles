@@ -1,0 +1,3 @@
+## 2025-01-24 - Hoisting optimization in R reporting loops
+**Learning:** In nested reporting loops (e.g., HSCP > Locality), moving data loading and partnership-level calculations (like map rendering) from the inner loop to the outer loop provides significant performance gains by avoiding redundant I/O and expensive computations.
+**Action:** When refactoring for hoisting, split the original script into 'a' (outer loop/data prep) and 'b' (inner loop/output specific) scripts. Ensure that all data dependencies are preserved and that explicit cleanup of hoisted objects is added to the end of the outer loop to prevent memory leaks across top-level iterations.
