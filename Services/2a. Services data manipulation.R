@@ -23,9 +23,13 @@ lookup2 <- read_in_localities()
 ## Determine HSCP if not already defined
 if (!exists("HSCP")) {
   if (exists("LOCALITY")) {
-    HSCP <- as.character(dplyr::filter(lookup2, hscp_locality == LOCALITY)[["hscp2019name"]])
+    HSCP <- as.character(dplyr::filter(lookup2, hscp_locality == LOCALITY)[[
+      "hscp2019name"
+    ]])
   } else {
-    stop("Neither HSCP nor LOCALITY is defined. Cannot determine target partnership.")
+    stop(
+      "Neither HSCP nor LOCALITY is defined. Cannot determine target partnership."
+    )
   }
 }
 

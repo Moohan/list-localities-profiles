@@ -393,4 +393,3 @@ service_map <- cowplot::plot_grid(
 
 # preview final service map
 # plot(service_map)
-
