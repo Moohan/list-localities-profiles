@@ -112,10 +112,10 @@ zones_coord <- shp_hscp |>
   )
 
 # Get min and max longitude for locality, add a 0.01 extra to add a border to map.
-min_long <- zones_coord$min_long - 0.01
-max_long <- zones_coord$max_long + 0.01
-min_lat <- zones_coord$min_lat - 0.01
-max_lat <- zones_coord$max_lat + 0.01
+min_long <- zones_coord[["min_long"]] - 0.01
+max_long <- zones_coord[["max_long"]] + 0.01
+min_lat <- zones_coord[["min_lat"]] - 0.01
+max_lat <- zones_coord[["max_lat"]] + 0.01
 
 # get data zones in HSCP
 hscp_loc <- read_csv(
@@ -130,7 +130,7 @@ places <- read_csv(paste0(
   "Shapefiles/Scottish Places/Places to Data Zone Lookup.csv"
 )) |>
   rename(datazone2011 = DataZone) |>
-  filter(datazone2011 %in% hscp_loc$datazone2011) |>
+  filter(datazone2011 %in% hscp_loc[["datazone2011"]]) |>
   # extra filter to remove place names with coordinates outwith locality
   filter(
     Longitude >= min_long &
@@ -150,7 +150,7 @@ places <- read_csv(paste0(
 
 # 3.3 Background map ----
 locality_map_id <- read_csv(paste0(lp_path, "Services/", "locality_map_id.csv"))
-api_key <- locality_map_id$id
+api_key <- locality_map_id[["id"]]
 # upload map background from stadia maps, enter registration key, filter for max and min long/lat
 register_stadiamaps(key = api_key)
 service_map_background <- get_stadiamap(
@@ -309,18 +309,18 @@ leg1 <- cowplot::get_legend(service_map_1)
 
 # Create Map of Just the Locations in order to use its legend (of location colours and shapes) ----
 
-all_markers <- dplyr::select(markers_miu, name, latitude, longitude) %>%
-  mutate(type = "Minor Injury Unit") %>%
+all_markers <- dplyr::select(markers_miu, name, latitude, longitude) |>
+  mutate(type = "Minor Injury Unit") |>
   bind_rows(
-    dplyr::select(markers_care_home, name, latitude, longitude) %>%
+    dplyr::select(markers_care_home, name, latitude, longitude) |>
       mutate(type = "Care Home")
-  ) %>%
+  ) |>
   bind_rows(
-    dplyr::select(markers_emergency_dep, name, latitude, longitude) %>%
+    dplyr::select(markers_emergency_dep, name, latitude, longitude) |>
       mutate(type = "Emergency Department")
-  ) %>%
+  ) |>
   bind_rows(
-    dplyr::select(markers_gp, name = gp_practice_name, latitude, longitude) %>%
+    dplyr::select(markers_gp, name = gp_practice_name, latitude, longitude) |>
       mutate(type = "GP Practice")
   )
 
@@ -397,45 +397,25 @@ service_map <- cowplot::plot_grid(
 # 4 Cleanup ----
 # remove unnecessary objects
 rm(
+  all_markers,
+  api_key,
   blank_leg,
-  Clacks_Royal,
-  data,
-  hosp_postcodes,
-  hosp_types,
+  col_palette,
+  hscp_loc,
   leg1,
   leg2,
   leg12,
-  markers_care_home,
-  markers_emergency_dep,
-  markers_gp,
-  markers_miu,
-  other_care_type,
-  postcode_lkp,
+  locality_map_id,
+  max_lat,
+  max_long,
+  min_lat,
+  min_long,
+  places,
   service_map_1,
   service_map_2,
   service_map_background,
   shp,
   shp_hscp,
   zones_coord
-)
-
-# Housekeeping ----
-# These objects are left over after the script is run
-# but don't appear to be used in any 'downstream' process:
-# Main markdown, Summary Table, Excel data tables, SDC output.
-# TODO: Investigate if these can be removed earlier or not created at all.
-rm(
-  all_markers,
-  api_key,
-  col_palette,
-  ext_year,
-  hscp_loc,
-  locality_map_id,
-  lookup2,
-  max_lat,
-  max_long,
-  min_lat,
-  min_long,
-  places
 )
 gc()
