@@ -125,20 +125,22 @@ for (HSCP in hscp_list) {
   }
 
   # After all localities in an HSCP are done, clean up HSCP-level objects
-  rm(list = intersect(
-    c(
-      "care_homes",
-      "ext_year",
-      "lookup2",
-      "markers_care_home",
-      "markers_emergency_dep",
-      "markers_gp",
-      "markers_miu",
-      "n_loc",
-      "postcode_lkp",
-      "service_map"
-    ),
-    ls()
-  ))
+  rm(
+    list = intersect(
+      c(
+        "care_homes",
+        "ext_year",
+        "lookup2",
+        "markers_care_home",
+        "markers_emergency_dep",
+        "markers_gp",
+        "markers_miu",
+        "n_loc",
+        "postcode_lkp",
+        "service_map"
+      ),
+      ls()
+    )
+  )
   gc()
 }
