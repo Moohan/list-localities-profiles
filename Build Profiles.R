@@ -42,6 +42,10 @@ for (HSCP in hscp_list) {
     filter(hscp2019name == HSCP) |>
     pull(hscp_locality)
 
+  # Services (Hoisted to HSCP level) ----
+  source("Services/2a. Services data manipulation.R")
+  source("Services/3. Service HSCP map.R")
+
   # Loop to create the profiles for all the localities in the list
 
   # There are several stages to the profiles:
@@ -64,8 +68,7 @@ for (HSCP in hscp_list) {
     source("Households/Households Code.R")
 
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
-    source("Services/3. Service HSCP map.R")
+    source("Services/2b. Services table.R")
 
     # General Health ----
     source("General Health/3. General Health Outputs.R")
@@ -119,4 +122,48 @@ for (HSCP in hscp_list) {
     # Force garbage collection to free up memory
     gc()
   }
+  # Housekeeping for HSCP-level objects ----
+  # Remove objects created in the outer loop for Services to prevent memory buildup
+  rm(list = intersect(
+    c(
+      "service_map",
+      "markers_gp",
+      "markers_care_home",
+      "markers_emergency_dep",
+      "markers_miu",
+      "care_homes",
+      "postcode_lkp",
+      "prac",
+      "hosp_lookup",
+      "hosp_postcodes",
+      "hosp_types",
+      "services_file_names",
+      "Clacks_Royal",
+      "lookup2",
+      "n_loc",
+      "ext_year",
+      "blank_leg",
+      "leg1",
+      "leg2",
+      "leg12",
+      "service_map_1",
+      "service_map_2",
+      "service_map_background",
+      "shp",
+      "shp_hscp",
+      "zones_coord",
+      "api_key",
+      "col_palette",
+      "hscp_loc",
+      "locality_map_id",
+      "places",
+      "all_markers",
+      "min_long",
+      "max_long",
+      "min_lat",
+      "max_lat"
+    ),
+    ls()
+  ))
+  gc()
 }
