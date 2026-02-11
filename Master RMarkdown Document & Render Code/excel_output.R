@@ -199,25 +199,27 @@ for (HSCP in hscp_list) {
 
   # Housekeeping for HSCP-level objects ----
   # Remove objects created in the outer loop for Services to prevent memory buildup
-  rm(list = intersect(
-    c(
-      "markers_gp",
-      "markers_care_home",
-      "markers_emergency_dep",
-      "markers_miu",
-      "care_homes",
-      "postcode_lkp",
-      "prac",
-      "hosp_lookup",
-      "hosp_postcodes",
-      "hosp_types",
-      "services_file_names",
-      "Clacks_Royal",
-      "lookup2",
-      "n_loc",
-      "ext_year"
-    ),
-    ls()
-  ))
+  rm(
+    list = intersect(
+      c(
+        "markers_gp",
+        "markers_care_home",
+        "markers_emergency_dep",
+        "markers_miu",
+        "care_homes",
+        "postcode_lkp",
+        "prac",
+        "hosp_lookup",
+        "hosp_postcodes",
+        "hosp_types",
+        "services_file_names",
+        "Clacks_Royal",
+        "lookup2",
+        "n_loc",
+        "ext_year"
+      ),
+      ls()
+    )
+  )
   gc()
 }
