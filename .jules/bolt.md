@@ -1,0 +1,3 @@
+## 2024-05-24 - Hoisting Services logic out of locality loop
+**Learning:** Significant performance bottlenecks in this codebase often stem from performing partnership-level (HSCP) operations inside locality-level loops. Specifically, rendering maps (using `ggmap` and `get_stadiamap`) and loading large datasets (like postcodes and service markers) are expensive and constant for all localities in an HSCP.
+**Action:** Refactor scripts to separate HSCP-level manipulation from locality-level table logic. Source the HSCP scripts in the outer loop of `Build Profiles.R` and `excel_output.R` before the `loop_env` is captured, ensuring these objects are preserved but not redundantly re-calculated. Always add explicit cleanup for these hoisted objects at the end of the outer loop.

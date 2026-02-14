@@ -19,7 +19,7 @@ lookup <- read_in_localities()
 hscp_list <- "Angus"
 
 # NOTE - This checks that it exactly matches the lookup
-stopifnot(all(hscp_list %in% unique(lookup$hscp2019name)))
+stopifnot(all(hscp_list %in% unique(lookup[["hscp2019name"]])))
 
 # Loop over HSCP ----
 # 'looping' over one HSCP is fine.
@@ -29,6 +29,9 @@ for (HSCP in hscp_list) {
     filter(hscp2019name == HSCP) |>
     distinct(hscp_locality) |>
     pull(hscp_locality)
+
+  # Services (HSCP level) ----
+  source("Services/2a. Services data manipulation.R")
 
   loop_env <- c(ls(), "loop_env")
 
@@ -60,25 +63,22 @@ for (HSCP in hscp_list) {
     # housing
     source("Households/Households Code.R")
 
-    # services
-    source("Services/2. Services data manipulation & table.R")
-
     # Define data frames and their corresponding sheet names
     df <- list(
-      "Population_Estimates" = pops[pops$hscp_locality == LOCALITY, ],
+      "Population_Estimates" = pops[pops[["hscp_locality"]] == LOCALITY, ],
       "Population_Projections" = pop_proj_dat,
       "SIMD_Locality_2022" = simd_perc_breakdown,
       "SIMD_Domains_2016" = simd2016_dom,
       "SIMD_Domains_2022" = simd2020_dom,
       "Care_Home" = markers_care_home[
-        markers_care_home$hscp_locality == LOCALITY,
+        markers_care_home[["hscp_locality"]] == LOCALITY,
       ],
       "Emergency_Dep" = markers_emergency_dep[
-        markers_emergency_dep$hscp_locality == LOCALITY,
+        markers_emergency_dep[["hscp_locality"]] == LOCALITY,
       ],
-      "GP" = markers_gp[markers_gp$hscp_locality == LOCALITY, ],
+      "GP" = markers_gp[markers_gp[["hscp_locality"]] == LOCALITY, ],
       "Minor_Injuries_Unit" = markers_miu[
-        markers_miu$hscp_locality == LOCALITY,
+        markers_miu[["hscp_locality"]] == LOCALITY,
       ],
       "Housing_Data" = house_dat1,
       "Housing_Council_Tax_Band" = house_dat2,
@@ -144,6 +144,12 @@ for (HSCP in hscp_list) {
       # Combine the current dataframe with existing dataframes for the same output
       excel_output[[i]] <- rbind(excel_output[[i]], output) # append(excel_output[[i]], output)
     }
+
+    # End of loop housekeeping ----
+    # Clean up the environment by restoring it to the 'pre-loop' state.
+    rm(list = setdiff(ls(), loop_env))
+    # Force garbage collection to free up memory
+    gc()
   }
 
   wb <- createWorkbook()
@@ -193,7 +199,12 @@ for (HSCP in hscp_list) {
     ),
     overwrite = TRUE
   )
-  rm(list = setdiff(ls(), loop_env))
-  # Force garbage collection to free up memory
+
+  # HSCP level housekeeping ----
+  rm(list = intersect(c(
+    "markers_gp", "markers_miu", "markers_emergency_dep", "markers_care_home",
+    "care_homes", "postcode_lkp", "prac", "hosp_lookup", "hosp_postcodes",
+    "hosp_types", "lookup2", "n_loc", "ext_year"
+  ), ls()))
   gc()
 }
