@@ -124,13 +124,42 @@ for (HSCP in hscp_list) {
   }
 
   # HSCP level housekeeping ----
-  rm(list = intersect(c(
-    "service_map", "markers_gp", "markers_miu", "markers_emergency_dep",
-    "markers_care_home", "care_homes", "postcode_lkp", "prac", "hosp_lookup",
-    "hosp_postcodes", "hosp_types", "lookup2", "n_loc", "ext_year", "leg1",
-    "shp", "places", "shp_hscp", "service_map_background", "zones_coord",
-    "hscp_loc", "locality_map_id", "api_key", "col_palette", "service_map_1",
-    "service_map_2", "all_markers", "leg2", "blank_leg", "leg12"
-  ), ls()))
+  rm(
+    list = intersect(
+      c(
+        "service_map",
+        "markers_gp",
+        "markers_miu",
+        "markers_emergency_dep",
+        "markers_care_home",
+        "care_homes",
+        "postcode_lkp",
+        "prac",
+        "hosp_lookup",
+        "hosp_postcodes",
+        "hosp_types",
+        "lookup2",
+        "n_loc",
+        "ext_year",
+        "leg1",
+        "shp",
+        "places",
+        "shp_hscp",
+        "service_map_background",
+        "zones_coord",
+        "hscp_loc",
+        "locality_map_id",
+        "api_key",
+        "col_palette",
+        "service_map_1",
+        "service_map_2",
+        "all_markers",
+        "leg2",
+        "blank_leg",
+        "leg12"
+      ),
+      ls()
+    )
+  )
   gc()
 }

@@ -17,7 +17,9 @@ lookup2 <- read_in_localities()
 
 ## Determine HSCP
 if (!exists("HSCP")) {
-  HSCP <- as.character(filter(lookup2, hscp_locality == LOCALITY)[["hscp2019name"]])
+  HSCP <- as.character(filter(lookup2, hscp_locality == LOCALITY)[[
+    "hscp2019name"
+  ]])
 }
 
 # Get number of localities in HSCP
