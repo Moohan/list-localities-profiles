@@ -1,0 +1,3 @@
+## 2026-02-15 - [Hoisted Services Data Manipulation and Map Rendering]
+**Learning:** Hoisting expensive operations (file I/O and map rendering) from a locality-level inner loop to an HSCP-level outer loop provides a significant performance gain. Map rendering in 'Services/3. Service HSCP map.R' takes 10-20 seconds per partnership; by moving it out of the locality loop (which typically has 3-8 iterations per partnership), we save ~30-150 seconds per HSCP.
+**Action:** Always check for redundant calculations or data loading in nested loops. Scripts that mix partnership-level preparation and locality-level output should be split to support hoisting.
