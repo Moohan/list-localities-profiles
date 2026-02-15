@@ -202,10 +202,21 @@ for (HSCP in hscp_list) {
   gc()
 
   # End of HSCP loop housekeeping ----
-  rm(list = intersect(c(
-    "markers_gp", "markers_miu", "markers_emergency_dep",
-    "markers_care_home", "care_homes", "postcode_lkp", "lookup2", "n_loc",
-    "ext_year"
-  ), ls()))
+  rm(
+    list = intersect(
+      c(
+        "markers_gp",
+        "markers_miu",
+        "markers_emergency_dep",
+        "markers_care_home",
+        "care_homes",
+        "postcode_lkp",
+        "lookup2",
+        "n_loc",
+        "ext_year"
+      ),
+      ls()
+    )
+  )
   gc()
 }
