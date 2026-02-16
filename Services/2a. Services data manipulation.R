@@ -23,7 +23,9 @@ lookup2 <- read_in_localities()
 ## Determine HSCP defensively if not already defined
 if (!exists("HSCP")) {
   if (exists("LOCALITY")) {
-    HSCP <- as.character(filter(lookup2, hscp_locality == LOCALITY)[["hscp2019name"]])
+    HSCP <- as.character(filter(lookup2, hscp_locality == LOCALITY)[[
+      "hscp2019name"
+    ]])
   } else {
     stop("Neither HSCP nor LOCALITY is defined. Please specify one.")
   }
@@ -64,7 +66,11 @@ services_file_names <- list.files(
 for (file in services_file_names) {
   name <- substr(x = file, 1, 4)
 
-  data <- readRDS(file.path(lp_path, paste0("Services/DATA ", ext_year), file)) |>
+  data <- readRDS(file.path(
+    lp_path,
+    paste0("Services/DATA ", ext_year),
+    file
+  )) |>
     clean_names()
 
   assign(name, data)
