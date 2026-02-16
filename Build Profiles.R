@@ -42,6 +42,11 @@ for (HSCP in hscp_list) {
     filter(hscp2019name == HSCP) |>
     pull(hscp_locality)
 
+  # Hoist partnership-level scripts out of the locality loop for performance.
+  # This saves ~10-20 seconds per locality iteration by not re-rendering the HSCP map.
+  source("Services/2a. Services data manipulation.R")
+  source("Services/3. Service HSCP map.R")
+
   # Loop to create the profiles for all the localities in the list
 
   # There are several stages to the profiles:
@@ -64,8 +69,7 @@ for (HSCP in hscp_list) {
     source("Households/Households Code.R")
 
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
-    source("Services/3. Service HSCP map.R")
+    source("Services/2b. Services table.R")
 
     # General Health ----
     source("General Health/3. General Health Outputs.R")
@@ -119,4 +123,16 @@ for (HSCP in hscp_list) {
     # Force garbage collection to free up memory
     gc()
   }
+
+  # Partnership-level housekeeping
+  # Remove objects created by hoisted scripts to prevent memory buildup across HSCPs.
+  rm(list = intersect(c(
+    "service_map", "markers_gp", "markers_care_home", "markers_emergency_dep",
+    "markers_miu", "care_homes", "postcode_lkp", "prac", "hosp_lookup",
+    "hosp_postcodes", "hosp_types", "lookup2", "n_loc", "ext_year", "leg1",
+    "leg2", "leg12", "shp", "shp_hscp", "places", "all_markers", "api_key",
+    "col_palette", "hscp_loc", "locality_map_id", "max_lat", "max_long",
+    "min_lat", "min_long", "zones_coord", "service_map_background",
+    "service_map_1", "service_map_2", "blank_leg"
+  ), ls()))
 }
