@@ -1,0 +1,3 @@
+## 2025-05-14 - Hoisting Map Generation in Nested Loops
+**Learning:** In R report generation pipelines using nested loops (Partnership > Locality), generating static assets like maps in the inner loop is a major bottleneck. Moving map generation to the outer loop saved ~10-20 seconds per locality iteration.
+**Action:** Always identify objects that are identical for all iterations of an inner loop (e.g., partnership-level maps, totals, or shared lookups) and 'hoist' their creation to the outer loop. Ensure proper environment management (using `loop_env` and explicit `rm()`) to preserve these objects in the inner loop while preventing memory leaks between outer loop iterations.

@@ -17,7 +17,8 @@
 # LOCALITY <- read_in_localities() |> filter(hscp2019name == HSCP) |> slice(1) |> pull(hscp_locality)
 
 # Source the data manipulation script for services
-# source("Services/2. Services data manipulation & table.R")
+# source("Services/2a. Services data manipulation.R")
+# source("Services/2b. Services table.R")
 
 # 1. Set up ----
 
@@ -32,7 +33,10 @@ library(patchwork)
 # 2. Read in locality shape files ----
 
 shp <- read_sf(
-  "/conf/linkage/output/lookups/Unicode/Geography/Shapefiles/HSCP Locality (Datazone2011 Base)/HSCP_Locality.shp"
+  fs::path(
+    "/conf/linkage/output/lookups/Unicode/Geography/Shapefiles",
+    "HSCP Locality (Datazone2011 Base)/HSCP_Locality.shp"
+  )
 )
 shp <- st_transform(shp, 4326) |>
   select(hscp_local, HSCP_name, Shape_Leng, Shape_Area, geometry)
@@ -119,15 +123,18 @@ max_lat <- zones_coord$max_lat + 0.01
 
 # get data zones in HSCP
 hscp_loc <- read_csv(
-  "/conf/linkage/output/lookups/Unicode/Geography/HSCP Locality/HSCP Localities_DZ11_Lookup_20240513.csv"
+  fs::path(
+    "/conf/linkage/output/lookups/Unicode/Geography/HSCP Locality",
+    "HSCP Localities_DZ11_Lookup_20240513.csv"
+  )
 ) |>
   select(datazone2011, hscp2019name) |>
   filter(hscp2019name == HSCP)
 
 # get place names of cities, towns and villages within locality
-places <- read_csv(paste0(
-  "/conf/linkage/output/lookups/Unicode/Geography/",
-  "Shapefiles/Scottish Places/Places to Data Zone Lookup.csv"
+places <- read_csv(fs::path(
+  "/conf/linkage/output/lookups/Unicode/Geography/Shapefiles/Scottish Places",
+  "Places to Data Zone Lookup.csv"
 )) |>
   rename(datazone2011 = DataZone) |>
   filter(datazone2011 %in% hscp_loc$datazone2011) |>
@@ -149,7 +156,7 @@ places <- read_csv(paste0(
   filter(type != "hamlet" & type != "village") # remove smaller places
 
 # 3.3 Background map ----
-locality_map_id <- read_csv(paste0(lp_path, "Services/", "locality_map_id.csv"))
+locality_map_id <- read_csv(fs::path(lp_path, "Services", "locality_map_id.csv"))
 api_key <- locality_map_id$id
 # upload map background from stadia maps, enter registration key, filter for max and min long/lat
 register_stadiamaps(key = api_key)
@@ -394,48 +401,6 @@ service_map <- cowplot::plot_grid(
 # preview final service map
 # plot(service_map)
 
-# 4 Cleanup ----
-# remove unnecessary objects
-rm(
-  blank_leg,
-  Clacks_Royal,
-  data,
-  hosp_postcodes,
-  hosp_types,
-  leg1,
-  leg2,
-  leg12,
-  markers_care_home,
-  markers_emergency_dep,
-  markers_gp,
-  markers_miu,
-  other_care_type,
-  postcode_lkp,
-  service_map_1,
-  service_map_2,
-  service_map_background,
-  shp,
-  shp_hscp,
-  zones_coord
-)
-
 # Housekeeping ----
-# These objects are left over after the script is run
-# but don't appear to be used in any 'downstream' process:
-# Main markdown, Summary Table, Excel data tables, SDC output.
-# TODO: Investigate if these can be removed earlier or not created at all.
-rm(
-  all_markers,
-  api_key,
-  col_palette,
-  ext_year,
-  hscp_loc,
-  locality_map_id,
-  lookup2,
-  max_lat,
-  max_long,
-  min_lat,
-  min_long,
-  places
-)
-gc()
+# Housekeeping has been moved to the outer loop in Build Profiles.R
+# to allow objects to be reused across locality iterations.
