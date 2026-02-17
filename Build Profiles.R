@@ -124,14 +124,45 @@ for (HSCP in hscp_list) {
   }
 
   # HSCP level cleanup ----
-  rm(list = intersect(c(
-    "service_map", "markers_gp", "markers_miu", "markers_emergency_dep",
-    "markers_care_home", "markers_other_care", "care_homes", "postcode_lkp",
-    "prac", "hosp_lookup", "hosp_postcodes", "hosp_types", "lookup2",
-    "n_loc", "ext_year", "leg1", "leg2", "leg12", "all_markers",
-    "service_map_1", "service_map_2", "service_map_background",
-    "shp", "shp_hscp", "places", "col_palette", "zones_coord",
-    "min_long", "max_long", "min_lat", "max_lat", "hscp_loc",
-    "locality_map_id", "api_key"
-  ), ls()))
+  rm(
+    list = intersect(
+      c(
+        "service_map",
+        "markers_gp",
+        "markers_miu",
+        "markers_emergency_dep",
+        "markers_care_home",
+        "markers_other_care",
+        "care_homes",
+        "postcode_lkp",
+        "prac",
+        "hosp_lookup",
+        "hosp_postcodes",
+        "hosp_types",
+        "lookup2",
+        "n_loc",
+        "ext_year",
+        "leg1",
+        "leg2",
+        "leg12",
+        "all_markers",
+        "service_map_1",
+        "service_map_2",
+        "service_map_background",
+        "shp",
+        "shp_hscp",
+        "places",
+        "col_palette",
+        "zones_coord",
+        "min_long",
+        "max_long",
+        "min_lat",
+        "max_lat",
+        "hscp_loc",
+        "locality_map_id",
+        "api_key"
+      ),
+      ls()
+    )
+  )
 }

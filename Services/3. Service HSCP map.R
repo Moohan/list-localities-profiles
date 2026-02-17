@@ -156,7 +156,11 @@ places <- read_csv(fs::path(
   filter(type != "hamlet" & type != "village") # remove smaller places
 
 # 3.3 Background map ----
-locality_map_id <- read_csv(fs::path(lp_path, "Services", "locality_map_id.csv"))
+locality_map_id <- read_csv(fs::path(
+  lp_path,
+  "Services",
+  "locality_map_id.csv"
+))
 api_key <- locality_map_id$id
 # upload map background from stadia maps, enter registration key, filter for max and min long/lat
 register_stadiamaps(key = api_key)
