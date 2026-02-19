@@ -198,18 +198,20 @@ for (HSCP in hscp_list) {
   gc()
 
   # HSCP cleanup ----
-  rm(list = intersect(
-    c(
-      "markers_gp",
-      "markers_miu",
-      "markers_emergency_dep",
-      "markers_care_home",
-      "other_care_type_hscp",
-      "n_loc",
-      "ext_year",
-      "postcode_lkp",
-      "lookup2"
-    ),
-    ls()
-  ))
+  rm(
+    list = intersect(
+      c(
+        "markers_gp",
+        "markers_miu",
+        "markers_emergency_dep",
+        "markers_care_home",
+        "other_care_type_hscp",
+        "n_loc",
+        "ext_year",
+        "postcode_lkp",
+        "lookup2"
+      ),
+      ls()
+    )
+  )
 }
