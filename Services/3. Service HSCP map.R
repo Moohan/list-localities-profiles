@@ -1,23 +1,5 @@
-# LOCALITY PROFILES SERVICES MAP & TABLE CODE
+# LOCALITY PROFILES SERVICES MAP CODE
 # Code for creating the HSCP services map for the locality profiles
-
-# 0. Testing Set up ----
-
-## Select HCSP (for testing only)
-# HSCP <- "Renfrewshire"
-
-## Set file path
-
-# lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
-
-# Source in functions code (for testing only)
-# source("Master RMarkdown Document & Render Code/Global Script.R")
-
-## Select a locality based on the HSCP (for source code "2. Services Outputs" to run - it does not matter which one is chosen)
-# LOCALITY <- read_in_localities() |> filter(hscp2019name == HSCP) |> slice(1) |> pull(hscp_locality)
-
-# Source the data manipulation script for services
-# source("Services/2. Services data manipulation & table.R")
 
 # 1. Set up ----
 
@@ -118,19 +100,19 @@ min_lat <- zones_coord$min_lat - 0.01
 max_lat <- zones_coord$max_lat + 0.01
 
 # get data zones in HSCP
-hscp_loc <- read_csv(
+hscp_loc_map <- read_csv(
   "/conf/linkage/output/lookups/Unicode/Geography/HSCP Locality/HSCP Localities_DZ11_Lookup_20240513.csv"
 ) |>
   select(datazone2011, hscp2019name) |>
   filter(hscp2019name == HSCP)
 
 # get place names of cities, towns and villages within locality
-places <- read_csv(paste0(
-  "/conf/linkage/output/lookups/Unicode/Geography/",
-  "Shapefiles/Scottish Places/Places to Data Zone Lookup.csv"
+places <- read_csv(fs::path(
+  "/conf/linkage/output/lookups/Unicode/Geography",
+  "Shapefiles", "Scottish Places", "Places to Data Zone Lookup.csv"
 )) |>
   rename(datazone2011 = DataZone) |>
-  filter(datazone2011 %in% hscp_loc$datazone2011) |>
+  filter(datazone2011 %in% hscp_loc_map$datazone2011) |>
   # extra filter to remove place names with coordinates outwith locality
   filter(
     Longitude >= min_long &
@@ -149,7 +131,7 @@ places <- read_csv(paste0(
   filter(type != "hamlet" & type != "village") # remove smaller places
 
 # 3.3 Background map ----
-locality_map_id <- read_csv(paste0(lp_path, "Services/", "locality_map_id.csv"))
+locality_map_id <- read_csv(fs::path(lp_path, "Services", "locality_map_id.csv"))
 api_key <- locality_map_id$id
 # upload map background from stadia maps, enter registration key, filter for max and min long/lat
 register_stadiamaps(key = api_key)
@@ -163,12 +145,9 @@ service_map_background <- get_stadiamap(
   maptype = "stamen_terrain_background"
 )
 
-# preview map
-# ggmap(service_map_background)
-
 # 3.4 Map markers ----
 # add locality polygons and service markers to map where services are located
-service_map <- ggmap(service_map_background) +
+service_map_plot <- ggmap(service_map_background) +
   geom_sf(
     data = shp_hscp,
     mapping = aes(
@@ -182,7 +161,7 @@ service_map <- ggmap(service_map_background) +
 
 # check if services markers exist for locality
 if (nrow(markers_gp) > 0) {
-  service_map <- service_map +
+  service_map_plot <- service_map_plot +
     geom_point(
       data = markers_gp,
       mapping = aes(
@@ -197,7 +176,7 @@ if (nrow(markers_gp) > 0) {
     )
 }
 if (nrow(markers_care_home) > 0) {
-  service_map <- service_map +
+  service_map_plot <- service_map_plot +
     geom_point(
       data = markers_care_home,
       mapping = aes(
@@ -212,7 +191,7 @@ if (nrow(markers_care_home) > 0) {
     )
 }
 if (nrow(markers_emergency_dep) > 0) {
-  service_map <- service_map +
+  service_map_plot <- service_map_plot +
     geom_point(
       data = markers_emergency_dep,
       mapping = aes(
@@ -227,7 +206,7 @@ if (nrow(markers_emergency_dep) > 0) {
     )
 }
 if (nrow(markers_miu) > 0) {
-  service_map <- service_map +
+  service_map_plot <- service_map_plot +
     geom_point(
       data = markers_miu,
       mapping = aes(
@@ -242,13 +221,10 @@ if (nrow(markers_miu) > 0) {
     )
 }
 
-# preview HSCP map with service markers added and localities outlined
-# plot(service_map)
-
 # 3.5 Final map ----
 # create final service map WITHOUT LEGEND
 
-service_map <- service_map +
+service_map_plot <- service_map_plot +
   labs(colour = "Service Type") +
   scale_color_manual(
     values = c(
@@ -309,19 +285,19 @@ leg1 <- cowplot::get_legend(service_map_1)
 
 # Create Map of Just the Locations in order to use its legend (of location colours and shapes) ----
 
-all_markers <- dplyr::select(markers_miu, name, latitude, longitude) %>%
-  mutate(type = "Minor Injury Unit") %>%
-  bind_rows(
-    dplyr::select(markers_care_home, name, latitude, longitude) %>%
-      mutate(type = "Care Home")
-  ) %>%
-  bind_rows(
-    dplyr::select(markers_emergency_dep, name, latitude, longitude) %>%
-      mutate(type = "Emergency Department")
-  ) %>%
-  bind_rows(
-    dplyr::select(markers_gp, name = gp_practice_name, latitude, longitude) %>%
-      mutate(type = "GP Practice")
+all_markers <- dplyr::select(markers_miu, name, latitude, longitude) |>
+  dplyr::mutate(type = "Minor Injury Unit") |>
+  dplyr::bind_rows(
+    dplyr::select(markers_care_home, name, latitude, longitude) |>
+      dplyr::mutate(type = "Care Home")
+  ) |>
+  dplyr::bind_rows(
+    dplyr::select(markers_emergency_dep, name, latitude, longitude) |>
+      dplyr::mutate(type = "Emergency Department")
+  ) |>
+  dplyr::bind_rows(
+    dplyr::select(markers_gp, name = gp_practice_name, latitude, longitude) |>
+      dplyr::mutate(type = "GP Practice")
   )
 
 service_map_2 <- ggmap(service_map_background) +
@@ -383,7 +359,7 @@ leg12 <- cowplot::plot_grid(
 # Combine plot of locations and localities with corrected legends
 
 service_map <- cowplot::plot_grid(
-  service_map,
+  service_map_plot,
   leg12,
   nrow = 1,
   align = "h",
@@ -391,51 +367,29 @@ service_map <- cowplot::plot_grid(
   rel_widths = c(1.7, 1.0)
 )
 
-# preview final service map
-# plot(service_map)
-
-# 4 Cleanup ----
-# remove unnecessary objects
-rm(
-  blank_leg,
-  Clacks_Royal,
-  data,
-  hosp_postcodes,
-  hosp_types,
-  leg1,
-  leg2,
-  leg12,
-  markers_care_home,
-  markers_emergency_dep,
-  markers_gp,
-  markers_miu,
-  other_care_type,
-  postcode_lkp,
-  service_map_1,
-  service_map_2,
-  service_map_background,
-  shp,
-  shp_hscp,
-  zones_coord
-)
-
-# Housekeeping ----
-# These objects are left over after the script is run
-# but don't appear to be used in any 'downstream' process:
-# Main markdown, Summary Table, Excel data tables, SDC output.
-# TODO: Investigate if these can be removed earlier or not created at all.
+# 4. Cleanup ----
+# remove temporary objects created in this script
 rm(
   all_markers,
   api_key,
+  blank_leg,
   col_palette,
-  ext_year,
-  hscp_loc,
+  hscp_loc_map,
+  leg1,
+  leg2,
+  leg12,
   locality_map_id,
-  lookup2,
   max_lat,
   max_long,
   min_lat,
   min_long,
-  places
+  places,
+  service_map_1,
+  service_map_2,
+  service_map_background,
+  service_map_plot,
+  shp,
+  shp_hscp,
+  zones_coord
 )
 gc()
