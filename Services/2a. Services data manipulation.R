@@ -22,7 +22,9 @@ lookup2 <- read_in_localities()
 # If HSCP isn't already defined (e.g. when testing a single locality),
 # derive it from the LOCALITY object.
 if (!exists("HSCP") && exists("LOCALITY")) {
-  HSCP <- as.character(dplyr::filter(lookup2, hscp_locality == LOCALITY)$hscp2019name)
+  HSCP <- as.character(
+    dplyr::filter(lookup2, hscp_locality == LOCALITY)$hscp2019name
+  )
 }
 
 # Get number of localities in HSCP
