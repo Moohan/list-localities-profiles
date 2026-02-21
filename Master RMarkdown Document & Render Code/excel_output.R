@@ -198,35 +198,40 @@ for (HSCP in hscp_list) {
   gc()
 
   # Clean up partnership-level objects
-  rm(list = intersect(c(
-    "service_map",
-    "markers_gp",
-    "markers_miu",
-    "markers_emergency_dep",
-    "markers_care_home",
-    "markers_other_care",
-    "care_homes",
-    "postcode_lkp",
-    "prac",
-    "hosp_lookup",
-    "hosp_postcodes",
-    "hosp_types",
-    "lookup2",
-    "n_loc",
-    "ext_year",
-    "leg1",
-    "shp",
-    "places",
-    "service_map_background",
-    "leg12",
-    "all_markers",
-    "api_key",
-    "col_palette",
-    "hscp_loc",
-    "locality_map_id",
-    "max_lat",
-    "max_long",
-    "min_lat",
-    "min_long"
-  ), ls()))
+  rm(
+    list = intersect(
+      c(
+        "service_map",
+        "markers_gp",
+        "markers_miu",
+        "markers_emergency_dep",
+        "markers_care_home",
+        "markers_other_care",
+        "care_homes",
+        "postcode_lkp",
+        "prac",
+        "hosp_lookup",
+        "hosp_postcodes",
+        "hosp_types",
+        "lookup2",
+        "n_loc",
+        "ext_year",
+        "leg1",
+        "shp",
+        "places",
+        "service_map_background",
+        "leg12",
+        "all_markers",
+        "api_key",
+        "col_palette",
+        "hscp_loc",
+        "locality_map_id",
+        "max_lat",
+        "max_long",
+        "min_lat",
+        "min_long"
+      ),
+      ls()
+    )
+  )
 }
