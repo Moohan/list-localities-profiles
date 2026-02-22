@@ -130,17 +130,46 @@ for (HSCP in hscp_list) {
 
   # 3. Outer loop housekeeping ----
   # Clean up partnership-level objects created for the hoisted scripts
-  rm(list = intersect(
-    c(
-      "service_map", "markers_gp", "markers_miu", "markers_emergency_dep",
-      "markers_care_home", "care_homes", "postcode_lkp", "prac",
-      "hosp_lookup", "hosp_postcodes", "hosp_types", "lookup2", "n_loc",
-      "ext_year", "leg1", "leg2", "leg12", "shp", "shp_hscp", "places",
-      "locality_map_id", "hscp_loc", "zones_coord", "api_key", "col_palette",
-      "min_long", "max_long", "min_lat", "max_lat", "all_markers", "service_map_1",
-      "service_map_2", "service_map_background", "data"
-    ),
-    ls()
-  ))
+  rm(
+    list = intersect(
+      c(
+        "service_map",
+        "markers_gp",
+        "markers_miu",
+        "markers_emergency_dep",
+        "markers_care_home",
+        "care_homes",
+        "postcode_lkp",
+        "prac",
+        "hosp_lookup",
+        "hosp_postcodes",
+        "hosp_types",
+        "lookup2",
+        "n_loc",
+        "ext_year",
+        "leg1",
+        "leg2",
+        "leg12",
+        "shp",
+        "shp_hscp",
+        "places",
+        "locality_map_id",
+        "hscp_loc",
+        "zones_coord",
+        "api_key",
+        "col_palette",
+        "min_long",
+        "max_long",
+        "min_lat",
+        "max_lat",
+        "all_markers",
+        "service_map_1",
+        "service_map_2",
+        "service_map_background",
+        "data"
+      ),
+      ls()
+    )
+  )
   gc()
 }
