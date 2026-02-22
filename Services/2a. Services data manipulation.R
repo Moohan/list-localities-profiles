@@ -1,48 +1,37 @@
 ############################################################################################# .
 #                                                                                           #
-#                         LOCALITY PROFILES SERVICES MAP & TABLE CODE                       #
+#                         LOCALITY PROFILES SERVICES MAP & DATA MANIPULATION                #
 #                                                                                           #
 ############################################################################################# .
 
 ## Code used to manipulate services data for locality profiles.
-# Also produces a table of what services are in the locality.
-# The map is created in script "3. Services HSCP Map" - this is so that it does not have to run
-# for every locality
+# The map is created in script "3. Services HSCP Map"
+# The table is created in script "2b. Services table"
 
-## Written by C.Puech
-## Created on 24/02/2020
-## Latest update August 2022 - rewrote parts of code for smoother process
-
-###### 1. Set up ######
+# 1. Set up ----
 
 # Change year to be the year in the data folder name
-ext_year <- 2024
+if (!exists("ext_year")) {
+  ext_year <- 2024
+}
 
-## Set Locality (for testing only)
-# LOCALITY <- "Falkirk West"
-
-## Set file path
-# lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
-
-# Source in functions code
-# source("Master RMarkdown Document & Render Code/Global Script.R")
-
-### Geographical lookups and objects ----
-
-# Locality lookup
-lookup <- read_in_localities(dz_level = TRUE)
+# Locality lookup (DZ level is not needed here and overwriting the global 'lookup'
+# can cause issues in the orchestration loops)
+# lookup_dz <- read_in_localities(dz_level = TRUE)
 
 # Lookup without datazones
 lookup2 <- read_in_localities()
 
-## Determine HSCP
-HSCP <- as.character(filter(lookup2, hscp_locality == LOCALITY)$hscp2019name)
+# If HSCP is not already defined, try to get it from LOCALITY (for testing/Global Script)
+if (!exists("HSCP") && exists("LOCALITY")) {
+  HSCP <- as.character(filter(lookup2, hscp_locality == LOCALITY)$hscp2019name)
+}
 
 # Get number of localities in HSCP
 n_loc <- count_localities(lookup2, HSCP)
 
 
-###### 2. Read in services data ######
+# 2. Read in services data ----
 
 ## Read in Postcode file for latitudes and longitudes
 
@@ -87,7 +76,7 @@ care_homes <- MDSF
 rm(curr, hosp, MDSF)
 
 
-###### 3. Manipulate services data ######
+# 3. Manipulate services data ----
 
 ## GP Practices ----
 
@@ -161,60 +150,3 @@ markers_care_home <- care_homes %>%
   mutate(postcode = gsub(" ", "", service_postcode, fixed = TRUE)) %>%
   left_join(postcode_lkp, by = "postcode") %>%
   filter(hscp2019name == HSCP)
-
-
-###### 4. Table ######
-
-# Subset care which is not Elderly care for table
-other_care_type <- care_homes %>%
-  select(
-    type = care_service,
-    subtype,
-    name = service_name,
-    service_postcode
-  ) %>%
-  filter(type == "Care Home Service") %>%
-  filter(subtype != "Older People") %>%
-  mutate(postcode = gsub(" ", "", service_postcode, fixed = TRUE)) %>%
-  left_join(postcode_lkp, by = "postcode") %>%
-  filter(hscp_locality == LOCALITY)
-
-# Create table
-services_tibble <- tibble(
-  Type = c("Primary Care", "A&E", "", "Care Home", ""),
-  Service = c(
-    "GP Practice",
-    "Emergency Department",
-    "Minor Injuries Unit",
-    "Elderly Care",
-    "Other"
-  ),
-  Number = c(
-    sum(markers_gp[["hscp_locality"]] == LOCALITY),
-    sum(markers_emergency_dep[["hscp_locality"]] == LOCALITY),
-    sum(markers_miu[["hscp_locality"]] == LOCALITY),
-    sum(markers_care_home[["hscp_locality"]] == LOCALITY),
-    nrow(other_care_type)
-  )
-)
-
-# Housekeeping ----
-# These objects are left over after the script is run
-# but don't appear to be used in any 'downstream' process:
-# Main markdown, Summary Table, Excel data tables, SDC output.
-# TODO: Investigate if these can be removed earlier or not created at all.
-rm(
-  care_homes,
-  Clacks_Royal,
-  data,
-  file,
-  hosp_lookup,
-  hosp_postcodes,
-  hosp_types,
-  name,
-  other_care_type,
-  postcode_lkp,
-  prac,
-  services_file_names
-)
-gc()

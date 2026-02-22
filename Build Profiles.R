@@ -45,16 +45,25 @@ for (HSCP in hscp_list) {
   # Loop to create the profiles for all the localities in the list
 
   # There are several stages to the profiles:
-  # 1. Looping through each locality in the HSCP doing the following:
-  # 1a. Run each section script for that locality
-  # 1b. Run the Rmd for the main body of the profiles
-  # 1c. Run the Rmd for the summary tables
+  # 1. Run HSCP-level scripts (hoisted for performance)
+  # 2. Looping through each locality in the HSCP doing the following:
+  # 2a. Run each section script for that locality
+  # 2b. Run the Rmd for the main body of the profiles
+  # 2c. Run the Rmd for the summary tables
+
+  # 1. Run HSCP-level scripts ----
+  # These scripts are hoisted out of the locality loop to avoid redundant processing.
+  # Services map rendering is especially expensive (~10-20s per partnership).
+
+  # Services ----
+  source("Services/2a. Services data manipulation.R")
+  source("Services/3. Service HSCP map.R")
 
   loop_env <- c(ls(), "loop_env")
 
-  # 1. Loop through each locality to create the main body of the profiles and the summary table
+  # 2. Loop through each locality to create the main body of the profiles and the summary table
   for (LOCALITY in locality_list) {
-    # 1a) Source in all the scripts for a given LOCALITY
+    # 2a) Source in all the scripts for a given LOCALITY
 
     # Demographics ----
     source("Demographics/1. Demographics - Population.R")
@@ -64,8 +73,7 @@ for (HSCP in hscp_list) {
     source("Households/Households Code.R")
 
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
-    source("Services/3. Service HSCP map.R")
+    source("Services/2b. Services table.R")
 
     # General Health ----
     source("General Health/3. General Health Outputs.R")
@@ -119,4 +127,20 @@ for (HSCP in hscp_list) {
     # Force garbage collection to free up memory
     gc()
   }
+
+  # 3. Outer loop housekeeping ----
+  # Clean up partnership-level objects created for the hoisted scripts
+  rm(list = intersect(
+    c(
+      "service_map", "markers_gp", "markers_miu", "markers_emergency_dep",
+      "markers_care_home", "care_homes", "postcode_lkp", "prac",
+      "hosp_lookup", "hosp_postcodes", "hosp_types", "lookup2", "n_loc",
+      "ext_year", "leg1", "leg2", "leg12", "shp", "shp_hscp", "places",
+      "locality_map_id", "hscp_loc", "zones_coord", "api_key", "col_palette",
+      "min_long", "max_long", "min_lat", "max_lat", "all_markers", "service_map_1",
+      "service_map_2", "service_map_background", "data"
+    ),
+    ls()
+  ))
+  gc()
 }
