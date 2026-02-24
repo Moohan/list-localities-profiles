@@ -197,12 +197,30 @@ for (HSCP in hscp_list) {
 
   # Outer loop housekeeping ----
   # Clean up partnership-level objects after all localities are done
-  rm(list = intersect(c(
-    "service_map", "markers_gp", "markers_care_home", "markers_emergency_dep",
-    "markers_miu", "care_homes", "postcode_lkp", "prac", "hosp_lookup",
-    "hosp_postcodes", "hosp_types", "lookup2", "n_loc", "ext_year",
-    "leg1", "shp", "places"
-  ), ls()))
+  rm(
+    list = intersect(
+      c(
+        "service_map",
+        "markers_gp",
+        "markers_care_home",
+        "markers_emergency_dep",
+        "markers_miu",
+        "care_homes",
+        "postcode_lkp",
+        "prac",
+        "hosp_lookup",
+        "hosp_postcodes",
+        "hosp_types",
+        "lookup2",
+        "n_loc",
+        "ext_year",
+        "leg1",
+        "shp",
+        "places"
+      ),
+      ls()
+    )
+  )
 
   rm(list = setdiff(ls(), loop_env))
   # Force garbage collection to free up memory

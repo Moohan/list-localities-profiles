@@ -37,7 +37,9 @@ lookup2 <- read_in_localities()
 ## Determine HSCP
 # Defensive logic to derive HSCP if not already defined (for testing/single chapter use)
 if (!exists("HSCP") && exists("LOCALITY")) {
-  HSCP <- as.character(dplyr::filter(lookup2, hscp_locality == LOCALITY)[["hscp2019name"]])
+  HSCP <- as.character(dplyr::filter(lookup2, hscp_locality == LOCALITY)[[
+    "hscp2019name"
+  ]])
 }
 
 # Get number of localities in HSCP
@@ -75,7 +77,12 @@ services_file_names <- list.files(
 for (file in services_file_names) {
   name <- substr(x = file, 1, 4)
 
-  data <- readRDS(fs::path(lp_path, "Services", paste0("DATA ", ext_year), file)) |>
+  data <- readRDS(fs::path(
+    lp_path,
+    "Services",
+    paste0("DATA ", ext_year),
+    file
+  )) |>
     janitor::clean_names()
 
   assign(name, data)
@@ -94,7 +101,12 @@ rm(curr, hosp, MDSF)
 ## GP Practices ----
 
 prac <- prac |>
-  dplyr::select(practice_code, gp_practice_name, practice_list_size, postcode) |>
+  dplyr::select(
+    practice_code,
+    gp_practice_name,
+    practice_list_size,
+    postcode
+  ) |>
   dplyr::mutate(postcode = gsub(" ", "", postcode, fixed = TRUE))
 
 # Merge practice data with postcode and locality lookups
@@ -133,7 +145,10 @@ markers_emergency_dep <- hosp_lookup |>
   dplyr::filter(type == "Emergency Department") |>
   dplyr::filter(hscp2019name == HSCP)
 
-Clacks_Royal <- dplyr::filter(hosp_lookup, name == "Forth Valley Royal Hospital")
+Clacks_Royal <- dplyr::filter(
+  hosp_lookup,
+  name == "Forth Valley Royal Hospital"
+)
 
 # Ninewells hospital is incorrectly mapped even though postcode ok - so corrected coords here
 
