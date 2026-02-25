@@ -395,22 +395,23 @@ service_map <- cowplot::plot_grid(
 # plot(service_map)
 
 # 4 Cleanup ----
-# remove unnecessary objects
+# Objects used for map generation are cleaned up here, except for those
+# needed by the locality loops (service_map, markers_*, etc.)
 rm(
   blank_leg,
-  Clacks_Royal,
-  data,
-  hosp_postcodes,
-  hosp_types,
+  # Clacks_Royal, # Already removed in 2a
+  # data, # Already removed in 2a
+  # hosp_postcodes, # Already removed in 2a
+  # hosp_types, # Already removed in 2a
   leg1,
   leg2,
   leg12,
-  markers_care_home,
-  markers_emergency_dep,
-  markers_gp,
-  markers_miu,
-  other_care_type,
-  postcode_lkp,
+  # markers_care_home, # KEEP for 2b
+  # markers_emergency_dep, # KEEP for 2b
+  # markers_gp, # KEEP for 2b
+  # markers_miu, # KEEP for 2b
+  # other_care_type, # Created in 2b instead
+  # postcode_lkp, # Already removed in 2a
   service_map_1,
   service_map_2,
   service_map_background,
@@ -419,19 +420,14 @@ rm(
   zones_coord
 )
 
-# Housekeeping ----
-# These objects are left over after the script is run
-# but don't appear to be used in any 'downstream' process:
-# Main markdown, Summary Table, Excel data tables, SDC output.
-# TODO: Investigate if these can be removed earlier or not created at all.
 rm(
   all_markers,
   api_key,
   col_palette,
-  ext_year,
+  # ext_year, # Created in 2a
   hscp_loc,
   locality_map_id,
-  lookup2,
+  # lookup2, # Usually read once
   max_lat,
   max_long,
   min_lat,

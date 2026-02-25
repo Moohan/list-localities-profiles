@@ -42,6 +42,12 @@ for (HSCP in hscp_list) {
     filter(hscp2019name == HSCP) |>
     pull(hscp_locality)
 
+  # Run partnership-level scripts (hoisted outside locality loop)
+  # Services ----
+  # Hoisting Services manipulation and map generation saves ~10-20s per locality
+  source("Services/2a. Services data manipulation.R")
+  source("Services/3. Service HSCP map.R")
+
   # Loop to create the profiles for all the localities in the list
 
   # There are several stages to the profiles:
@@ -64,8 +70,7 @@ for (HSCP in hscp_list) {
     source("Households/Households Code.R")
 
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
-    source("Services/3. Service HSCP map.R")
+    source("Services/2b. Services table.R")
 
     # General Health ----
     source("General Health/3. General Health Outputs.R")
@@ -119,4 +124,11 @@ for (HSCP in hscp_list) {
     # Force garbage collection to free up memory
     gc()
   }
+
+  # Clean up partnership-level objects after locality loop
+  rm(list = intersect(c(
+    "service_map", "markers_gp", "markers_miu",
+    "markers_emergency_dep", "markers_care_home",
+    "other_care_hscp", "ext_year", "n_loc", "lookup2"
+  ), ls()))
 }

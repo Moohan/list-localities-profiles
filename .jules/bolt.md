@@ -1,0 +1,3 @@
+## 2025-05-14 - Services Chapter Hoisting
+**Learning:** Hoisting expensive data manipulation and visualization scripts (like map rendering) from an inner locality loop to an outer partnership (HSCP) loop can significantly improve performance (estimated 10-20 seconds per locality). However, this requires careful management of global variables like 'lookup2' and 'markers_*' that must persist for inner-loop scripts.
+**Action:** When refactoring R scripts for loops, always check for implicit data dependencies between scripts and ensure that 'rm()' calls are adjusted to avoid deleting objects needed by downstream scripts in the inner loop. Use 'rm(list = intersect(..., ls()))' at the end of the outer loop for safe cleanup.
