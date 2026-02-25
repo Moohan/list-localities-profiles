@@ -202,9 +202,19 @@ for (HSCP in hscp_list) {
   gc()
 
   # Clean up partnership-level objects after locality loop
-  rm(list = intersect(c(
-    "markers_gp", "markers_miu",
-    "markers_emergency_dep", "markers_care_home",
-    "other_care_hscp", "ext_year", "n_loc", "lookup2"
-  ), ls()))
+  rm(
+    list = intersect(
+      c(
+        "markers_gp",
+        "markers_miu",
+        "markers_emergency_dep",
+        "markers_care_home",
+        "other_care_hscp",
+        "ext_year",
+        "n_loc",
+        "lookup2"
+      ),
+      ls()
+    )
+  )
 }

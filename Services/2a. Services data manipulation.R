@@ -4,9 +4,13 @@
 if (!exists("HSCP")) {
   if (exists("LOCALITY")) {
     lookup2 <- read_in_localities()
-    HSCP <- as.character(filter(lookup2, hscp_locality == LOCALITY)$hscp2019name)
+    HSCP <- as.character(
+      filter(lookup2, hscp_locality == LOCALITY)$hscp2019name
+    )
   } else {
-    stop("HSCP or LOCALITY must be defined to run Services/2a. Services data manipulation.R")
+    stop(
+      "HSCP or LOCALITY must be defined to run Services/2a. Services data manipulation.R"
+    )
   }
 }
 
