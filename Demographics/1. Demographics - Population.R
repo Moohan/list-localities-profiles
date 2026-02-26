@@ -496,16 +496,10 @@ rm(
 ##################### SECTION 5: Objects for summary table #######################
 
 ## Relevant lookups for creating the table objects
-HSCP <- as.character(filter(lookup, hscp_locality == LOCALITY)$hscp2019name)
-
-# Determine other localities based on LOCALITY object
-other_locs <- lookup %>%
-  select(hscp_locality, hscp2019name) %>%
-  filter(hscp2019name == HSCP & hscp_locality != LOCALITY) %>%
-  arrange(hscp_locality)
-
-# Find number of locs per partnership
-n_loc <- count_localities(lookup, HSCP)
+context <- get_locality_context(lookup, LOCALITY)
+HSCP <- context$HSCP
+other_locs <- context$other_locs
+n_loc <- context$n_loc
 
 ## Locality objects
 total_population <- format_number_for_text(gender_breakdown$total[1])

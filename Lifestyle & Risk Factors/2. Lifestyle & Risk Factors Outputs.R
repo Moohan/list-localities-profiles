@@ -35,17 +35,11 @@ ext_year <- 2024
 lookup <- read_in_localities()
 
 # Determine HSCP and HB based on Loc
-HSCP <- as.character(filter(lookup, hscp_locality == LOCALITY)$hscp2019name)
-HB <- as.character(filter(lookup, hscp_locality == LOCALITY)$hb2019name)
-
-# Determine other localities based on LOCALITY object
-other_locs <- lookup %>%
-  select(hscp_locality, hscp2019name) %>%
-  filter(hscp2019name == HSCP & hscp_locality != LOCALITY) %>%
-  arrange(hscp_locality)
-
-# Find number of locs per partnership
-n_loc <- count_localities(lookup, HSCP)
+context <- get_locality_context(lookup, LOCALITY)
+HSCP <- context$HSCP
+HB <- context$HB
+other_locs <- context$other_locs
+n_loc <- context$n_loc
 
 
 ### Import + clean datasets ----
@@ -411,19 +405,6 @@ bowel_screening_diff_scot <- if_else(
 
 ## Make GH objects table for hscp, scot AND other localities in the partnership
 
-# Function to get latest data from scotpho for other localities
-
-other_locs_summary_table <- function(data, latest_year) {
-  data %>%
-    filter(year == latest_year) %>%
-    filter(area_type == "Locality") %>%
-    rename("hscp_locality" = "area_name") %>%
-    right_join(other_locs, by = join_by(hscp_locality)) %>%
-    arrange(hscp_locality) %>%
-    select(hscp_locality, measure) %>%
-    mutate(measure = round_half_up(measure, 1)) %>%
-    pivot_wider(names_from = hscp_locality, values_from = measure)
-}
 
 # 1. Other locs
 
