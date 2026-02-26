@@ -119,10 +119,14 @@ early_deaths_cancer_rate_earliest <- filter(
   area_type == "Locality"
 )$measure
 
-cancer_deaths_perc_change <- abs(
-  (early_deaths_cancer_rate_latest - early_deaths_cancer_rate_earliest) *
-    100 /
-    early_deaths_cancer_rate_earliest
+cancer_deaths_perc_change <- if_else(
+  early_deaths_cancer_rate_earliest == 0,
+  NA_real_,
+  abs(
+    (early_deaths_cancer_rate_latest - early_deaths_cancer_rate_earliest) *
+      100 /
+      early_deaths_cancer_rate_earliest
+  )
 )
 
 cancer_deaths_changeword <- if_else(
