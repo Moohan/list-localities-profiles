@@ -327,7 +327,7 @@ other_loc_bed_days <- bed_days %>%
   summarise(bed_days = sum(bed_days)) %>%
   ungroup() %>%
   right_join(pops_other_locs, by = join_by(financial_year, hscp_locality)) %>%
-  mutate(adm = replace_na(bed_days, 0)) %>%
+  mutate(bed_days = replace_na(bed_days, 0)) %>%
   mutate(data = round_half_up(bed_days / pop * 100000)) %>%
   mutate(data = format(data, big.mark = ",")) %>%
   select(hscp_locality, data) %>%
