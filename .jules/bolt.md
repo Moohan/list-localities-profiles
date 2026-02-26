@@ -1,0 +1,3 @@
+## 2026-02-26 - Hoisting R scripts in reporting loops
+**Learning:** Performance in R reporting pipelines can be significantly improved by hoisting data manipulation and asset generation (like maps) from locality-level loops to partnership-level loops. However, this requires careful environment management. Objects created in the outer loop must be defined BEFORE the `loop_env` anchor to be preserved across locality iterations, and must be explicitly cleaned up at the end of the outer loop to avoid memory leaks across partnerships.
+**Action:** Always check the `loop_env` assignment point when moving scripts out of a loop, and ensure a corresponding `rm()` call is added to the outer loop's end.
