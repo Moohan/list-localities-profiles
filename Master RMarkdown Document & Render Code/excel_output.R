@@ -198,12 +198,27 @@ for (HSCP in hscp_list) {
   )
 
   # End of HSCP loop housekeeping ----
-  rm(list = intersect(c(
-    "service_map", "markers_gp", "markers_care_home",
-    "markers_emergency_dep", "markers_miu", "care_homes", "postcode_lkp",
-    "prac", "hosp_lookup", "hosp_postcodes", "hosp_types", "lookup2",
-    "n_loc", "ext_year"
-  ), ls()))
+  rm(
+    list = intersect(
+      c(
+        "service_map",
+        "markers_gp",
+        "markers_care_home",
+        "markers_emergency_dep",
+        "markers_miu",
+        "care_homes",
+        "postcode_lkp",
+        "prac",
+        "hosp_lookup",
+        "hosp_postcodes",
+        "hosp_types",
+        "lookup2",
+        "n_loc",
+        "ext_year"
+      ),
+      ls()
+    )
+  )
 
   rm(list = setdiff(ls(), loop_env))
   # Force garbage collection to free up memory
