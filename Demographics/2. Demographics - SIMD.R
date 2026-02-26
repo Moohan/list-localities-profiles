@@ -469,16 +469,10 @@ simd_diff_overall <- simd_16_20_dom %>%
 lookup <- read_in_localities()
 
 ## Relevant lookups for creating the table objects
-HSCP <- as.character(filter(lookup, hscp_locality == LOCALITY)$hscp2019name)
-
-# Determine other localities based on LOCALITY object
-other_locs <- lookup %>%
-  select(hscp_locality, hscp2019name) %>%
-  filter(hscp2019name == HSCP & hscp_locality != LOCALITY) %>%
-  arrange(hscp_locality)
-
-# Find number of locs per partnership
-n_loc <- count_localities(lookup, HSCP)
+context <- get_locality_context(lookup, LOCALITY)
+HSCP <- context$HSCP
+other_locs <- context$other_locs
+n_loc <- context$n_loc
 
 
 ## Other localities in HSCP objects

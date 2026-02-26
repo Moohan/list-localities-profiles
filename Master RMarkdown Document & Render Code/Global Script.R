@@ -195,6 +195,39 @@ count_localities <- function(locality_lookup, hscp_name) {
   return(sum(locality_lookup[["hscp2019name"]] == hscp_name))
 }
 
+## Function to return HSCP, HB, other localities and number of localities ----
+get_locality_context <- function(locality_lookup, locality_name) {
+  hscp_name <- as.character(
+    locality_lookup[
+      locality_lookup$hscp_locality == locality_name,
+      "hscp2019name",
+      drop = TRUE
+    ]
+  )
+
+  hb_name <- as.character(
+    locality_lookup[
+      locality_lookup$hscp_locality == locality_name,
+      "hb2019name",
+      drop = TRUE
+    ]
+  )
+
+  other_localities <- locality_lookup |>
+    dplyr::filter(hscp2019name == hscp_name & hscp_locality != locality_name) |>
+    dplyr::select(hscp_locality, hscp2019name) |>
+    dplyr::arrange(hscp_locality)
+
+  n_localities <- count_localities(locality_lookup, hscp_name)
+
+  return(list(
+    HSCP = hscp_name,
+    HB = hb_name,
+    other_locs = other_localities,
+    n_loc = n_localities
+  ))
+}
+
 ## Function to read in latest SPD file ----
 
 # No arguments needed, just use read_in_latest_postcodes()
@@ -349,140 +382,87 @@ scotpho_time_trend <- function(
   yaxis_title,
   string_wrap,
   rotate_xaxis = FALSE,
-  trend_years = 10
+  trend_years = 10,
+  include_locality = TRUE
 ) {
   # rotate axis criteria if T/F
   if (rotate_xaxis) {
-    rotation <- element_text(angle = 45, hjust = 1)
+    rotation <- ggplot2::element_text(angle = 45, hjust = 1)
   } else {
-    rotation <- element_text(angle = 0)
+    rotation <- ggplot2::element_text(angle = 0)
   }
 
   # filter and reorder data
-  data |>
-    filter(
-      (area_name == LOCALITY & area_type == "Locality") |
+  plot_data <- if (include_locality) {
+    data |>
+      dplyr::filter(
+        (area_name == LOCALITY & area_type == "Locality") |
+          (area_name == HSCP & area_type == "HSCP") |
+          area_name == HB |
+          area_name == "Scotland"
+      )
+  } else {
+    data |>
+      dplyr::filter(
         (area_name == HSCP & area_type == "HSCP") |
-        area_name == HB |
-        area_name == "Scotland"
-    ) |>
-    filter(year >= max(year) - trend_years) |>
-    mutate(
-      area_type = factor(
-        area_type,
-        levels = c("Locality", "HSCP", "Health board", "Scotland")
-      ),
-      area_name = fct_reorder(
-        as.factor(str_wrap(area_name, 23)),
-        as.numeric(area_type)
+          area_name == HB |
+          area_name == "Scotland"
       )
-    ) |>
-    # plot
-    ggplot(aes(
-      x = str_wrap(period_short, width = string_wrap),
-      y = measure,
-      group = area_name,
-      fill = area_name,
-      linetype = area_type
-    )) +
-    geom_line(aes(colour = area_name), linewidth = 1) +
-    geom_point(aes(colour = area_name), size = 2) +
-    geom_ribbon(
-      aes(
-        x = str_wrap(period_short, width = string_wrap),
-        ymin = lower_confidence_interval,
-        ymax = upper_confidence_interval
-      ),
-      alpha = 0.1
-    ) +
-    scale_fill_manual(values = palette) +
-    scale_colour_manual(values = palette) +
-    scale_y_continuous(labels = scales::comma) +
-    theme_profiles() +
-    expand_limits(y = 0) +
-    labs(
-      title = chart_title,
-      x = xaxis_title,
-      y = yaxis_title,
-      caption = "Source: ScotPHO"
-    ) +
-    theme(axis.text.x = rotation) +
-    guides(
-      linetype = "none",
-      shape = "none",
-      fill = "none",
-      colour = guide_legend(nrow = 1, byrow = TRUE)
-    )
-}
-
-
-scotpho_time_trend_HSCP <- function(
-  data,
-  chart_title,
-  xaxis_title,
-  yaxis_title,
-  string_wrap,
-  rotate_xaxis = FALSE
-) {
-  # rotate axis criteria if T/F
-  if (rotate_xaxis) {
-    rotation <- element_text(angle = 45, hjust = 1)
-  } else {
-    rotation <- element_text(angle = 0)
   }
 
-  # filter and reorder data
-  data |>
-    filter(
-      (area_name == HSCP & area_type == "HSCP") |
-        area_name == HB |
-        area_name == "Scotland"
-    ) |>
-    filter(year >= max(year) - 10) |>
-    mutate(
+  levels <- if (include_locality) {
+    c("Locality", "HSCP", "Health board", "Scotland")
+  } else {
+    c("HSCP", "Health board", "Scotland")
+  }
+
+  plot_data |>
+    dplyr::filter(year >= max(year) - trend_years) |>
+    dplyr::mutate(
       area_type = factor(
         area_type,
-        levels = c("HSCP", "Health board", "Scotland")
+        levels = levels
       ),
-      area_name = fct_reorder(
-        as.factor(str_wrap(area_name, 23)),
+      area_name = forcats::fct_reorder(
+        as.factor(stringr::str_wrap(area_name, 23)),
         as.numeric(area_type)
       )
     ) |>
     # plot
-    ggplot(aes(
-      x = str_wrap(period_short, width = string_wrap),
+    ggplot2::ggplot(ggplot2::aes(
+      x = stringr::str_wrap(period_short, width = string_wrap),
       y = measure,
       group = area_name,
       fill = area_name,
       linetype = area_type
     )) +
-    geom_line(aes(colour = area_name), linewidth = 1) +
-    geom_point(aes(colour = area_name), size = 2) +
-    geom_ribbon(
-      aes(
-        x = str_wrap(period_short, width = string_wrap),
+    ggplot2::geom_line(ggplot2::aes(colour = area_name), linewidth = 1) +
+    ggplot2::geom_point(ggplot2::aes(colour = area_name), size = 2) +
+    ggplot2::geom_ribbon(
+      ggplot2::aes(
+        x = stringr::str_wrap(period_short, width = string_wrap),
         ymin = lower_confidence_interval,
         ymax = upper_confidence_interval
       ),
       alpha = 0.1
     ) +
-    scale_fill_manual(values = palette) +
-    scale_colour_manual(values = palette) +
+    ggplot2::scale_fill_manual(values = palette) +
+    ggplot2::scale_colour_manual(values = palette) +
+    ggplot2::scale_y_continuous(labels = scales::comma) +
     theme_profiles() +
-    expand_limits(y = 0) +
-    labs(
+    ggplot2::expand_limits(y = 0) +
+    ggplot2::labs(
       title = chart_title,
       x = xaxis_title,
       y = yaxis_title,
       caption = "Source: ScotPHO"
     ) +
-    theme(axis.text.x = rotation) +
-    guides(
+    ggplot2::theme(axis.text.x = rotation) +
+    ggplot2::guides(
       linetype = "none",
       shape = "none",
       fill = "none",
-      colour = guide_legend(nrow = 1, byrow = TRUE)
+      colour = ggplot2::guide_legend(nrow = 1, byrow = TRUE)
     )
 }
 
@@ -498,95 +478,119 @@ scotpho_time_trend_HSCP <- function(
 # data: data to use for chart
 # chart_title, xaxis_title : titles for chart and x axis
 
-scotpho_bar_chart <- function(data, chart_title, xaxis_title) {
+scotpho_bar_chart <- function(
+  data,
+  chart_title,
+  xaxis_title,
+  include_locality = TRUE
+) {
+  highlight_area <- if (include_locality) LOCALITY else HSCP
+
   data_for_plot <- data |>
-    filter(year == max(year)) |>
-    filter(
+    dplyr::filter(year == max(year)) |>
+    dplyr::filter(
       (area_name %in%
-        c(LOCALITY, other_locs$hscp_locality) &
+        c(if (include_locality) LOCALITY, other_locs$hscp_locality) &
         area_type == "Locality") |
         (area_name == HSCP & area_type == "HSCP") |
         area_name == HB |
         area_name == "Scotland"
     ) |>
-    mutate(
-      text_highlight = area_name == LOCALITY,
+    dplyr::mutate(
+      text_highlight = area_name == highlight_area,
       area_type = factor(
         area_type,
         levels = c("Locality", "HSCP", "Health board", "Scotland")
       ),
-      area_name = fct_reorder(as.factor(str_wrap(area_name, 28)), measure)
+      area_name = forcats::fct_reorder(
+        as.factor(stringr::str_wrap(area_name, 28)),
+        measure
+      )
     ) |>
-    arrange(area_name)
+    dplyr::arrange(area_name)
 
-  ggplot(data_for_plot) +
-    aes(y = area_name, fill = area_type, weight = measure) +
-    geom_bar(colour = "white") +
-    scale_fill_manual(values = palette) +
+  ggplot2::ggplot(data_for_plot) +
+    ggplot2::aes(y = area_name, fill = area_type, weight = measure) +
+    ggplot2::geom_bar(colour = "white") +
+    ggplot2::scale_fill_manual(values = palette) +
     theme_profiles() +
-    theme(
-      axis.text.y = element_text(
-        colour = if_else(data_for_plot$text_highlight, "red", "black"),
-        face = if_else(data_for_plot$text_highlight, "bold", "plain")
+    ggplot2::theme(
+      axis.text.y = ggplot2::element_text(
+        colour = dplyr::if_else(data_for_plot$text_highlight, "red", "black"),
+        face = dplyr::if_else(
+          data_for_plot$text_highlight & include_locality,
+          "bold",
+          "plain"
+        )
       )
     ) +
-    labs(
+    ggplot2::labs(
       title = chart_title,
       x = xaxis_title,
       y = " ",
       fill = " ",
       caption = "Source: ScotPHO"
     ) +
-    geom_errorbar(
-      aes(xmin = lower_confidence_interval, xmax = upper_confidence_interval),
+    ggplot2::geom_errorbar(
+      ggplot2::aes(
+        xmin = lower_confidence_interval,
+        xmax = upper_confidence_interval
+      ),
       width = 0.2,
-      position = position_dodge(width = 1)
+      position = ggplot2::position_dodge(width = 1)
     )
+}
+
+
+scotpho_time_trend_HSCP <- function(
+  data,
+  chart_title,
+  xaxis_title,
+  yaxis_title,
+  string_wrap,
+  rotate_xaxis = FALSE
+) {
+  scotpho_time_trend(
+    data = data,
+    chart_title = chart_title,
+    xaxis_title = xaxis_title,
+    yaxis_title = yaxis_title,
+    string_wrap = string_wrap,
+    rotate_xaxis = rotate_xaxis,
+    include_locality = FALSE
+  )
 }
 
 
 scotpho_bar_chart_HSCP <- function(data, chart_title, xaxis_title) {
-  data_for_plot <- data |>
-    filter(year == max(year)) |>
-    filter(
-      (area_name %in% c(other_locs$hscp_locality) & area_type == "Locality") |
-        (area_name == HSCP & area_type == "HSCP") |
-        area_name == HB |
-        area_name == "Scotland"
-    ) |>
-    mutate(
-      text_highlight = area_name == HSCP,
-      area_type = factor(
-        area_type,
-        levels = c("Locality", "HSCP", "Health board", "Scotland")
-      ),
-      area_name = fct_reorder(as.factor(str_wrap(area_name, 28)), measure)
-    ) |>
-    arrange(area_name)
-
-  ggplot(data_for_plot) +
-    aes(y = area_name, fill = area_type, weight = measure) +
-    geom_bar(colour = "white") +
-    scale_fill_manual(values = palette) +
-    theme_profiles() +
-    theme(
-      axis.text.y = element_text(
-        colour = if_else(data_for_plot$text_highlight, "red", "black")
-      )
-    ) +
-    labs(
-      title = chart_title,
-      x = xaxis_title,
-      y = " ",
-      fill = " ",
-      caption = "Source: ScotPHO"
-    ) +
-    geom_errorbar(
-      aes(xmin = lower_confidence_interval, xmax = upper_confidence_interval),
-      width = 0.2,
-      position = position_dodge(width = 1)
-    )
+  scotpho_bar_chart(
+    data = data,
+    chart_title = chart_title,
+    xaxis_title = xaxis_title,
+    include_locality = FALSE
+  )
 }
+
+## Functions for summary table objects ----
+
+other_locs_summary_table <- function(data, latest_year) {
+  data %>%
+    dplyr::filter(year == latest_year, area_type == "Locality") %>%
+    dplyr::rename("hscp_locality" = "area_name") %>%
+    dplyr::right_join(other_locs, by = dplyr::join_by(hscp_locality)) %>%
+    dplyr::arrange(hscp_locality) %>%
+    dplyr::select(hscp_locality, measure) %>%
+    dplyr::mutate(measure = phstemplates::round_half_up(measure, 1)) %>%
+    tidyr::pivot_wider(names_from = hscp_locality, values_from = measure)
+}
+
+hscp_scot_summary_table <- function(data, latest_year, area) {
+  type <- dplyr::if_else(area == HSCP, "HSCP", "Scotland")
+  temp <- data |>
+    dplyr::filter(year == latest_year, area_name == area, area_type == type)
+  phstemplates::round_half_up(temp[["measure"]], digits = 1)
+}
+
 
 ## Checking for missing data
 check_missing_data_scotpho <- function(data) {

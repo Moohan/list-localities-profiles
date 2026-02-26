@@ -1,0 +1,2448 @@
+{
+  "version": 1,
+  "created": "2026-02-25T18:40:08+00:00",
+  "last_scan": "2026-02-26T12:33:37+00:00",
+  "scan_count": 7,
+  "overall_score": 96.5,
+  "objective_score": 91.3,
+  "strict_score": 95.1,
+  "verified_strict_score": 87.7,
+  "stats": {
+    "total": 26,
+    "open": 7,
+    "fixed": 0,
+    "auto_resolved": 13,
+    "wontfix": 6,
+    "false_positive": 0,
+    "by_tier": {
+      "3": {
+        "open": 7,
+        "fixed": 0,
+        "auto_resolved": 13,
+        "wontfix": 6,
+        "false_positive": 0
+      }
+    }
+  },
+  "findings": {
+    "structural::Unscheduled Care/2. Unscheduled Care outputs.R": {
+      "id": "structural::Unscheduled Care/2. Unscheduled Care outputs.R",
+      "detector": "structural",
+      "file": "Unscheduled Care/2. Unscheduled Care outputs.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Needs decomposition: large (2232 LOC)",
+      "detail": {
+        "loc": 2232
+      },
+      "status": "auto_resolved",
+      "note": "Disappeared from scan \u2014 likely fixed",
+      "first_seen": "2026-02-25T18:40:08+00:00",
+      "last_seen": "2026-02-25T18:40:08+00:00",
+      "resolved_at": "2026-02-26T12:23:30+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "scan_verified",
+        "text": "Disappeared from detector output",
+        "attested_at": "2026-02-26T12:23:30+00:00",
+        "scan_verified": true
+      }
+    },
+    "structural::General Health/3. General Health Outputs.R": {
+      "id": "structural::General Health/3. General Health Outputs.R",
+      "detector": "structural",
+      "file": "General Health/3. General Health Outputs.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Needs decomposition: large (1396 LOC)",
+      "detail": {
+        "loc": 1396
+      },
+      "status": "auto_resolved",
+      "note": "Disappeared from scan \u2014 likely fixed",
+      "first_seen": "2026-02-25T18:40:08+00:00",
+      "last_seen": "2026-02-25T18:40:08+00:00",
+      "resolved_at": "2026-02-26T12:23:30+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "scan_verified",
+        "text": "Disappeared from detector output",
+        "attested_at": "2026-02-26T12:23:30+00:00",
+        "scan_verified": true
+      }
+    },
+    "structural::Unscheduled Care/1. Unscheduled Care data extraction.R": {
+      "id": "structural::Unscheduled Care/1. Unscheduled Care data extraction.R",
+      "detector": "structural",
+      "file": "Unscheduled Care/1. Unscheduled Care data extraction.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Needs decomposition: large (970 LOC)",
+      "detail": {
+        "loc": 970
+      },
+      "status": "auto_resolved",
+      "note": "Disappeared from scan \u2014 likely fixed",
+      "first_seen": "2026-02-25T18:40:08+00:00",
+      "last_seen": "2026-02-25T18:40:08+00:00",
+      "resolved_at": "2026-02-26T12:23:30+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "scan_verified",
+        "text": "Disappeared from detector output",
+        "attested_at": "2026-02-26T12:23:30+00:00",
+        "scan_verified": true
+      }
+    },
+    "structural::Master RMarkdown Document & Render Code/Global Script.R": {
+      "id": "structural::Master RMarkdown Document & Render Code/Global Script.R",
+      "detector": "structural",
+      "file": "Master RMarkdown Document & Render Code/Global Script.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Needs decomposition: large (881 LOC)",
+      "detail": {
+        "loc": 881
+      },
+      "status": "open",
+      "note": "Reopened (\u00d71) \u2014 reappeared in scan (was fixed)",
+      "first_seen": "2026-02-25T18:40:08+00:00",
+      "last_seen": "2026-02-26T12:33:37+00:00",
+      "resolved_at": null,
+      "reopen_count": 1,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "structural::Demographics/1. Demographics - Population.R": {
+      "id": "structural::Demographics/1. Demographics - Population.R",
+      "detector": "structural",
+      "file": "Demographics/1. Demographics - Population.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Needs decomposition: large (618 LOC)",
+      "detail": {
+        "loc": 618
+      },
+      "status": "open",
+      "note": "Reopened (\u00d71) \u2014 reappeared in scan (was fixed)",
+      "first_seen": "2026-02-25T18:40:08+00:00",
+      "last_seen": "2026-02-26T12:33:37+00:00",
+      "resolved_at": null,
+      "reopen_count": 1,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "structural::Demographics/2. Demographics - SIMD.R": {
+      "id": "structural::Demographics/2. Demographics - SIMD.R",
+      "detector": "structural",
+      "file": "Demographics/2. Demographics - SIMD.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Needs decomposition: large (541 LOC)",
+      "detail": {
+        "loc": 541
+      },
+      "status": "open",
+      "note": "Reopened (\u00d71) \u2014 reappeared in scan (was fixed)",
+      "first_seen": "2026-02-25T18:40:08+00:00",
+      "last_seen": "2026-02-26T12:33:37+00:00",
+      "resolved_at": null,
+      "reopen_count": 1,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "structural::Lifestyle & Risk Factors/2. Lifestyle & Risk Factors Outputs.R": {
+      "id": "structural::Lifestyle & Risk Factors/2. Lifestyle & Risk Factors Outputs.R",
+      "detector": "structural",
+      "file": "Lifestyle & Risk Factors/2. Lifestyle & Risk Factors Outputs.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Needs decomposition: large (501 LOC)",
+      "detail": {
+        "loc": 501
+      },
+      "status": "auto_resolved",
+      "note": "Disappeared from scan \u2014 likely fixed",
+      "first_seen": "2026-02-25T18:40:08+00:00",
+      "last_seen": "2026-02-26T12:29:15+00:00",
+      "resolved_at": "2026-02-26T12:33:37+00:00",
+      "reopen_count": 1,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "scan_verified",
+        "text": "Disappeared from detector output",
+        "attested_at": "2026-02-26T12:33:37+00:00",
+        "scan_verified": true
+      }
+    },
+    "boilerplate_duplication::Demographics/1. Demographics - Population.R::32cd24dc2a903833": {
+      "id": "boilerplate_duplication::Demographics/1. Demographics - Population.R::32cd24dc2a903833",
+      "detector": "boilerplate_duplication",
+      "file": "Demographics/1. Demographics - Population.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Boilerplate block repeated across 2 files (window 13 lines): Demographics/1. Demographics - Population.R:498, Demographics/2. Demographics - SIMD.R:471",
+      "detail": {
+        "distinct_files": 2,
+        "window_size": 13,
+        "locations": [
+          {
+            "file": "Demographics/1. Demographics - Population.R",
+            "line": 498
+          },
+          {
+            "file": "Demographics/2. Demographics - SIMD.R",
+            "line": 471
+          }
+        ],
+        "sample": [
+          "## Relevant lookups for creating the table objects",
+          "HSCP <- as.character(filter(lookup, hscp_locality == LOCALITY)$hscp2019name)",
+          "",
+          "# Determine other localities based on LOCALITY object"
+        ]
+      },
+      "status": "auto_resolved",
+      "note": "Disappeared from scan \u2014 likely fixed",
+      "first_seen": "2026-02-25T18:40:24+00:00",
+      "last_seen": "2026-02-25T18:40:24+00:00",
+      "resolved_at": "2026-02-26T12:23:30+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "scan_verified",
+        "text": "Disappeared from detector output",
+        "attested_at": "2026-02-26T12:23:30+00:00",
+        "scan_verified": true
+      }
+    },
+    "boilerplate_duplication::Master RMarkdown Document & Render Code/Global Script.R::16873f018b3ed81e": {
+      "id": "boilerplate_duplication::Master RMarkdown Document & Render Code/Global Script.R::16873f018b3ed81e",
+      "detector": "boilerplate_duplication",
+      "file": "Master RMarkdown Document & Render Code/Global Script.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Boilerplate block repeated across 1 files (window 18 lines): Master RMarkdown Document & Render Code/Global Script.R:558",
+      "detail": {
+        "distinct_files": 1,
+        "window_size": 18,
+        "locations": [
+          {
+            "file": "Master RMarkdown Document & Render Code/Global Script.R",
+            "line": 558
+          }
+        ],
+        "sample": [
+          ",",
+          "      area_type = factor(",
+          "        area_type,",
+          "        levels = c(\"Locality\", \"HSCP\", \"Health board\", \"Scotland\")"
+        ]
+      },
+      "status": "auto_resolved",
+      "note": "Disappeared from scan \u2014 likely fixed",
+      "first_seen": "2026-02-25T18:40:24+00:00",
+      "last_seen": "2026-02-25T18:40:24+00:00",
+      "resolved_at": "2026-02-26T12:23:30+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "scan_verified",
+        "text": "Disappeared from detector output",
+        "attested_at": "2026-02-26T12:23:30+00:00",
+        "scan_verified": true
+      }
+    },
+    "boilerplate_duplication::Master RMarkdown Document & Render Code/Global Script.R::86645ff5f75d8cf3": {
+      "id": "boilerplate_duplication::Master RMarkdown Document & Render Code/Global Script.R::86645ff5f75d8cf3",
+      "detector": "boilerplate_duplication",
+      "file": "Master RMarkdown Document & Render Code/Global Script.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Boilerplate block repeated across 1 files (window 28 lines): Master RMarkdown Document & Render Code/Global Script.R:445",
+      "detail": {
+        "distinct_files": 1,
+        "window_size": 28,
+        "locations": [
+          {
+            "file": "Master RMarkdown Document & Render Code/Global Script.R",
+            "line": 445
+          }
+        ],
+        "sample": [
+          "\"HSCP\", \"Health board\", \"Scotland\")",
+          "      ),",
+          "      area_name = fct_reorder(",
+          "        as.factor(str_wrap(area_name, 23)),"
+        ]
+      },
+      "status": "auto_resolved",
+      "note": "Disappeared from scan \u2014 likely fixed",
+      "first_seen": "2026-02-25T18:40:24+00:00",
+      "last_seen": "2026-02-25T18:40:24+00:00",
+      "resolved_at": "2026-02-26T12:23:30+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "scan_verified",
+        "text": "Disappeared from detector output",
+        "attested_at": "2026-02-26T12:23:30+00:00",
+        "scan_verified": true
+      }
+    },
+    "boilerplate_duplication::Master RMarkdown Document & Render Code/Global Script.R::c73f1ac2781b6a06": {
+      "id": "boilerplate_duplication::Master RMarkdown Document & Render Code/Global Script.R::c73f1ac2781b6a06",
+      "detector": "boilerplate_duplication",
+      "file": "Master RMarkdown Document & Render Code/Global Script.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Boilerplate block repeated across 1 files (window 18 lines): Master RMarkdown Document & Render Code/Global Script.R:574",
+      "detail": {
+        "distinct_files": 1,
+        "window_size": 18,
+        "locations": [
+          {
+            "file": "Master RMarkdown Document & Render Code/Global Script.R",
+            "line": 574
+          }
+        ],
+        "sample": [
+          ")",
+          "      )",
+          "    ) +",
+          "    labs("
+        ]
+      },
+      "status": "auto_resolved",
+      "note": "Disappeared from scan \u2014 likely fixed",
+      "first_seen": "2026-02-25T18:40:24+00:00",
+      "last_seen": "2026-02-25T18:40:24+00:00",
+      "resolved_at": "2026-02-26T12:23:30+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "scan_verified",
+        "text": "Disappeared from detector output",
+        "attested_at": "2026-02-26T12:23:30+00:00",
+        "scan_verified": true
+      }
+    },
+    "boilerplate_duplication::Unscheduled Care/1. Unscheduled Care data extraction.R::fb1808fd2f65c72e": {
+      "id": "boilerplate_duplication::Unscheduled Care/1. Unscheduled Care data extraction.R::fb1808fd2f65c72e",
+      "detector": "boilerplate_duplication",
+      "file": "Unscheduled Care/1. Unscheduled Care data extraction.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Boilerplate block repeated across 1 files (window 9 lines): Unscheduled Care/1. Unscheduled Care data extraction.R:98",
+      "detail": {
+        "distinct_files": 1,
+        "window_size": 9,
+        "locations": [
+          {
+            "file": "Unscheduled Care/1. Unscheduled Care data extraction.R",
+            "line": 98
+          }
+        ],
+        "sample": [
+          "%>%",
+          "  mutate(age_group = age_group_1(age_group)) %>%",
+          "  mutate(financial_year = phsmethods::extract_fin_year(month)) %>%",
+          "  mutate(hscp_locality = gsub(\"&\", \"and\", locality, fixed = TRUE)) %>%"
+        ]
+      },
+      "status": "auto_resolved",
+      "note": "Disappeared from scan \u2014 likely fixed",
+      "first_seen": "2026-02-25T18:40:24+00:00",
+      "last_seen": "2026-02-25T18:40:24+00:00",
+      "resolved_at": "2026-02-26T12:23:30+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "scan_verified",
+        "text": "Disappeared from detector output",
+        "attested_at": "2026-02-26T12:23:30+00:00",
+        "scan_verified": true
+      }
+    },
+    "boilerplate_duplication::Master RMarkdown Document & Render Code/Global Script.R::fcea1b8350b4f5e8": {
+      "id": "boilerplate_duplication::Master RMarkdown Document & Render Code/Global Script.R::fcea1b8350b4f5e8",
+      "detector": "boilerplate_duplication",
+      "file": "Master RMarkdown Document & Render Code/Global Script.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Boilerplate block repeated across 1 files (window 19 lines): Master RMarkdown Document & Render Code/Global Script.R:471",
+      "detail": {
+        "distinct_files": 1,
+        "window_size": 19,
+        "locations": [
+          {
+            "file": "Master RMarkdown Document & Render Code/Global Script.R",
+            "line": 471
+          }
+        ],
+        "sample": [
+          ") +",
+          "    theme_profiles() +",
+          "    expand_limits(y = 0) +",
+          "    labs("
+        ]
+      },
+      "status": "auto_resolved",
+      "note": "Disappeared from scan \u2014 likely fixed",
+      "first_seen": "2026-02-25T18:40:24+00:00",
+      "last_seen": "2026-02-25T18:40:24+00:00",
+      "resolved_at": "2026-02-26T12:23:30+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "scan_verified",
+        "text": "Disappeared from detector output",
+        "attested_at": "2026-02-26T12:23:30+00:00",
+        "scan_verified": true
+      }
+    },
+    "structural::Unscheduled Care/2d. Other Unscheduled Care.R": {
+      "id": "structural::Unscheduled Care/2d. Other Unscheduled Care.R",
+      "detector": "structural",
+      "file": "Unscheduled Care/2d. Other Unscheduled Care.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Needs decomposition: large (864 LOC)",
+      "detail": {
+        "loc": 864
+      },
+      "status": "open",
+      "note": "Reopened (\u00d71) \u2014 reappeared in scan (was fixed)",
+      "first_seen": "2026-02-26T12:23:26+00:00",
+      "last_seen": "2026-02-26T12:33:37+00:00",
+      "resolved_at": null,
+      "reopen_count": 1,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "structural::Unscheduled Care/1b. SMR Extraction.R": {
+      "id": "structural::Unscheduled Care/1b. SMR Extraction.R",
+      "detector": "structural",
+      "file": "Unscheduled Care/1b. SMR Extraction.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Needs decomposition: large (785 LOC)",
+      "detail": {
+        "loc": 785
+      },
+      "status": "open",
+      "note": "Reopened (\u00d71) \u2014 reappeared in scan (was fixed)",
+      "first_seen": "2026-02-26T12:23:26+00:00",
+      "last_seen": "2026-02-26T12:33:37+00:00",
+      "resolved_at": null,
+      "reopen_count": 1,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "structural::General Health/3d. LTCs.R": {
+      "id": "structural::General Health/3d. LTCs.R",
+      "detector": "structural",
+      "file": "General Health/3d. LTCs.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Needs decomposition: large (784 LOC)",
+      "detail": {
+        "loc": 784
+      },
+      "status": "open",
+      "note": "Reopened (\u00d71) \u2014 reappeared in scan (was fixed)",
+      "first_seen": "2026-02-26T12:23:26+00:00",
+      "last_seen": "2026-02-26T12:33:37+00:00",
+      "resolved_at": null,
+      "reopen_count": 1,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "structural::Unscheduled Care/2a. Emergency Admissions.R": {
+      "id": "structural::Unscheduled Care/2a. Emergency Admissions.R",
+      "detector": "structural",
+      "file": "Unscheduled Care/2a. Emergency Admissions.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Needs decomposition: large (629 LOC)",
+      "detail": {
+        "loc": 629
+      },
+      "status": "open",
+      "note": "Reopened (\u00d71) \u2014 reappeared in scan (was fixed)",
+      "first_seen": "2026-02-26T12:23:26+00:00",
+      "last_seen": "2026-02-26T12:33:37+00:00",
+      "resolved_at": null,
+      "reopen_count": 1,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null
+    },
+    "boilerplate_duplication::General Health/3d. LTCs.R::255592c00540e61a": {
+      "id": "boilerplate_duplication::General Health/3d. LTCs.R::255592c00540e61a",
+      "detector": "boilerplate_duplication",
+      "file": "General Health/3d. LTCs.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Boilerplate block repeated across 2 files (window 11 lines): General Health/3d. LTCs.R:578, Lifestyle & Risk Factors/2. Lifestyle & Risk Factors Outputs.R:419",
+      "detail": {
+        "distinct_files": 2,
+        "window_size": 11,
+        "locations": [
+          {
+            "file": "General Health/3d. LTCs.R",
+            "line": 578
+          },
+          {
+            "file": "Lifestyle & Risk Factors/2. Lifestyle & Risk Factors Outputs.R",
+            "line": 419
+          }
+        ],
+        "sample": [
+          "area_type == \"Locality\"",
+          "    ) %>%",
+          "    rename(\"hscp_locality\" = \"area_name\") %>%",
+          "    right_join(other_locs, by = join_by(hscp_locality)) %>%"
+        ]
+      },
+      "status": "auto_resolved",
+      "note": "Disappeared from scan \u2014 likely fixed",
+      "first_seen": "2026-02-26T12:23:30+00:00",
+      "last_seen": "2026-02-26T12:23:30+00:00",
+      "resolved_at": "2026-02-26T12:26:27+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "scan_verified",
+        "text": "Disappeared from detector output",
+        "attested_at": "2026-02-26T12:26:27+00:00",
+        "scan_verified": true
+      }
+    },
+    "boilerplate_duplication::.desloppify/query.json::1037d9f45e4a143d": {
+      "id": "boilerplate_duplication::.desloppify/query.json::1037d9f45e4a143d",
+      "detector": "boilerplate_duplication",
+      "file": ".desloppify/query.json",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Boilerplate block repeated across 1 files (window 57 lines): .desloppify/query.json:617",
+      "detail": {
+        "distinct_files": 1,
+        "window_size": 57,
+        "locations": [
+          {
+            "file": ".desloppify/query.json",
+            "line": 617
+          }
+        ],
+        "sample": [
+          "},",
+          "    {",
+          "      \"name\": \"Elegance\",",
+          "      \"score\": 100.0,"
+        ]
+      },
+      "status": "auto_resolved",
+      "note": "Disappeared from scan \u2014 likely fixed",
+      "first_seen": "2026-02-26T12:23:30+00:00",
+      "last_seen": "2026-02-26T12:23:30+00:00",
+      "resolved_at": "2026-02-26T12:26:27+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "scan_verified",
+        "text": "Disappeared from detector output",
+        "attested_at": "2026-02-26T12:26:27+00:00",
+        "scan_verified": true
+      }
+    },
+    "boilerplate_duplication::.desloppify/query.json::1087d133ced46724": {
+      "id": "boilerplate_duplication::.desloppify/query.json::1087d133ced46724",
+      "detector": "boilerplate_duplication",
+      "file": ".desloppify/query.json",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Boilerplate block repeated across 1 files (window 28 lines): .desloppify/query.json:579",
+      "detail": {
+        "distinct_files": 1,
+        "window_size": 28,
+        "locations": [
+          {
+            "file": ".desloppify/query.json",
+            "line": 579
+          }
+        ],
+        "sample": [
+          "{",
+          "      \"name\": \"AI Generated Debt\",",
+          "      \"score\": 100.0,",
+          "      \"strict\": 100.0,"
+        ]
+      },
+      "status": "auto_resolved",
+      "note": "Disappeared from scan \u2014 likely fixed",
+      "first_seen": "2026-02-26T12:23:30+00:00",
+      "last_seen": "2026-02-26T12:23:30+00:00",
+      "resolved_at": "2026-02-26T12:26:27+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "scan_verified",
+        "text": "Disappeared from detector output",
+        "attested_at": "2026-02-26T12:26:27+00:00",
+        "scan_verified": true
+      }
+    },
+    "boilerplate_duplication::Unscheduled Care/2a. Emergency Admissions.R::1c41eea7162b7155": {
+      "id": "boilerplate_duplication::Unscheduled Care/2a. Emergency Admissions.R::1c41eea7162b7155",
+      "detector": "boilerplate_duplication",
+      "file": "Unscheduled Care/2a. Emergency Admissions.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Boilerplate block repeated across 1 files (window 10 lines): Unscheduled Care/2a. Emergency Admissions.R:618",
+      "detail": {
+        "distinct_files": 1,
+        "window_size": 10,
+        "locations": [
+          {
+            "file": "Unscheduled Care/2a. Emergency Admissions.R",
+            "line": 618
+          }
+        ],
+        "sample": [
+          "%>%",
+          "  group_by(financial_year, hscp_locality) %>%",
+          "  summarise(bed_days = sum(bed_days)) %>%",
+          "  ungroup() %>%"
+        ]
+      },
+      "status": "wontfix",
+      "note": "Standard PHS aggregation pattern",
+      "first_seen": "2026-02-26T12:23:30+00:00",
+      "last_seen": "2026-02-26T12:33:37+00:00",
+      "resolved_at": "2026-02-26T12:28:11+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "manual",
+        "text": "I have actually verified this is intentional/false-positive and I am not gaming the score by resolving without fixing.",
+        "attested_at": "2026-02-26T12:28:11+00:00",
+        "scan_verified": false
+      },
+      "wontfix_scan_count": 4,
+      "wontfix_snapshot": {
+        "captured_at": "2026-02-26T12:28:11+00:00",
+        "scan_count": 4,
+        "tier": 3,
+        "confidence": "medium",
+        "detail": {
+          "distinct_files": 1,
+          "window_size": 10,
+          "locations": [
+            {
+              "file": "Unscheduled Care/2a. Emergency Admissions.R",
+              "line": 618
+            }
+          ],
+          "sample": [
+            "%>%",
+            "  group_by(financial_year, hscp_locality) %>%",
+            "  summarise(bed_days = sum(bed_days)) %>%",
+            "  ungroup() %>%"
+          ]
+        }
+      }
+    },
+    "boilerplate_duplication::General Health/3d. LTCs.R::3dd0942cae41b4e9": {
+      "id": "boilerplate_duplication::General Health/3d. LTCs.R::3dd0942cae41b4e9",
+      "detector": "boilerplate_duplication",
+      "file": "General Health/3d. LTCs.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Boilerplate block repeated across 1 files (window 10 lines): General Health/3d. LTCs.R:557",
+      "detail": {
+        "distinct_files": 1,
+        "window_size": 10,
+        "locations": [
+          {
+            "file": "General Health/3d. LTCs.R",
+            "line": 557
+          }
+        ],
+        "sample": [
+          "|>",
+          "  select(-hscp_locality, -hscp2019name, -people, -slf_adj_pop) |>",
+          "  summarise(across(everything(), sum)) |>",
+          "  pivot_longer("
+        ]
+      },
+      "status": "wontfix",
+      "note": "Idiomatic R ggplot sequence",
+      "first_seen": "2026-02-26T12:23:30+00:00",
+      "last_seen": "2026-02-26T12:33:37+00:00",
+      "resolved_at": "2026-02-26T12:28:08+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "manual",
+        "text": "I have actually verified this is intentional/false-positive and I am not gaming the score by resolving without fixing.",
+        "attested_at": "2026-02-26T12:28:08+00:00",
+        "scan_verified": false
+      },
+      "wontfix_scan_count": 4,
+      "wontfix_snapshot": {
+        "captured_at": "2026-02-26T12:28:08+00:00",
+        "scan_count": 4,
+        "tier": 3,
+        "confidence": "medium",
+        "detail": {
+          "distinct_files": 1,
+          "window_size": 10,
+          "locations": [
+            {
+              "file": "General Health/3d. LTCs.R",
+              "line": 504
+            }
+          ],
+          "sample": [
+            "|>",
+            "  select(-hscp_locality, -hscp2019name, -people, -slf_adj_pop) |>",
+            "  summarise(across(everything(), sum)) |>",
+            "  pivot_longer("
+          ]
+        }
+      }
+    },
+    "boilerplate_duplication::Unscheduled Care/2a. Emergency Admissions.R::3fc16fb1aa8aadbc": {
+      "id": "boilerplate_duplication::Unscheduled Care/2a. Emergency Admissions.R::3fc16fb1aa8aadbc",
+      "detector": "boilerplate_duplication",
+      "file": "Unscheduled Care/2a. Emergency Admissions.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Boilerplate block repeated across 1 files (window 12 lines): Unscheduled Care/2a. Emergency Admissions.R:405",
+      "detail": {
+        "distinct_files": 1,
+        "window_size": 12,
+        "locations": [
+          {
+            "file": "Unscheduled Care/2a. Emergency Admissions.R",
+            "line": 405
+          }
+        ],
+        "sample": [
+          "%>%",
+          "  filter(hscp_locality == LOCALITY) %>%",
+          "  drop_na(age_group) %>%",
+          "  group_by(financial_year, age_group) %>%"
+        ]
+      },
+      "status": "wontfix",
+      "note": "Standard PHS aggregation pattern",
+      "first_seen": "2026-02-26T12:23:30+00:00",
+      "last_seen": "2026-02-26T12:33:37+00:00",
+      "resolved_at": "2026-02-26T12:28:12+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "manual",
+        "text": "I have actually verified this is intentional/false-positive and I am not gaming the score by resolving without fixing.",
+        "attested_at": "2026-02-26T12:28:12+00:00",
+        "scan_verified": false
+      },
+      "wontfix_scan_count": 4,
+      "wontfix_snapshot": {
+        "captured_at": "2026-02-26T12:28:12+00:00",
+        "scan_count": 4,
+        "tier": 3,
+        "confidence": "medium",
+        "detail": {
+          "distinct_files": 1,
+          "window_size": 12,
+          "locations": [
+            {
+              "file": "Unscheduled Care/2a. Emergency Admissions.R",
+              "line": 405
+            }
+          ],
+          "sample": [
+            "%>%",
+            "  filter(hscp_locality == LOCALITY) %>%",
+            "  drop_na(age_group) %>%",
+            "  group_by(financial_year, age_group) %>%"
+          ]
+        }
+      }
+    },
+    "boilerplate_duplication::Unscheduled Care/2. Unscheduled Care outputs.R::8969d43fa6083390": {
+      "id": "boilerplate_duplication::Unscheduled Care/2. Unscheduled Care outputs.R::8969d43fa6083390",
+      "detector": "boilerplate_duplication",
+      "file": "Unscheduled Care/2. Unscheduled Care outputs.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Boilerplate block repeated across 1 files (window 19 lines): Unscheduled Care/2. Unscheduled Care outputs.R:148",
+      "detail": {
+        "distinct_files": 1,
+        "window_size": 19,
+        "locations": [
+          {
+            "file": "Unscheduled Care/2. Unscheduled Care outputs.R",
+            "line": 148
+          }
+        ],
+        "sample": [
+          "%>%",
+          "  pivot_longer(",
+          "    \"Pop0_17\":\"total_pop\",",
+          "    names_to = \"age_group\","
+        ]
+      },
+      "status": "wontfix",
+      "note": "Standard PHS aggregation pattern",
+      "first_seen": "2026-02-26T12:23:30+00:00",
+      "last_seen": "2026-02-26T12:33:37+00:00",
+      "resolved_at": "2026-02-26T12:28:11+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "manual",
+        "text": "I have actually verified this is intentional/false-positive and I am not gaming the score by resolving without fixing.",
+        "attested_at": "2026-02-26T12:28:11+00:00",
+        "scan_verified": false
+      },
+      "wontfix_scan_count": 4,
+      "wontfix_snapshot": {
+        "captured_at": "2026-02-26T12:28:11+00:00",
+        "scan_count": 4,
+        "tier": 3,
+        "confidence": "medium",
+        "detail": {
+          "distinct_files": 1,
+          "window_size": 19,
+          "locations": [
+            {
+              "file": "Unscheduled Care/2. Unscheduled Care outputs.R",
+              "line": 148
+            }
+          ],
+          "sample": [
+            "%>%",
+            "  pivot_longer(",
+            "    \"Pop0_17\":\"total_pop\",",
+            "    names_to = \"age_group\","
+          ]
+        }
+      }
+    },
+    "boilerplate_duplication::General Health/3d. LTCs.R::c1ffdac5cdbbdeb4": {
+      "id": "boilerplate_duplication::General Health/3d. LTCs.R::c1ffdac5cdbbdeb4",
+      "detector": "boilerplate_duplication",
+      "file": "General Health/3d. LTCs.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Boilerplate block repeated across 1 files (window 9 lines): General Health/3d. LTCs.R:424",
+      "detail": {
+        "distinct_files": 1,
+        "window_size": 9,
+        "locations": [
+          {
+            "file": "General Health/3d. LTCs.R",
+            "line": 424
+          }
+        ],
+        "sample": [
+          "]),",
+          "    plot.margin = unit(c(0.5, 0, 0, 0), \"cm\"),",
+          "    axis.title.y = element_blank(),",
+          "    axis.text.y = element_blank(),"
+        ]
+      },
+      "status": "wontfix",
+      "note": "Idiomatic R ggplot sequence",
+      "first_seen": "2026-02-26T12:23:30+00:00",
+      "last_seen": "2026-02-26T12:33:37+00:00",
+      "resolved_at": "2026-02-26T12:28:09+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "manual",
+        "text": "I have actually verified this is intentional/false-positive and I am not gaming the score by resolving without fixing.",
+        "attested_at": "2026-02-26T12:28:09+00:00",
+        "scan_verified": false
+      },
+      "wontfix_scan_count": 4,
+      "wontfix_snapshot": {
+        "captured_at": "2026-02-26T12:28:09+00:00",
+        "scan_count": 4,
+        "tier": 3,
+        "confidence": "medium",
+        "detail": {
+          "distinct_files": 1,
+          "window_size": 9,
+          "locations": [
+            {
+              "file": "General Health/3d. LTCs.R",
+              "line": 371
+            }
+          ],
+          "sample": [
+            "]),",
+            "    plot.margin = unit(c(0.5, 0, 0, 0), \"cm\"),",
+            "    axis.title.y = element_blank(),",
+            "    axis.text.y = element_blank(),"
+          ]
+        }
+      }
+    },
+    "boilerplate_duplication::Unscheduled Care/1a. MSG Extraction.R::fb1808fd2f65c72e": {
+      "id": "boilerplate_duplication::Unscheduled Care/1a. MSG Extraction.R::fb1808fd2f65c72e",
+      "detector": "boilerplate_duplication",
+      "file": "Unscheduled Care/1a. MSG Extraction.R",
+      "tier": 3,
+      "confidence": "medium",
+      "summary": "Boilerplate block repeated across 1 files (window 9 lines): Unscheduled Care/1a. MSG Extraction.R:53",
+      "detail": {
+        "distinct_files": 1,
+        "window_size": 9,
+        "locations": [
+          {
+            "file": "Unscheduled Care/1a. MSG Extraction.R",
+            "line": 53
+          }
+        ],
+        "sample": [
+          "%>%",
+          "  mutate(age_group = age_group_1(age_group)) %>%",
+          "  mutate(financial_year = phsmethods::extract_fin_year(month)) %>%",
+          "  mutate(hscp_locality = gsub(\"&\", \"and\", locality, fixed = TRUE)) %>%"
+        ]
+      },
+      "status": "wontfix",
+      "note": "Standard PHS data cleaning pattern",
+      "first_seen": "2026-02-26T12:23:30+00:00",
+      "last_seen": "2026-02-26T12:33:37+00:00",
+      "resolved_at": "2026-02-26T12:28:10+00:00",
+      "reopen_count": 0,
+      "lang": "r",
+      "zone": "production",
+      "suppressed": false,
+      "suppressed_at": null,
+      "suppression_pattern": null,
+      "resolution_attestation": {
+        "kind": "manual",
+        "text": "I have actually verified this is intentional/false-positive and I am not gaming the score by resolving without fixing.",
+        "attested_at": "2026-02-26T12:28:10+00:00",
+        "scan_verified": false
+      },
+      "wontfix_scan_count": 4,
+      "wontfix_snapshot": {
+        "captured_at": "2026-02-26T12:28:10+00:00",
+        "scan_count": 4,
+        "tier": 3,
+        "confidence": "medium",
+        "detail": {
+          "distinct_files": 1,
+          "window_size": 9,
+          "locations": [
+            {
+              "file": "Unscheduled Care/1a. MSG Extraction.R",
+              "line": 53
+            }
+          ],
+          "sample": [
+            "%>%",
+            "  mutate(age_group = age_group_1(age_group)) %>%",
+            "  mutate(financial_year = phsmethods::extract_fin_year(month)) %>%",
+            "  mutate(hscp_locality = gsub(\"&\", \"and\", locality, fixed = TRUE)) %>%"
+          ]
+        }
+      }
+    }
+  },
+  "subjective_integrity": {
+    "status": "pass",
+    "target_score": 95.0,
+    "matched_count": 0,
+    "matched_dimensions": [],
+    "reset_dimensions": []
+  },
+  "subjective_assessments": {},
+  "lang_capabilities": {
+    "r": {
+      "fixers": [],
+      "typecheck_cmd": ""
+    }
+  },
+  "zone_distribution": {
+    "production": 33
+  },
+  "scan_history": [
+    {
+      "timestamp": "2026-02-25T18:40:24+00:00",
+      "lang": "r",
+      "strict_score": 93.3,
+      "verified_strict_score": 83.2,
+      "objective_score": 83.2,
+      "overall_score": 93.3,
+      "open": 13,
+      "diff_new": 13,
+      "diff_resolved": 0,
+      "ignored": 0,
+      "raw_findings": 13,
+      "suppressed_pct": 0.0,
+      "ignore_patterns": 0,
+      "subjective_integrity": {
+        "status": "pass",
+        "matched_count": 0,
+        "reset_count": 0,
+        "target_score": 95.0
+      },
+      "dimension_scores": {
+        "File health": {
+          "score": 78.7,
+          "strict": 78.7
+        },
+        "Code quality": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Duplication": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Security": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Naming Quality": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Logic Clarity": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Type Safety": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Contracts": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Error Consistency": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Abstraction Fit": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "AI Generated Debt": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "High Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Mid Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Low Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Cross-Module Arch": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Init Coupling": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Convention Drift": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Dep Health": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Test Strategy": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "API Coherence": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Auth Consistency": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Stale Migration": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Structure Nav": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Design Coherence": {
+          "score": 100.0,
+          "strict": 100.0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-02-26T12:23:30+00:00",
+      "lang": "r",
+      "strict_score": 94.1,
+      "verified_strict_score": 85.3,
+      "objective_score": 85.3,
+      "overall_score": 94.1,
+      "open": 17,
+      "diff_new": 13,
+      "diff_resolved": 9,
+      "ignored": 0,
+      "raw_findings": 17,
+      "suppressed_pct": 0.0,
+      "ignore_patterns": 0,
+      "subjective_integrity": {
+        "status": "pass",
+        "matched_count": 0,
+        "reset_count": 0,
+        "target_score": 95.0
+      },
+      "dimension_scores": {
+        "File health": {
+          "score": 83.5,
+          "strict": 83.5
+        },
+        "Code quality": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Duplication": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Security": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Naming Quality": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Logic Clarity": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Type Safety": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Contracts": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Error Consistency": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Abstraction Fit": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "AI Generated Debt": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "High Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Mid Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Low Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Cross-Module Arch": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Init Coupling": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Convention Drift": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Dep Health": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Test Strategy": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "API Coherence": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Auth Consistency": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Stale Migration": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Structure Nav": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Design Coherence": {
+          "score": 100.0,
+          "strict": 100.0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-02-26T12:26:27+00:00",
+      "lang": "r",
+      "strict_score": 94.7,
+      "verified_strict_score": 86.8,
+      "objective_score": 86.8,
+      "overall_score": 94.7,
+      "open": 14,
+      "diff_new": 0,
+      "diff_resolved": 3,
+      "ignored": 0,
+      "raw_findings": 14,
+      "suppressed_pct": 0.0,
+      "ignore_patterns": 0,
+      "subjective_integrity": {
+        "status": "pass",
+        "matched_count": 0,
+        "reset_count": 0,
+        "target_score": 95.0
+      },
+      "dimension_scores": {
+        "File health": {
+          "score": 83.5,
+          "strict": 83.5
+        },
+        "Code quality": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Duplication": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Security": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Naming Quality": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Logic Clarity": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Type Safety": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Contracts": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Error Consistency": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Abstraction Fit": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "AI Generated Debt": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "High Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Mid Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Low Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Cross-Module Arch": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Init Coupling": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Convention Drift": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Dep Health": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Test Strategy": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "API Coherence": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Auth Consistency": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Stale Migration": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Structure Nav": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Design Coherence": {
+          "score": 100.0,
+          "strict": 100.0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-02-26T12:27:36+00:00",
+      "lang": "r",
+      "strict_score": 94.7,
+      "verified_strict_score": 86.8,
+      "objective_score": 86.8,
+      "overall_score": 94.7,
+      "open": 14,
+      "diff_new": 0,
+      "diff_resolved": 0,
+      "ignored": 0,
+      "raw_findings": 14,
+      "suppressed_pct": 0.0,
+      "ignore_patterns": 0,
+      "subjective_integrity": {
+        "status": "pass",
+        "matched_count": 0,
+        "reset_count": 0,
+        "target_score": 95.0
+      },
+      "dimension_scores": {
+        "File health": {
+          "score": 83.5,
+          "strict": 83.5
+        },
+        "Code quality": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Duplication": {
+          "score": 0.0,
+          "strict": 0.0
+        },
+        "Security": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Naming Quality": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Logic Clarity": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Type Safety": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Contracts": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Error Consistency": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Abstraction Fit": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "AI Generated Debt": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "High Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Mid Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Low Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Cross-Module Arch": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Init Coupling": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Convention Drift": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Dep Health": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Test Strategy": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "API Coherence": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Auth Consistency": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Stale Migration": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Structure Nav": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Design Coherence": {
+          "score": 100.0,
+          "strict": 100.0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-02-26T12:28:16+00:00",
+      "lang": "r",
+      "strict_score": 94.7,
+      "verified_strict_score": 86.8,
+      "objective_score": 90.2,
+      "overall_score": 96.1,
+      "open": 8,
+      "diff_new": 0,
+      "diff_resolved": 0,
+      "ignored": 0,
+      "raw_findings": 14,
+      "suppressed_pct": 0.0,
+      "ignore_patterns": 0,
+      "subjective_integrity": {
+        "status": "pass",
+        "matched_count": 0,
+        "reset_count": 0,
+        "target_score": 95.0
+      },
+      "dimension_scores": {
+        "File health": {
+          "score": 83.5,
+          "strict": 83.5
+        },
+        "Code quality": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Duplication": {
+          "score": 100.0,
+          "strict": 0.0
+        },
+        "Security": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Naming Quality": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Logic Clarity": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Type Safety": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Contracts": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Error Consistency": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Abstraction Fit": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "AI Generated Debt": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "High Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Mid Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Low Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Cross-Module Arch": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Init Coupling": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Convention Drift": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Dep Health": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Test Strategy": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "API Coherence": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Auth Consistency": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Stale Migration": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Structure Nav": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Design Coherence": {
+          "score": 100.0,
+          "strict": 100.0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-02-26T12:29:15+00:00",
+      "lang": "r",
+      "strict_score": 94.6,
+      "verified_strict_score": 86.4,
+      "objective_score": 90.0,
+      "overall_score": 96.0,
+      "open": 8,
+      "diff_new": 0,
+      "diff_resolved": 0,
+      "ignored": 0,
+      "raw_findings": 14,
+      "suppressed_pct": 0.0,
+      "ignore_patterns": 0,
+      "subjective_integrity": {
+        "status": "pass",
+        "matched_count": 0,
+        "reset_count": 0,
+        "target_score": 95.0
+      },
+      "dimension_scores": {
+        "File health": {
+          "score": 83.0,
+          "strict": 83.0
+        },
+        "Code quality": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Duplication": {
+          "score": 100.0,
+          "strict": 0.0
+        },
+        "Security": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Naming Quality": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Logic Clarity": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Type Safety": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Contracts": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Error Consistency": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Abstraction Fit": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "AI Generated Debt": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "High Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Mid Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Low Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Cross-Module Arch": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Init Coupling": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Convention Drift": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Dep Health": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Test Strategy": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "API Coherence": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Auth Consistency": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Stale Migration": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Structure Nav": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Design Coherence": {
+          "score": 100.0,
+          "strict": 100.0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-02-26T12:33:37+00:00",
+      "lang": "r",
+      "strict_score": 95.1,
+      "verified_strict_score": 87.7,
+      "objective_score": 91.3,
+      "overall_score": 96.5,
+      "open": 7,
+      "diff_new": 0,
+      "diff_resolved": 1,
+      "ignored": 0,
+      "raw_findings": 13,
+      "suppressed_pct": 0.0,
+      "ignore_patterns": 0,
+      "subjective_integrity": {
+        "status": "pass",
+        "matched_count": 0,
+        "reset_count": 0,
+        "target_score": 95.0
+      },
+      "dimension_scores": {
+        "File health": {
+          "score": 85.2,
+          "strict": 85.2
+        },
+        "Code quality": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Duplication": {
+          "score": 100.0,
+          "strict": 0.0
+        },
+        "Security": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Naming Quality": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Logic Clarity": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Type Safety": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Contracts": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Error Consistency": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Abstraction Fit": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "AI Generated Debt": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "High Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Mid Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Low Elegance": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Cross-Module Arch": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Init Coupling": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Convention Drift": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Dep Health": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Test Strategy": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "API Coherence": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Auth Consistency": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Stale Migration": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Structure Nav": {
+          "score": 100.0,
+          "strict": 100.0
+        },
+        "Design Coherence": {
+          "score": 100.0,
+          "strict": 100.0
+        }
+      }
+    }
+  ],
+  "tool_hash": "c8e8b32df435",
+  "scan_path": ".",
+  "scan_completeness": {
+    "r": "full"
+  },
+  "potentials": {
+    "r": {
+      "structural": 33,
+      "flat_dirs": 9,
+      "security": 33,
+      "boilerplate_duplication": 4,
+      "dupes": 0,
+      "stale_wontfix": 6
+    }
+  },
+  "codebase_metrics": {
+    "r": {
+      "total_files": 33,
+      "total_loc": 9384,
+      "total_directories": 9
+    }
+  },
+  "dimension_scores": {
+    "File health": {
+      "score": 85.2,
+      "strict_score": 85.2,
+      "verified_strict_score": 85.2,
+      "checks": 33,
+      "issues": 7,
+      "tier": 3,
+      "detectors": {
+        "structural": {
+          "potential": 33,
+          "pass_rate": 0.8515151515151516,
+          "issues": 7,
+          "weighted_failures": 4.9
+        }
+      },
+      "strict": 85.2
+    },
+    "Code quality": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 9,
+      "issues": 0,
+      "tier": 3,
+      "detectors": {
+        "flat_dirs": {
+          "potential": 9,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0
+        }
+      },
+      "strict": 100.0
+    },
+    "Duplication": {
+      "score": 100.0,
+      "strict_score": 0.0,
+      "verified_strict_score": 0.0,
+      "checks": 4,
+      "issues": 0,
+      "tier": 3,
+      "detectors": {
+        "boilerplate_duplication": {
+          "potential": 4,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0
+        }
+      },
+      "strict": 0.0
+    },
+    "Security": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 33,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "security": {
+          "potential": 33,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0
+        }
+      },
+      "strict": 100.0
+    },
+    "Naming Quality": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "naming_quality",
+          "configured_weight": 2.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Logic Clarity": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "logic_clarity",
+          "configured_weight": 6.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Type Safety": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "type_safety",
+          "configured_weight": 12.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Contracts": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "contract_coherence",
+          "configured_weight": 12.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Error Consistency": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "error_consistency",
+          "configured_weight": 3.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Abstraction Fit": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "abstraction_fitness",
+          "configured_weight": 8.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "AI Generated Debt": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "ai_generated_debt",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "High Elegance": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "high_level_elegance",
+          "configured_weight": 22.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Mid Elegance": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "mid_level_elegance",
+          "configured_weight": 22.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Low Elegance": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "low_level_elegance",
+          "configured_weight": 12.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Cross-Module Arch": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "cross_module_architecture",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Init Coupling": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "initialization_coupling",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Convention Drift": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "convention_outlier",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Dep Health": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "dependency_health",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Test Strategy": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "test_strategy",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "API Coherence": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "api_surface_coherence",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Auth Consistency": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "authorization_consistency",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Stale Migration": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "incomplete_migration",
+          "configured_weight": 1.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Structure Nav": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "package_organization",
+          "configured_weight": 5.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    },
+    "Design Coherence": {
+      "score": 100.0,
+      "strict_score": 100.0,
+      "verified_strict_score": 100.0,
+      "checks": 10,
+      "issues": 0,
+      "tier": 4,
+      "detectors": {
+        "subjective_assessment": {
+          "potential": 10,
+          "pass_rate": 1.0,
+          "issues": 0,
+          "weighted_failures": 0.0,
+          "assessment_score": 0.0,
+          "placeholder": false,
+          "dimension_key": "design_coherence",
+          "configured_weight": 10.0,
+          "components": []
+        }
+      },
+      "strict": 100.0
+    }
+  },
+  "reminder_history": {
+    "report_scores": 6,
+    "review_not_run": 3,
+    "badge_recommendation": 3,
+    "feedback_nudge": 3,
+    "stagnant_nudge": 23,
+    "wontfix_growing": 2
+  }
+}
