@@ -621,9 +621,10 @@ scot_psych_hosp <- round_half_up(
 )
 
 
-list_years <- unique(psych_hosp_time_trend$data[5])
-list_years_latest <- list_years$period
-
+list_years_latest <- psych_hosp %>%
+  filter(year == max(year)) %>%
+  pull(period) %>%
+  unique()
 
 # Locality
 loc_psych_hosp <- psych_hosp %>%
