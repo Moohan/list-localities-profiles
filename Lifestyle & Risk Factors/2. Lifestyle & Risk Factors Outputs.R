@@ -405,7 +405,6 @@ bowel_screening_diff_scot <- if_else(
 
 ## Make GH objects table for hscp, scot AND other localities in the partnership
 
-
 # 1. Other locs
 
 other_locs_drug_hosp <- other_locs_summary_table(

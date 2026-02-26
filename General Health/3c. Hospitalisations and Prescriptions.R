@@ -142,7 +142,6 @@ ltc_scot <- ltc %>%
   summarise(across(everything(), sum)) %>%
   ungroup()
 
-
 ###### 3a Waffle Chart Infographic ######
 
 # Load images

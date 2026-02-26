@@ -198,11 +198,19 @@ count_localities <- function(locality_lookup, hscp_name) {
 ## Function to return HSCP, HB, other localities and number of localities ----
 get_locality_context <- function(locality_lookup, locality_name) {
   hscp_name <- as.character(
-    locality_lookup[locality_lookup$hscp_locality == locality_name, "hscp2019name", drop = TRUE]
+    locality_lookup[
+      locality_lookup$hscp_locality == locality_name,
+      "hscp2019name",
+      drop = TRUE
+    ]
   )
 
   hb_name <- as.character(
-    locality_lookup[locality_lookup$hscp_locality == locality_name, "hb2019name", drop = TRUE]
+    locality_lookup[
+      locality_lookup$hscp_locality == locality_name,
+      "hb2019name",
+      drop = TRUE
+    ]
   )
 
   other_localities <- locality_lookup |>
@@ -524,7 +532,10 @@ scotpho_bar_chart <- function(
       caption = "Source: ScotPHO"
     ) +
     ggplot2::geom_errorbar(
-      ggplot2::aes(xmin = lower_confidence_interval, xmax = upper_confidence_interval),
+      ggplot2::aes(
+        xmin = lower_confidence_interval,
+        xmax = upper_confidence_interval
+      ),
       width = 0.2,
       position = ggplot2::position_dodge(width = 1)
     )

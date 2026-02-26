@@ -624,7 +624,6 @@ ltc_diff_scot <- if_else(
 
 # Function to get latest data from scotpho
 
-
 # 1. Other localities
 
 # male life expectancy
