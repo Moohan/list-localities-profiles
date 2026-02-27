@@ -30,6 +30,9 @@ for (HSCP in hscp_list) {
     distinct(hscp_locality) |>
     pull(hscp_locality)
 
+  # Services (Partnership Level) ----
+  source("Services/2a. Services data manipulation.R")
+
   loop_env <- c(ls(), "loop_env")
 
   ## Loop to create the profiles for all the localities in the list
@@ -61,7 +64,7 @@ for (HSCP in hscp_list) {
     source("Households/Households Code.R")
 
     # services
-    source("Services/2. Services data manipulation & table.R")
+    source("Services/2b. Services table.R")
 
     # Define data frames and their corresponding sheet names
     df <- list(
@@ -196,4 +199,31 @@ for (HSCP in hscp_list) {
   rm(list = setdiff(ls(), loop_env))
   # Force garbage collection to free up memory
   gc()
+
+  # HSCP level housekeeping ----
+  # Clean up objects created by HSCP-level script (2a)
+  rm(list = intersect(
+    c(
+      "markers_gp",
+      "markers_emergency_dep",
+      "markers_miu",
+      "markers_care_home",
+      "care_homes",
+      "postcode_lkp",
+      "prac",
+      "hosp_lookup",
+      "hosp_postcodes",
+      "hosp_types",
+      "lookup2",
+      "n_loc",
+      "ext_year",
+      "dz_lookup_services",
+      "Clacks_Royal",
+      "data",
+      "file",
+      "name",
+      "services_file_names"
+    ),
+    ls()
+  ))
 }
