@@ -202,28 +202,30 @@ for (HSCP in hscp_list) {
 
   # HSCP level housekeeping ----
   # Clean up objects created by HSCP-level script (2a)
-  rm(list = intersect(
-    c(
-      "markers_gp",
-      "markers_emergency_dep",
-      "markers_miu",
-      "markers_care_home",
-      "care_homes",
-      "postcode_lkp",
-      "prac",
-      "hosp_lookup",
-      "hosp_postcodes",
-      "hosp_types",
-      "lookup2",
-      "n_loc",
-      "ext_year",
-      "dz_lookup_services",
-      "Clacks_Royal",
-      "data",
-      "file",
-      "name",
-      "services_file_names"
-    ),
-    ls()
-  ))
+  rm(
+    list = intersect(
+      c(
+        "markers_gp",
+        "markers_emergency_dep",
+        "markers_miu",
+        "markers_care_home",
+        "care_homes",
+        "postcode_lkp",
+        "prac",
+        "hosp_lookup",
+        "hosp_postcodes",
+        "hosp_types",
+        "lookup2",
+        "n_loc",
+        "ext_year",
+        "dz_lookup_services",
+        "Clacks_Royal",
+        "data",
+        "file",
+        "name",
+        "services_file_names"
+      ),
+      ls()
+    )
+  )
 }
