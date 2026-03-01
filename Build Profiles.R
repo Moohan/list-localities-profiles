@@ -50,6 +50,11 @@ for (HSCP in hscp_list) {
   # 1b. Run the Rmd for the main body of the profiles
   # 1c. Run the Rmd for the summary tables
 
+  # Services ----
+  # Generate HSCP-level services data and map once per partnership
+  source("Services/2a. Services data manipulation.R")
+  source("Services/3. Service HSCP map.R")
+
   loop_env <- c(ls(), "loop_env")
 
   # 1. Loop through each locality to create the main body of the profiles and the summary table
@@ -64,8 +69,7 @@ for (HSCP in hscp_list) {
     source("Households/Households Code.R")
 
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
-    source("Services/3. Service HSCP map.R")
+    source("Services/2b. Services table.R")
 
     # General Health ----
     source("General Health/3. General Health Outputs.R")
@@ -119,4 +123,27 @@ for (HSCP in hscp_list) {
     # Force garbage collection to free up memory
     gc()
   }
+
+  # Clean up partnership-level objects
+  rm(list = intersect(
+    c(
+      "service_map",
+      "markers_gp",
+      "markers_emergency_dep",
+      "markers_miu",
+      "markers_care_home",
+      "care_homes",
+      "postcode_lkp",
+      "prac",
+      "hosp_lookup",
+      "hosp_postcodes",
+      "hosp_types",
+      "lookup2",
+      "n_loc",
+      "ext_year",
+      "dz_lookup_services",
+      "Clacks_Royal"
+    ),
+    ls()
+  ))
 }

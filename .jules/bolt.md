@@ -1,0 +1,3 @@
+## 2024-11-20 - [Optimization of R Report Loop]
+**Learning:** In reporting pipelines that iterate over multiple localities within a parent region (e.g., HSCP), identify operations that are static at the parent level (data loading, map generation, large lookups). Hoisting these from the inner locality loop to an outer partnership loop significantly reduces redundant I/O and expensive computations.
+**Action:** When refactoring R loops, use a scoped cleanup pattern (`loop_env`) to manage memory while preserving hoisted objects, and ensure explicit namespace prefixes for functions like `fs::path()` to avoid environment-specific failures.
