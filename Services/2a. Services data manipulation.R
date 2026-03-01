@@ -60,7 +60,12 @@ services_file_names <- list.files(
 for (file in services_file_names) {
   name <- substr(x = file, 1, 4)
 
-  data <- readRDS(fs::path(lp_path, "Services", paste0("DATA ", ext_year), file)) |>
+  data <- readRDS(fs::path(
+    lp_path,
+    "Services",
+    paste0("DATA ", ext_year),
+    file
+  )) |>
     clean_names()
 
   assign(name, data)
