@@ -1,0 +1,3 @@
+## 2025-05-15 - [Hoisting R Scripts in Report Loops]
+**Learning:** Significant performance gains (10-20s per locality) can be achieved by refactoring monolithic chapter scripts into HSCP-level logic (sourced once per partnership) and locality-level logic (sourced once per locality). This avoids redundant expensive operations like map tile fetching and large RDS file loading.
+**Action:** Always check if scripts sourced inside loops perform operations that are constant across the outer loop's iteration variable. Use the `loop_env` pattern to preserve hoisted variables while still allowing inner-loop cleanup.
