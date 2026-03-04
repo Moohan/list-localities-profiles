@@ -116,7 +116,11 @@ places <- readr::read_csv(paste0(
     Latitude = dplyr::first(Latitude),
     type = dplyr::first(type)
   ) |>
-  sf::st_as_sf(coords = c("Longitude", "Latitude"), remove = FALSE, crs = 4326) |>
+  sf::st_as_sf(
+    coords = c("Longitude", "Latitude"),
+    remove = FALSE,
+    crs = 4326
+  ) |>
   dplyr::filter(!grepl("_", name, fixed = TRUE)) |> # filter incorrect name types
   dplyr::filter(type != "hamlet" & type != "village") # remove smaller places
 
@@ -293,7 +297,13 @@ all_markers <- dplyr::select(markers_miu, name, latitude, longitude) |>
 service_map_2 <- ggmap::ggmap(service_map_background) +
   ggplot2::geom_point(
     data = all_markers,
-    ggplot2::aes(x = longitude, y = latitude, colour = type, fill = type, shape = type)
+    ggplot2::aes(
+      x = longitude,
+      y = latitude,
+      colour = type,
+      fill = type,
+      shape = type
+    )
   ) +
   ggplot2::scale_color_manual(
     values = c(
