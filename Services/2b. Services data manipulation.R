@@ -9,7 +9,9 @@
 
 # Determine HSCP if not already defined (e.g. when running in testing chapter)
 if (!exists("HSCP") && exists("LOCALITY")) {
-  HSCP <- as.character(dplyr::filter(lookup, hscp_locality == LOCALITY)[["hscp2019name"]])
+  HSCP <- as.character(dplyr::filter(lookup, hscp_locality == LOCALITY)[[
+    "hscp2019name"
+  ]])
 }
 
 # Get number of localities in HSCP
@@ -20,7 +22,12 @@ n_loc <- count_localities(lookup, HSCP)
 ## GP Practices ----
 
 prac_hscp <- prac |>
-  dplyr::select(practice_code, gp_practice_name, practice_list_size, postcode) |>
+  dplyr::select(
+    practice_code,
+    gp_practice_name,
+    practice_list_size,
+    postcode
+  ) |>
   dplyr::mutate(postcode = gsub(" ", "", postcode, fixed = TRUE))
 
 # Merge practice data with postcode and locality lookups
@@ -59,7 +66,10 @@ markers_emergency_dep <- hosp_lookup |>
   dplyr::filter(type == "Emergency Department") |>
   dplyr::filter(hscp2019name == HSCP)
 
-Clacks_Royal <- dplyr::filter(hosp_lookup, name == "Forth Valley Royal Hospital")
+Clacks_Royal <- dplyr::filter(
+  hosp_lookup,
+  name == "Forth Valley Royal Hospital"
+)
 
 # Ninewells hospital is incorrectly mapped even though postcode ok - so corrected coords here
 

@@ -205,36 +205,40 @@ for (HSCP in hscp_list) {
   gc()
 
   # Clean up partnership-level objects
-  rm(list = intersect(
-    c(
-      "Clacks_Royal",
-      "hosp_lookup",
-      "hosp_postcodes_hscp",
-      "markers_care_home",
-      "markers_emergency_dep",
-      "markers_gp",
-      "markers_miu",
-      "n_loc",
-      "prac_hscp"
-    ),
-    ls()
-  ))
+  rm(
+    list = intersect(
+      c(
+        "Clacks_Royal",
+        "hosp_lookup",
+        "hosp_postcodes_hscp",
+        "markers_care_home",
+        "markers_emergency_dep",
+        "markers_gp",
+        "markers_miu",
+        "n_loc",
+        "prac_hscp"
+      ),
+      ls()
+    )
+  )
   gc()
 }
 
 # Final cleanup of global objects
-rm(list = intersect(
-  c(
-    "care_homes",
-    "ext_year",
-    "hosp_postcodes",
-    "hosp_types",
-    "lookup",
-    "lp_path",
-    "postcode_lkp",
-    "prac",
-    "services_file_names"
-  ),
-  ls()
-))
+rm(
+  list = intersect(
+    c(
+      "care_homes",
+      "ext_year",
+      "hosp_postcodes",
+      "hosp_types",
+      "lookup",
+      "lp_path",
+      "postcode_lkp",
+      "prac",
+      "services_file_names"
+    ),
+    ls()
+  )
+)
 gc()

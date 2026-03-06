@@ -127,51 +127,55 @@ for (HSCP in hscp_list) {
   }
 
   # Clean up partnership-level objects
-  rm(list = intersect(
-    c(
-      "all_markers",
-      "api_key",
-      "Clacks_Royal",
-      "col_palette",
-      "hscp_loc",
-      "hosp_lookup",
-      "hosp_postcodes_hscp",
-      "leg1",
-      "leg2",
-      "leg12",
-      "locality_map_id",
-      "markers_care_home",
-      "markers_emergency_dep",
-      "markers_gp",
-      "markers_miu",
-      "max_lat",
-      "max_long",
-      "min_lat",
-      "min_long",
-      "n_loc",
-      "places",
-      "prac_hscp",
-      "service_map"
-    ),
-    ls()
-  ))
+  rm(
+    list = intersect(
+      c(
+        "all_markers",
+        "api_key",
+        "Clacks_Royal",
+        "col_palette",
+        "hscp_loc",
+        "hosp_lookup",
+        "hosp_postcodes_hscp",
+        "leg1",
+        "leg2",
+        "leg12",
+        "locality_map_id",
+        "markers_care_home",
+        "markers_emergency_dep",
+        "markers_gp",
+        "markers_miu",
+        "max_lat",
+        "max_long",
+        "min_lat",
+        "min_long",
+        "n_loc",
+        "places",
+        "prac_hscp",
+        "service_map"
+      ),
+      ls()
+    )
+  )
   gc()
 }
 
 # Final cleanup of global objects
-rm(list = intersect(
-  c(
-    "care_homes",
-    "ext_year",
-    "hosp_postcodes",
-    "hosp_types",
-    "lookup",
-    "lp_path",
-    "output_dir",
-    "postcode_lkp",
-    "prac",
-    "services_file_names"
-  ),
-  ls()
-))
+rm(
+  list = intersect(
+    c(
+      "care_homes",
+      "ext_year",
+      "hosp_postcodes",
+      "hosp_types",
+      "lookup",
+      "lp_path",
+      "output_dir",
+      "postcode_lkp",
+      "prac",
+      "services_file_names"
+    ),
+    ls()
+  )
+)
 gc()
