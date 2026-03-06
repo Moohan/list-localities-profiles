@@ -23,6 +23,9 @@ output_dir <- path(lp_path, "Profiles Output")
 # Below creates locality list of all the localities in a chosen HSCP
 lookup <- read_in_localities()
 
+# Global Services data loading (Once per run) ----
+source("Services/2a. Services data loading.R")
+
 # Specify HSCP(s) ----
 # use `unique(lookup$hscp2019name)` for all
 # or create a vector for multiple e.g. `c("Angus", "West Lothian")`
@@ -39,8 +42,12 @@ stopifnot(all(hscp_list %in% unique(lookup[["hscp2019name"]])))
 for (HSCP in hscp_list) {
   # Create list of localities in chosen HSCP
   locality_list <- lookup |>
-    filter(hscp2019name == HSCP) |>
-    pull(hscp_locality)
+    dplyr::filter(hscp2019name == HSCP) |>
+    dplyr::pull(hscp_locality)
+
+  # Services HSCP-level logic (Hoisted) ----
+  source("Services/2b. Services data manipulation.R")
+  source("Services/3. Service HSCP map.R")
 
   # Loop to create the profiles for all the localities in the list
 
@@ -64,8 +71,7 @@ for (HSCP in hscp_list) {
     source("Households/Households Code.R")
 
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
-    source("Services/3. Service HSCP map.R")
+    source("Services/2c. Services table.R")
 
     # General Health ----
     source("General Health/3. General Health Outputs.R")
@@ -119,4 +125,53 @@ for (HSCP in hscp_list) {
     # Force garbage collection to free up memory
     gc()
   }
+
+  # Clean up partnership-level objects
+  rm(list = intersect(
+    c(
+      "all_markers",
+      "api_key",
+      "Clacks_Royal",
+      "col_palette",
+      "hscp_loc",
+      "hosp_lookup",
+      "hosp_postcodes_hscp",
+      "leg1",
+      "leg2",
+      "leg12",
+      "locality_map_id",
+      "markers_care_home",
+      "markers_emergency_dep",
+      "markers_gp",
+      "markers_miu",
+      "max_lat",
+      "max_long",
+      "min_lat",
+      "min_long",
+      "n_loc",
+      "places",
+      "prac_hscp",
+      "service_map"
+    ),
+    ls()
+  ))
+  gc()
 }
+
+# Final cleanup of global objects
+rm(list = intersect(
+  c(
+    "care_homes",
+    "ext_year",
+    "hosp_postcodes",
+    "hosp_types",
+    "lookup",
+    "lp_path",
+    "output_dir",
+    "postcode_lkp",
+    "prac",
+    "services_file_names"
+  ),
+  ls()
+))
+gc()

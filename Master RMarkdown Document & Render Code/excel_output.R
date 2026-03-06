@@ -13,6 +13,10 @@ lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality
 # Source in functions code
 source("Master RMarkdown Document & Render Code/Global Script.R")
 lookup <- read_in_localities()
+
+# Global Services data loading (Once per run) ----
+source("Services/2a. Services data loading.R")
+
 # Specify HSCP(s) ----
 # use `unique(lookup$hscp2019name)` for all
 # hscp_list <- unique(lookup$hscp2019name)
@@ -26,9 +30,12 @@ stopifnot(all(hscp_list %in% unique(lookup$hscp2019name)))
 for (HSCP in hscp_list) {
   # Create list of localities in chosen HSCP
   locality_list <- lookup |>
-    filter(hscp2019name == HSCP) |>
-    distinct(hscp_locality) |>
-    pull(hscp_locality)
+    dplyr::filter(hscp2019name == HSCP) |>
+    dplyr::distinct(hscp_locality) |>
+    dplyr::pull(hscp_locality)
+
+  # Services HSCP-level logic (Hoisted) ----
+  source("Services/2b. Services data manipulation.R")
 
   loop_env <- c(ls(), "loop_env")
 
@@ -61,7 +68,7 @@ for (HSCP in hscp_list) {
     source("Households/Households Code.R")
 
     # services
-    source("Services/2. Services data manipulation & table.R")
+    source("Services/2c. Services table.R")
 
     # Define data frames and their corresponding sheet names
     df <- list(
@@ -196,4 +203,38 @@ for (HSCP in hscp_list) {
   rm(list = setdiff(ls(), loop_env))
   # Force garbage collection to free up memory
   gc()
+
+  # Clean up partnership-level objects
+  rm(list = intersect(
+    c(
+      "Clacks_Royal",
+      "hosp_lookup",
+      "hosp_postcodes_hscp",
+      "markers_care_home",
+      "markers_emergency_dep",
+      "markers_gp",
+      "markers_miu",
+      "n_loc",
+      "prac_hscp"
+    ),
+    ls()
+  ))
+  gc()
 }
+
+# Final cleanup of global objects
+rm(list = intersect(
+  c(
+    "care_homes",
+    "ext_year",
+    "hosp_postcodes",
+    "hosp_types",
+    "lookup",
+    "lp_path",
+    "postcode_lkp",
+    "prac",
+    "services_file_names"
+  ),
+  ls()
+))
+gc()
