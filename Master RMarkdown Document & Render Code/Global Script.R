@@ -700,17 +700,17 @@ save_dataframes_to_excel <- function(dataframes, sheet_names, file_path) {
 # flextable function
 
 lp_flextable_theme <- function(ft) {
-  ft %>%
-    bold(part = "header") %>%
-    bg(bg = "#43358B", part = "header") %>%
-    color(color = "white", part = "header") %>%
-    height(height = 0.236, part = "body") %>%
-    hrule(rule = "atleast", part = "body") %>%
-    align(align = "center", part = "header") %>%
-    valign(valign = "center", part = "header") %>%
-    valign(valign = "top", part = "body") %>%
-    colformat_num(big.mark = "") %>%
-    fontsize(size = 10, part = "all") %>%
+  ft |>
+    bold(part = "header") |>
+    bg(bg = "#43358B", part = "header") |>
+    color(color = "white", part = "header") |>
+    height(height = 0.236, part = "body") |>
+    hrule(rule = "atleast", part = "body") |>
+    align(align = "center", part = "header") |>
+    valign(valign = "center", part = "header") |>
+    valign(valign = "top", part = "body") |>
+    colformat_num(big.mark = "") |>
+    fontsize(size = 10, part = "all") |>
     border(
       border = fp_border_default(color = "#000000", width = 0.5),
       part = "all"
@@ -791,7 +791,9 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("Services.Rmd" %in% chapters_oi) {
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
+    source("Services/2a. Services data loading.R")
+    source("Services/2b. Services data manipulation.R")
+    source("Services/2c. Services table.R")
     source("Services/3. Service HSCP map.R")
   }
 
@@ -810,15 +812,15 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
     source("Unscheduled Care/2. Unscheduled Care outputs.R")
   }
 
-  chapters_oi_name <- chapters_oi %>%
-    gsub(".Rmd", "", .) %>%
+  chapters_oi_name <- chapters_oi |>
+    gsub(pattern = ".Rmd", replacement = "", x = _) |>
     paste(collapse = " ")
 
   # read _bookdown.yaml file
   yaml_file <- yaml::read_yaml("lp_bookdown/_bookdown.yaml")
 
   # change included chapters to relevant chapter(s) only + index.Rmd (sets formatting)
-  yaml_file$rmd_files <- c("index.Rmd", chapters_oi)
+  yaml_file[["rmd_files"]] <- c("index.Rmd", chapters_oi)
 
   # write temporary yaml with relevant chapters to be used in rendering
   yaml::write_yaml(yaml_file, path(tempdir(), "_practice_chapter_temp.yaml"))
@@ -862,10 +864,10 @@ orient <- function(document_path) {
   # Loop through sections and apply orientation
   for (sec in sections) {
     # Move cursor to the start of this section
-    doc <- officer::cursor_reach(doc, keyword = sec$keyword, fixed = TRUE)
+    doc <- officer::cursor_reach(doc, keyword = sec[["keyword"]], fixed = TRUE)
 
     # Apply section break + orientation
-    if (sec$orientation == "landscape") {
+    if (sec[["orientation"]] == "landscape") {
       doc <- officer::body_end_section_landscape(doc)
     } else {
       doc <- officer::body_end_section_portrait(doc)
@@ -873,12 +875,12 @@ orient <- function(document_path) {
 
     # Remove anchors
     # Move cursor back to the anchor keyword
-    doc <- officer::cursor_reach(doc, keyword = sec$keyword, fixed = TRUE)
+    doc <- officer::cursor_reach(doc, keyword = sec[["keyword"]], fixed = TRUE)
 
     # remove anchors
     doc <- officer::body_replace_all_text(
       doc,
-      old_value = sec$keyword,
+      old_value = sec[["keyword"]],
       new_value = "",
       fixed = TRUE
     )
