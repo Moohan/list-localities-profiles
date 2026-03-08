@@ -5,7 +5,9 @@
 
 # Ensure HSCP is defined if not already (e.g. for testing)
 if (!exists("HSCP")) {
-  HSCP <- as.character(dplyr::filter(read_in_localities(), hscp_locality == LOCALITY)$hscp2019name)
+  HSCP <- as.character(
+    dplyr::filter(read_in_localities(), hscp_locality == LOCALITY)$hscp2019name
+  )
 }
 
 # Get number of localities in HSCP
@@ -32,7 +34,10 @@ markers_emergency_dep <- hosp_lookup |>
   dplyr::filter(type == "Emergency Department") |>
   dplyr::filter(hscp2019name == HSCP)
 
-Clacks_Royal <- dplyr::filter(hosp_lookup, name == "Forth Valley Royal Hospital")
+Clacks_Royal <- dplyr::filter(
+  hosp_lookup,
+  name == "Forth Valley Royal Hospital"
+)
 
 # Ninewells hospital is incorrectly mapped even though postcode ok - so corrected coords here
 if (HSCP == "Dundee City") {

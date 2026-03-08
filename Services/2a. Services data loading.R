@@ -48,7 +48,12 @@ care_homes <- MDSF
 # 3. Initial manipulation ----
 
 prac <- prac |>
-  dplyr::select(practice_code, gp_practice_name, practice_list_size, postcode) |>
+  dplyr::select(
+    practice_code,
+    gp_practice_name,
+    practice_list_size,
+    postcode
+  ) |>
   dplyr::mutate(postcode = gsub(" ", "", postcode, fixed = TRUE))
 
 # create hospital lookup table
@@ -60,7 +65,11 @@ hosp_lookup <- hosp_types |>
     type = current_department_type
   ) |>
   dplyr::left_join(
-    dplyr::select(hosp_postcodes |> dplyr::rename(location = hospital_code), location, postcode),
+    dplyr::select(
+      hosp_postcodes |> dplyr::rename(location = hospital_code),
+      location,
+      postcode
+    ),
     by = dplyr::join_by(location)
   ) |>
   dplyr::mutate(postcode = gsub(" ", "", postcode, fixed = TRUE)) |>
