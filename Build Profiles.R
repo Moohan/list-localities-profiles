@@ -20,6 +20,9 @@ source("Master RMarkdown Document & Render Code/Global Script.R")
 lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
 output_dir <- path(lp_path, "Profiles Output")
 
+# Global Services Loading (Run once per session)
+source("Services/2a. Services data loading.R")
+
 # Below creates locality list of all the localities in a chosen HSCP
 lookup <- read_in_localities()
 
@@ -44,6 +47,10 @@ for (HSCP in hscp_list) {
 
   # Loop to create the profiles for all the localities in the list
 
+  # Partnership-level Services Prep (Run once per HSCP)
+  source("Services/2b. Services data manipulation.R")
+  source("Services/3. Service HSCP map.R")
+
   # There are several stages to the profiles:
   # 1. Looping through each locality in the HSCP doing the following:
   # 1a. Run each section script for that locality
@@ -64,8 +71,7 @@ for (HSCP in hscp_list) {
     source("Households/Households Code.R")
 
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
-    source("Services/3. Service HSCP map.R")
+    source("Services/2c. Services table.R")
 
     # General Health ----
     source("General Health/3. General Health Outputs.R")
@@ -119,4 +125,25 @@ for (HSCP in hscp_list) {
     # Force garbage collection to free up memory
     gc()
   }
+
+  # Partnership-level housekeeping
+  rm(
+    service_map,
+    markers_gp,
+    markers_miu,
+    markers_emergency_dep,
+    markers_care_home,
+    lookup2,
+    n_loc,
+    all_markers,
+    api_key,
+    col_palette,
+    hscp_loc,
+    locality_map_id,
+    max_lat,
+    max_long,
+    min_lat,
+    min_long,
+    places
+  )
 }
