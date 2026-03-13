@@ -16,9 +16,6 @@
 ## Select a locality based on the HSCP (for source code "2. Services Outputs" to run - it does not matter which one is chosen)
 # LOCALITY <- read_in_localities() |> filter(hscp2019name == HSCP) |> slice(1) |> pull(hscp_locality)
 
-# Source the data manipulation script for services
-# source("Services/2. Services data manipulation & table.R")
-
 # 1. Set up ----
 
 ## Load packages
@@ -397,20 +394,19 @@ service_map <- cowplot::plot_grid(
 # 4 Cleanup ----
 # remove unnecessary objects
 rm(
+  all_markers,
+  api_key,
   blank_leg,
-  Clacks_Royal,
-  data,
-  hosp_postcodes,
-  hosp_types,
+  hscp_loc,
   leg1,
   leg2,
   leg12,
-  markers_care_home,
-  markers_emergency_dep,
-  markers_gp,
-  markers_miu,
-  other_care_type,
-  postcode_lkp,
+  locality_map_id,
+  max_lat,
+  max_long,
+  min_lat,
+  min_long,
+  places,
   service_map_1,
   service_map_2,
   service_map_background,
@@ -418,24 +414,3 @@ rm(
   shp_hscp,
   zones_coord
 )
-
-# Housekeeping ----
-# These objects are left over after the script is run
-# but don't appear to be used in any 'downstream' process:
-# Main markdown, Summary Table, Excel data tables, SDC output.
-# TODO: Investigate if these can be removed earlier or not created at all.
-rm(
-  all_markers,
-  api_key,
-  col_palette,
-  ext_year,
-  hscp_loc,
-  locality_map_id,
-  lookup2,
-  max_lat,
-  max_long,
-  min_lat,
-  min_long,
-  places
-)
-gc()
