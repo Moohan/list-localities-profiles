@@ -65,10 +65,14 @@ if (HSCP == "Dundee City") {
   markers_emergency_dep <- markers_emergency_dep |>
     dplyr::mutate(
       latitude = dplyr::if_else(
-        latitude == 56.4617, 56.4659308, latitude
+        latitude == 56.4617,
+        56.4659308,
+        latitude
       ),
       longitude = dplyr::if_else(
-        longitude == -2.991432, -3.0378506, longitude
+        longitude == -2.991432,
+        -3.0378506,
+        longitude
       )
     )
 }

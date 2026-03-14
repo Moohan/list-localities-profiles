@@ -205,16 +205,18 @@ for (HSCP in hscp_list) {
   gc()
 
   # Partnership-level cleanup ----
-  rm(list = intersect(
-  c(
-    "markers_gp",
-    "markers_miu",
-    "markers_emergency_dep",
-    "markers_care_home",
-    "lookup2",
-    "n_loc",
-    "Clacks_Royal"
-  ),
-  ls()
-))
+  rm(
+    list = intersect(
+      c(
+        "markers_gp",
+        "markers_miu",
+        "markers_emergency_dep",
+        "markers_care_home",
+        "lookup2",
+        "n_loc",
+        "Clacks_Royal"
+      ),
+      ls()
+    )
+  )
 }

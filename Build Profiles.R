@@ -129,17 +129,19 @@ for (HSCP in hscp_list) {
   # Partnership-level cleanup ----
   # Clean up objects created in the HSCP loop that are no longer needed
   # after all localities in the partnership have been processed.
-  rm(list = intersect(
-    c(
-      "service_map",
-      "markers_gp",
-      "markers_miu",
-      "markers_emergency_dep",
-      "markers_care_home",
-      "lookup2",
-      "n_loc",
-      "Clacks_Royal"
-    ),
-    ls()
-  ))
+  rm(
+    list = intersect(
+      c(
+        "service_map",
+        "markers_gp",
+        "markers_miu",
+        "markers_emergency_dep",
+        "markers_care_home",
+        "lookup2",
+        "n_loc",
+        "Clacks_Royal"
+      ),
+      ls()
+    )
+  )
 }
