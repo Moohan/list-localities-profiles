@@ -195,6 +195,27 @@ count_localities <- function(locality_lookup, hscp_name) {
   return(sum(locality_lookup[["hscp2019name"]] == hscp_name))
 }
 
+get_locality_context <- function(lookup_df, locality_name) {
+  hscp <- as.character(
+    lookup_df[lookup_df[["hscp_locality"]] == locality_name, ][["hscp2019name"]]
+  )
+  hb <- as.character(
+    lookup_df[lookup_df[["hscp_locality"]] == locality_name, ][["hb2019name"]]
+  )
+  other_locs <- lookup_df |>
+    dplyr::select(hscp_locality, hscp2019name) |>
+    dplyr::filter(hscp2019name == hscp & hscp_locality != locality_name) |>
+    dplyr::arrange(hscp_locality)
+  n_loc <- count_localities(lookup_df, hscp)
+
+  return(list(
+    HSCP = hscp,
+    HB = hb,
+    other_locs = other_locs,
+    n_loc = n_loc
+  ))
+}
+
 ## Function to read in latest SPD file ----
 
 # No arguments needed, just use read_in_latest_postcodes()
@@ -700,17 +721,17 @@ save_dataframes_to_excel <- function(dataframes, sheet_names, file_path) {
 # flextable function
 
 lp_flextable_theme <- function(ft) {
-  ft %>%
-    bold(part = "header") %>%
-    bg(bg = "#43358B", part = "header") %>%
-    color(color = "white", part = "header") %>%
-    height(height = 0.236, part = "body") %>%
-    hrule(rule = "atleast", part = "body") %>%
-    align(align = "center", part = "header") %>%
-    valign(valign = "center", part = "header") %>%
-    valign(valign = "top", part = "body") %>%
-    colformat_num(big.mark = "") %>%
-    fontsize(size = 10, part = "all") %>%
+  ft |>
+    bold(part = "header") |>
+    bg(bg = "#43358B", part = "header") |>
+    color(color = "white", part = "header") |>
+    height(height = 0.236, part = "body") |>
+    hrule(rule = "atleast", part = "body") |>
+    align(align = "center", part = "header") |>
+    valign(valign = "center", part = "header") |>
+    valign(valign = "top", part = "body") |>
+    colformat_num(big.mark = "") |>
+    fontsize(size = 10, part = "all") |>
     border(
       border = fp_border_default(color = "#000000", width = 0.5),
       part = "all"
@@ -791,7 +812,9 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("Services.Rmd" %in% chapters_oi) {
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
+    source("Services/2a. Services data loading.R")
+    source("Services/2b. Services data manipulation.R")
+    source("Services/2c. Services table.R")
     source("Services/3. Service HSCP map.R")
   }
 
