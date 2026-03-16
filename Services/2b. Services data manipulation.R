@@ -13,7 +13,9 @@ if (!exists("HSCP") && exists("LOCALITY")) {
   if (!exists("lookup2")) {
     lookup2 <- read_in_localities()
   }
-  HSCP <- as.character(dplyr::filter(lookup2, hscp_locality == LOCALITY)$hscp2019name)
+  HSCP <- as.character(
+    dplyr::filter(lookup2, hscp_locality == LOCALITY)$hscp2019name
+  )
 }
 
 ###### 1. Manipulate services data ######
@@ -39,7 +41,10 @@ markers_emergency_dep <- hosp_lookup |>
   dplyr::filter(type == "Emergency Department") |>
   dplyr::filter(hscp2019name == HSCP)
 
-Clacks_Royal <- dplyr::filter(hosp_lookup, name == "Forth Valley Royal Hospital")
+Clacks_Royal <- dplyr::filter(
+  hosp_lookup,
+  name == "Forth Valley Royal Hospital"
+)
 
 # Ninewells hospital is incorrectly mapped even though postcode ok - so corrected coords here
 
@@ -66,6 +71,8 @@ markers_care_home <- care_homes |>
   ) |>
   dplyr::filter(type == "Care Home Service") |>
   dplyr::filter(subtype == "Older People") |>
-  dplyr::mutate(postcode = stringr::str_replace_all(toupper(service_postcode), " ", "")) |>
+  dplyr::mutate(
+    postcode = stringr::str_replace_all(toupper(service_postcode), " ", "")
+  ) |>
   dplyr::left_join(postcode_lkp, by = "postcode") |>
   dplyr::filter(hscp2019name == HSCP)

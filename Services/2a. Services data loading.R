@@ -41,7 +41,12 @@ services_file_names <- list.files(
 for (file in services_file_names) {
   name <- substr(x = file, 1, 4)
 
-  data <- readRDS(fs::path(lp_path, "Services", paste0("DATA ", ext_year), file)) |>
+  data <- readRDS(fs::path(
+    lp_path,
+    "Services",
+    paste0("DATA ", ext_year),
+    file
+  )) |>
     janitor::clean_names()
 
   assign(name, data)
@@ -59,7 +64,12 @@ rm(curr, hosp, MDSF, data, file, services_file_names)
 ## GP Practices ----
 
 prac <- prac |>
-  dplyr::select(practice_code, gp_practice_name, practice_list_size, postcode) |>
+  dplyr::select(
+    practice_code,
+    gp_practice_name,
+    practice_list_size,
+    postcode
+  ) |>
   dplyr::mutate(postcode = stringr::str_replace_all(toupper(postcode), " ", ""))
 
 ## Hospital Lookup (EDs and MIUs) ----
@@ -79,5 +89,7 @@ hosp_lookup <- hosp_types |>
     dplyr::select(hosp_postcodes, location, postcode),
     by = dplyr::join_by(location)
   ) |>
-  dplyr::mutate(postcode = stringr::str_replace_all(toupper(postcode), " ", "")) |>
+  dplyr::mutate(
+    postcode = stringr::str_replace_all(toupper(postcode), " ", "")
+  ) |>
   dplyr::left_join(postcode_lkp, by = "postcode")
