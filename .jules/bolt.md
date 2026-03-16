@@ -1,0 +1,3 @@
+## 2024-05-23 - Hoisting expensive GIS and I/O operations in R loops
+**Learning:** Redundant execution of map rendering and data loading inside nested loops is a major bottleneck in R report pipelines. In this codebase, rendering the service map took 10-20s per locality, but the map was identical for the entire partnership. Hoisting this to the HSCP loop and data loading to the global scope eliminates this waste.
+**Action:** When optimizing R loops, audit all 'source' calls and identify those that don't depend on the innermost loop variable (e.g., LOCALITY). Refactor these into scoped modules (Global -> HSCP -> Locality) to implement hoisting.
