@@ -11,7 +11,13 @@ other_care_type <- care_homes |>
   ) |>
   dplyr::filter(type == "Care Home Service") |>
   dplyr::filter(subtype != "Older People") |>
-  dplyr::mutate(postcode = stringr::str_replace_all(service_postcode, stringr::fixed(" "), "")) |>
+  dplyr::mutate(
+    postcode = stringr::str_replace_all(
+      service_postcode,
+      stringr::fixed(" "),
+      ""
+    )
+  ) |>
   dplyr::left_join(postcode_lkp, by = "postcode") |>
   dplyr::filter(hscp_locality == LOCALITY)
 

@@ -791,7 +791,9 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("Services.Rmd" %in% chapters_oi) {
     # Services ----
-    if (!exists("ext_year")) ext_year <- 2024
+    if (!exists("ext_year")) {
+      ext_year <- 2024
+    }
     source("Services/2a. Services data loading.R")
     source("Services/2b. Services data manipulation.R")
     source("Services/2c. Services table.R")

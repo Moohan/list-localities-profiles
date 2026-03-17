@@ -6,7 +6,9 @@
 
 # Read in Postcode file for latitudes and longitudes
 postcode_lkp <- read_in_postcodes() |>
-  dplyr::mutate(postcode = stringr::str_replace_all(pc7, stringr::fixed(" "), "")) |>
+  dplyr::mutate(
+    postcode = stringr::str_replace_all(pc7, stringr::fixed(" "), "")
+  ) |>
   dplyr::select(
     postcode,
     grid_reference_easting,

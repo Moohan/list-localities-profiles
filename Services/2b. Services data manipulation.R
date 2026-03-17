@@ -4,15 +4,24 @@
 # Ensure HSCP is defined
 if (!exists("HSCP")) {
   lookup_hscp <- read_in_localities()
-  HSCP <- as.character(dplyr::filter(lookup_hscp, hscp_locality == LOCALITY)[["hscp2019name"]])
+  HSCP <- as.character(dplyr::filter(lookup_hscp, hscp_locality == LOCALITY)[[
+    "hscp2019name"
+  ]])
   rm(lookup_hscp)
 }
 
 # GP Practices ----
 # Note: 'prac' is loaded in 2a.R
 markers_gp <- prac |>
-  dplyr::select(practice_code, gp_practice_name, practice_list_size, postcode) |>
-  dplyr::mutate(postcode = stringr::str_replace_all(postcode, stringr::fixed(" "), "")) |>
+  dplyr::select(
+    practice_code,
+    gp_practice_name,
+    practice_list_size,
+    postcode
+  ) |>
+  dplyr::mutate(
+    postcode = stringr::str_replace_all(postcode, stringr::fixed(" "), "")
+  ) |>
   dplyr::left_join(postcode_lkp, by = "postcode") |>
   dplyr::mutate(type = "GP Practice") |>
   dplyr::filter(hscp2019name == HSCP)
@@ -29,7 +38,9 @@ hosp_lookup <- hosp_types |>
     hosp_postcodes |> dplyr::select(location = hospital_code, postcode),
     by = "location"
   ) |>
-  dplyr::mutate(postcode = stringr::str_replace_all(postcode, stringr::fixed(" "), "")) |>
+  dplyr::mutate(
+    postcode = stringr::str_replace_all(postcode, stringr::fixed(" "), "")
+  ) |>
   dplyr::left_join(postcode_lkp, by = "postcode")
 
 # MIUs
@@ -68,7 +79,13 @@ markers_care_home <- care_homes |>
   ) |>
   dplyr::filter(type == "Care Home Service") |>
   dplyr::filter(subtype == "Older People") |>
-  dplyr::mutate(postcode = stringr::str_replace_all(service_postcode, stringr::fixed(" "), "")) |>
+  dplyr::mutate(
+    postcode = stringr::str_replace_all(
+      service_postcode,
+      stringr::fixed(" "),
+      ""
+    )
+  ) |>
   dplyr::left_join(postcode_lkp, by = "postcode") |>
   dplyr::filter(hscp2019name == HSCP)
 
