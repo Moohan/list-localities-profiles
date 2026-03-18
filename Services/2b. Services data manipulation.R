@@ -17,7 +17,12 @@ n_loc <- count_localities(lookup2, HSCP)
 
 ## GP Practices ----
 prac <- prac |>
-  dplyr::select(practice_code, gp_practice_name, practice_list_size, postcode) |>
+  dplyr::select(
+    practice_code,
+    gp_practice_name,
+    practice_list_size,
+    postcode
+  ) |>
   dplyr::mutate(
     postcode = stringr::str_replace_all(postcode, stringr::fixed(" "), "")
   )
