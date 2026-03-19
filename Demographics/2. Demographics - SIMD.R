@@ -359,7 +359,9 @@ simd_diff_overall <- simd_16_20_dom %>%
 lookup_summary <- read_in_localities()
 
 ## Relevant lookups for creating the table objects
-HSCP <- as.character(filter(lookup_summary, hscp_locality == LOCALITY)$hscp2019name)
+HSCP <- as.character(
+  filter(lookup_summary, hscp_locality == LOCALITY)$hscp2019name
+)
 
 # Determine other localities based on LOCALITY object
 other_locs <- lookup_summary %>%

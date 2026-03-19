@@ -17,12 +17,30 @@ pop_max_year <- max(pop_raw_data_base$year)
 pop_min_year <- pop_max_year - 5
 
 # compute age bands
-pop_raw_data_base$"Pop0_4" <- rowSums(subset(pop_raw_data_base, select = age0:age4))
-pop_raw_data_base$"Pop5_17" <- rowSums(subset(pop_raw_data_base, select = age5:age17))
-pop_raw_data_base$"Pop18_44" <- rowSums(subset(pop_raw_data_base, select = age18:age44))
-pop_raw_data_base$"Pop45_64" <- rowSums(subset(pop_raw_data_base, select = age45:age64))
-pop_raw_data_base$"Pop65_74" <- rowSums(subset(pop_raw_data_base, select = age65:age74))
-pop_raw_data_base$"Pop75_84" <- rowSums(subset(pop_raw_data_base, select = age75:age84))
+pop_raw_data_base$"Pop0_4" <- rowSums(subset(
+  pop_raw_data_base,
+  select = age0:age4
+))
+pop_raw_data_base$"Pop5_17" <- rowSums(subset(
+  pop_raw_data_base,
+  select = age5:age17
+))
+pop_raw_data_base$"Pop18_44" <- rowSums(subset(
+  pop_raw_data_base,
+  select = age18:age44
+))
+pop_raw_data_base$"Pop45_64" <- rowSums(subset(
+  pop_raw_data_base,
+  select = age45:age64
+))
+pop_raw_data_base$"Pop65_74" <- rowSums(subset(
+  pop_raw_data_base,
+  select = age65:age74
+))
+pop_raw_data_base$"Pop75_84" <- rowSums(subset(
+  pop_raw_data_base,
+  select = age75:age84
+))
 pop_raw_data_base$"Pop85Plus" <- rowSums(subset(
   pop_raw_data_base,
   select = age85:age90plus
