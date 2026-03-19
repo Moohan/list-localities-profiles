@@ -1,17 +1,7 @@
 # LOCALITY PROFILES DEMOGRAPHICS: SIMD
 
-### First Created: 08/08/2019
-### Original Author: Aidan Morrison
-
-### Written for: RStudio Server Pro, R Version 3.6.1
-
-### Description: The purpose of this code is to produce outputs on deprivation to be
-###              used for LIST locality profiles produced in RMarkdown.
-
-### Revised Oct/Nov 2022 by Craig Fraser and Luke Taylor for smoother process, ex:
-# Incorporated lookup functions so less dependent on static files
-
-### Script restructuring Nov 22 by C Puech
+# Description: Locality-specific SIMD outputs for locality profiles.
+#              Depends on hoisted logic in 'Demographics/2a. SIMD data loading.R'
 
 # SECTION 1: Packages, file paths, etc ----
 
@@ -20,104 +10,18 @@ library(reshape2)
 library(ggrepel)
 library(sf)
 
-# Source in global functions/themes script
-# source("Master RMarkdown Document & Render Code/Global Script.R")
-
-## Final document will loop through a list of localities
-# Create placeholder for for loop
-# LOCALITY <- "Skye, Lochalsh and West Ross"
-# LOCALITY <- "Falkirk West"
-# LOCALITY <- "Stirling City with the Eastern Villages Bridge of Allan and Dunblane"
-# LOCALITY <- "Ayr North and Former Coalfield Communities"
-# LOCALITY <- "Helensburgh and Lomond"
-# LOCALITY <- "City of Dunfermline"
-# LOCALITY <- "Eastwood"
-
 # SECTION 2: Data Imports ----
+# These objects are now provided by 2a. SIMD data loading.R:
+# lookup_dz_base, pop_data_base, simd2020_base, simd2016_base, zones_base
 
-## Locality/DZ lookup
-lookup_dz <- read_in_localities(dz_level = TRUE)
+lookup_dz <- lookup_dz_base
+pop_data <- pop_data_base
+simd2020 <- simd2020_base
+simd2016 <- simd2016_base
+zones <- zones_base
 
-## Population data
-pop_raw_data <- read_in_dz_pops()
-
-pop_max_year <- max(pop_raw_data$year)
-
-pop_data <- pop_raw_data %>%
-  filter(year == max(year)) %>%
-  group_by(
-    year,
-    datazone2011,
-    hscp_locality,
-    hscp2019name,
-    simd2020v2_sc_quintile
-  ) %>%
-  summarise(total_pop = sum(total_pop)) %>%
-  ungroup()
-
-
-## SIMD Domains
-
-lookups_dir <- path("/conf/linkage/output/lookups/Unicode")
-
-# 2020
-simd_2020_all <- read_rds(path(
-  lookups_dir,
-  "Deprivation",
-  "DataZone2011_simd2020v2.rds"
-)) %>%
-  select(datazone2011, simd = "simd2020v2_sc_quintile")
-
-simd_2020_dom <- read_rds(path(
-  lookups_dir,
-  "Deprivation",
-  "DataZone2011_domain_level_simd.rds"
-)) %>%
-  clean_names() %>%
-  select(
-    datazone2011,
-    income = "simd2020v2_inc_quintile",
-    employment = "simd2020v2_emp_quintile",
-    education = "simd2020v2_educ_quintile",
-    access = "simd2020v2_access_quintile",
-    housing = "simd2020v2_house_quintile",
-    health = "simd2020v2_hlth_quintile",
-    crime = "simd2020v2_crime_quintile"
-  )
-
-simd2020 <- merge(simd_2020_all, simd_2020_dom, by = "datazone2011") %>%
-  left_join(pop_data, by = join_by(datazone2011))
-
-# 2016
-simd_2016_all <- read_rds(path(
-  lookups_dir,
-  "Deprivation",
-  "DataZone2011_simd2016.rds"
-)) %>%
-  select(datazone2011 = "DataZone2011", simd = "simd2016_sc_quintile")
-
-simd_2016_dom <- read_rds(path(
-  lookups_dir,
-  "Deprivation",
-  "DataZone2011_domain_level_simd.rds"
-)) %>%
-  clean_names() %>%
-  select(
-    datazone2011,
-    income = "simd2016_inc_quintile",
-    employment = "simd2016_emp_quintile",
-    education = "simd2016_educ_quintile",
-    access = "simd2016_access_quintile",
-    housing = "simd2016_house_quintile",
-    health = "simd2016_hlth_quintile",
-    crime = "simd2016_crime_quintile"
-  )
-
-simd2016 <- merge(simd_2016_all, simd_2016_dom, by = "datazone2011") %>%
-  left_join(lookup_dz, by = join_by(datazone2011))
-
-rm(simd_2020_all, simd_2020_dom, simd_2016_all, simd_2016_dom)
-
+# Use pre-calculated values from loading scripts
+# pop_max_year is provided by 1a. Population data loading.R
 
 # SECTION 3: Outputs ----
 
@@ -142,26 +46,12 @@ perc_top_quintile <- simd_perc_breakdown[5, ]$perc
 
 ## 5b) SIMD map ----
 
-# load in shapefile for mapping
-zones <- read_sf(path(
-  lookups_dir,
-  "Geography",
-  "Shapefiles",
-  "Data Zones 2011",
-  "SG_DataZone_Bdry_2011.shp"
-)) %>%
-  st_transform(4326) %>%
-  rename(datazone2011 = DataZone)
-
-# merge lookup and shapefile
-zones <- merge(zones, lookup_dz, by = "datazone2011")
-
 # subset for Locality
-zones <- subset(zones, hscp_locality == LOCALITY)
+zones_loc <- subset(zones, hscp_locality == LOCALITY)
 
 # Get latitude and longitude co-ordinates for each datazone, find min and max.
 zones_coord <-
-  zones %>%
+  zones_loc %>%
   st_coordinates() %>%
   as_tibble() %>%
   select("long" = X, "lat" = Y) %>%
@@ -179,6 +69,7 @@ min_lat <- zones_coord$min_lat
 max_lat <- zones_coord$max_lat
 
 # get place names
+lookups_dir <- path("/conf/linkage/output/lookups/Unicode")
 places <- read_csv(path(
   lookups_dir,
   "Geography",
@@ -187,7 +78,7 @@ places <- read_csv(path(
   "Places to Data Zone Lookup.csv"
 )) %>%
   rename(datazone2011 = DataZone) %>%
-  filter(datazone2011 %in% zones$datazone2011) %>%
+  filter(datazone2011 %in% zones_loc$datazone2011) %>%
   # extra filter to remove place names with coordinates outwith locality
   filter(
     between(Longitude, min_long, max_long),
@@ -209,7 +100,7 @@ simd_map_data <- simd2020 %>%
   select(datazone2011, simd)
 
 # merge with shapefile
-zones <- merge(zones, simd_map_data, by = "datazone2011")
+zones_loc <- merge(zones_loc, simd_map_data, by = "datazone2011")
 
 # set colours for simd
 simd_col <- RColorBrewer::brewer.pal(n = 5, name = "RdYlBu")
@@ -218,7 +109,7 @@ simd_cats <- paste("SIMD", 1:5)
 # plot
 simd_map <- ggplot() +
   geom_sf(
-    data = zones,
+    data = zones_loc,
     aes(fill = ordered(simd, levels = 1:5)),
     colour = "black"
   ) +
@@ -235,7 +126,7 @@ simd_map <- ggplot() +
   guides(fill = guide_legend(title = "SIMD Quintile")) +
   labs(caption = "Source: Scottish Government, Public Health Scotland")
 
-rm(zones, places, simd_map_data)
+rm(zones_loc, places, simd_map_data)
 
 ## 5c) SIMD domains ----
 
@@ -328,8 +219,7 @@ simd2016_dom <- simd2016 %>%
 names(simd2016_dom)[2:9] <- paste0(names(simd2016_dom)[2:9], "_16")
 
 # Get most up to date datazone populations
-
-pop_16_20 <- pop_raw_data %>%
+pop_16_20 <- pop_raw_data_base %>%
   filter(year %in% c(2016, pop_max_year)) %>%
   select(year, datazone2011, sex, pop = total_pop) %>%
   group_by(datazone2011, year) %>%
@@ -466,19 +356,19 @@ simd_diff_overall <- simd_16_20_dom %>%
 ##################### SECTION 4: Objects for summary table #######################
 
 ## Relevant lookups for creating the table objects
-lookup <- read_in_localities()
+lookup_summary <- read_in_localities()
 
 ## Relevant lookups for creating the table objects
-HSCP <- as.character(filter(lookup, hscp_locality == LOCALITY)$hscp2019name)
+HSCP <- as.character(filter(lookup_summary, hscp_locality == LOCALITY)$hscp2019name)
 
 # Determine other localities based on LOCALITY object
-other_locs <- lookup %>%
+other_locs <- lookup_summary %>%
   select(hscp_locality, hscp2019name) %>%
   filter(hscp2019name == HSCP & hscp_locality != LOCALITY) %>%
   arrange(hscp_locality)
 
 # Find number of locs per partnership
-n_loc <- count_localities(lookup, HSCP)
+n_loc <- count_localities(lookup_summary, HSCP)
 
 
 ## Other localities in HSCP objects
@@ -530,18 +420,16 @@ rm(
   domains,
   hscp_simd,
   lookup_dz,
-  lookups_dir,
   max_lat,
   max_long,
   min_lat,
   min_long,
   pop_16_20,
-  pop_data,
-  pop_raw_data,
   simd_cats,
   simd_col,
   simd2016,
   simd2020,
-  zones_coord
+  zones_coord,
+  lookup_summary
 )
 gc()

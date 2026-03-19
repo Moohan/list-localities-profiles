@@ -780,6 +780,8 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("Demographics.Rmd" %in% chapters_oi) {
     # Demographics ----
+    source("Demographics/1a. Population data loading.R")
+    source("Demographics/2a. SIMD data loading.R")
     source("Demographics/1. Demographics - Population.R")
     source("Demographics/2. Demographics - SIMD.R")
   }

@@ -1,0 +1,3 @@
+## 2025-01-24 - [Hoisting Demographics Data Loading]
+**Learning:** Performance in R report pipelines can be significantly improved by "hoisting" heavy data loading and global aggregations out of inner loops. In this project, each locality profile was redundantly reading the same large population RDS files and a 50MB+ shapefile, and performing identical partnership-wide aggregations. Moving these to global loading scripts (`1a` and `2a`) avoids redundant I/O and computation.
+**Action:** Always identify if a script being sourced in a loop contains logic that is independent of the loop variable. If so, split the script into a global loading/setup part and a loop-dependent output part.

@@ -34,6 +34,11 @@ hscp_list <- "Falkirk"
 # NOTE - This checks that it exactly matches the lookup
 stopifnot(all(hscp_list %in% unique(lookup[["hscp2019name"]])))
 
+# Demographics loading ----
+# This is now sourced outside of the HSCP loop as it is global.
+source("Demographics/1a. Population data loading.R")
+source("Demographics/2a. SIMD data loading.R")
+
 # Loop over HSCP ----
 # 'looping' over one HSCP is fine.
 for (HSCP in hscp_list) {

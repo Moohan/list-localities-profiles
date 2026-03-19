@@ -1,51 +1,20 @@
-##################### LOCALITY PROFILES DEMOGRAPHICS: POPULATION ######################.
+##################### LOCALITY PROFILES DEMOGRAPHICS: POPULATION ######################
 
-### First Created: 08/08/2019
-### Original Author: Aidan Morrison
+# Description: Locality-specific population outputs for locality profiles.
+#              Depends on hoisted logic in 'Demographics/1a. Population data loading.R'
 
-### Written for: RStudio Server Pro, R Version 3.6.1
-
-### Description: The purpose of this code is to produce outputs on population to be
-###              used for LIST locality profiles produced in RMarkdown.
-
-### Revised Oct/Nov 2022 by Craig Fraser and Luke Taylor for smoother process, ex:
-
-# Incorporated lookup functions so less dependent on static files
-
-####################### SECTION 1: Packages, file paths, etc #########################
-
-## Libraries
+# SECTION 1: Packages, file paths, etc ----
 library(reshape2)
 
-# Source in global functions/themes script
-# source("Master RMarkdown Document & Render Code/Global Script.R")
+# SECTION 2: Data Imports ----
+# These objects are now provided by 1a. Population data loading.R:
+# pops_base, loc_pops_base, hscp_pop_proj_weight_base, pop_max_year, pop_min_year
 
-## Final document will loop through a list of localities
-# Create placeholder for for loop
-# LOCALITY <- "Inverness"
-# LOCALITY <- "Stirling City with the Eastern Villages Bridge of Allan and Dunblane"
-# LOCALITY <- "Ayr North and Former Coalfield Communities"
-
-########################## SECTION 2: Data Imports ###############################
-
-## Locality/DZ lookup
-lookup <- read_in_localities()
-
-## Population data
-pop_raw_data <- read_in_dz_pops()
-
-## Population Projection Data
-hscp_pop_proj <- read_in_pop_proj()
-
-## Set year
-pop_max_year <- max(pop_raw_data$year)
-pop_min_year <- pop_max_year - 5
-
-
-######################## SECTION 3: Gender and Age #############################
+# SECTION 3: Gender and Age ----
 
 ## Population data manipulation
-pop_10y_groups <- pop_raw_data |>
+# Use pre-calculated 'pops_base' and filter for the current locality
+pop_10y_groups <- pop_raw_data_base |>
   filter(
     hscp_locality == LOCALITY,
     year == max(year)
@@ -73,64 +42,7 @@ pop_10y_groups <- pop_raw_data |>
   summarise(pop = sum(pop)) |>
   ungroup()
 
-# compute age bands
-pop_raw_data$"Pop0_4" <- rowSums(subset(pop_raw_data, select = age0:age4))
-pop_raw_data$"Pop5_17" <- rowSums(subset(pop_raw_data, select = age5:age17))
-pop_raw_data$"Pop18_44" <- rowSums(subset(pop_raw_data, select = age18:age44))
-pop_raw_data$"Pop45_64" <- rowSums(subset(pop_raw_data, select = age45:age64))
-pop_raw_data$"Pop65_74" <- rowSums(subset(pop_raw_data, select = age65:age74))
-pop_raw_data$"Pop75_84" <- rowSums(subset(pop_raw_data, select = age75:age84))
-pop_raw_data$"Pop85Plus" <- rowSums(subset(
-  pop_raw_data,
-  select = age85:age90plus
-))
-pop_raw_data$"Pop65Plus" <- rowSums(subset(
-  pop_raw_data,
-  select = age65:age90plus
-))
-
-pops <- select(
-  pop_raw_data,
-  year,
-  sex,
-  hscp2019name,
-  hscp_locality,
-  Pop0_4,
-  Pop5_17,
-  Pop18_44,
-  Pop45_64,
-  Pop65_74,
-  Pop75_84,
-  Pop85Plus,
-  Pop65Plus,
-  total_pop
-)
-
-
-# Aggregate and add partnership + Scotland totals
-pops <- pops %>%
-  group_by(year, sex, hscp2019name, hscp_locality) %>%
-  summarise(across(everything(), sum)) %>%
-  ungroup() %>%
-  # Add a partnership total
-  bind_rows(
-    pops %>%
-      select(-hscp_locality) %>%
-      group_by(year, hscp2019name, sex) %>%
-      summarise(across(everything(), sum)) %>%
-      ungroup() %>%
-      mutate(hscp_locality = "Partnership Total")
-  ) %>%
-  # Add a Scotland total
-  bind_rows(
-    pops %>%
-      select(-hscp_locality, -hscp2019name) %>%
-      group_by(year, sex) %>%
-      summarise(across(everything(), sum)) %>%
-      ungroup() %>%
-      mutate(hscp_locality = "Scotland Total", hscp2019name = "Scotland")
-  )
-
+pops <- pops_base # Reference base object
 
 ## Gender
 gender_breakdown <- pops %>%
@@ -258,7 +170,7 @@ hist_pop_change <- ggplot(
   )
 
 
-######################## SECTION 4: Population over time ############################
+# SECTION 4: Population over time ----
 
 ## 4a) Data wrangling ----
 
@@ -269,56 +181,15 @@ locality_pop_trend <- pops %>%
   summarise(pop = sum(total_pop)) %>%
   ungroup()
 
-## Population projections by locality
-
-# current locality populations data breakdown
-loc_pops <- pops %>%
-  select(-Pop65Plus, -total_pop) %>%
-  filter(year == pop_max_year) %>%
-  filter(!(hscp_locality %in% c("Partnership Total", "Scotland Total"))) %>%
-  reshape2::melt(
-    id.vars = c("year", "sex", "hscp2019name", "hscp_locality")
-  ) %>%
-  rename(age_group = variable) %>%
-  as_tibble() %>%
-  select(-year)
-
-# hscp population projection data
-hscp_pop_proj_weight <- hscp_pop_proj %>%
-  mutate(
-    age_group = case_when(
-      age %in% 0:4 ~ "Pop0_4",
-      age %in% 5:17 ~ "Pop5_17",
-      age %in% 18:44 ~ "Pop18_44",
-      age %in% 45:64 ~ "Pop45_64",
-      age %in% 65:74 ~ "Pop65_74",
-      age %in% 75:84 ~ "Pop75_84",
-      age > 84 ~ "Pop85Plus"
-    )
-  ) %>%
-  # projection until 2028
-  filter(year %in% pop_max_year:2028) %>%
-  # aggregate to age groups
-  group_by(year, hscp2019, hscp2019name, sex, age_group) %>%
-  summarise(pop = sum(pop)) %>%
-  ungroup() %>%
-  # change sex variable coding
-  mutate(sex = ifelse(sex == 1, "M", "F")) %>%
-  # calculate weights
-  arrange(hscp2019, sex, age_group, year) %>%
-  group_by(hscp2019, sex, age_group) %>%
-  mutate(pop_change = if_else(year != pop_max_year, pop / first(pop), 1)) %>%
-  ungroup()
-
-
 ## Apply weights to localities
-locality_pop_proj <- hscp_pop_proj_weight %>%
+# Use pre-calculated weights and filter for current partnership/locality
+locality_pop_proj <- hscp_pop_proj_weight_base %>%
   # merge with lookup file
   left_join(lookup, by = join_by(hscp2019, hscp2019name)) %>%
   select(-hscp2019, -pop, -hb2019name, -hb2019) %>%
   # merge with locality populations data
   full_join(
-    loc_pops,
+    loc_pops_base,
     by = c("sex", "age_group", "hscp2019name", "hscp_locality")
   ) %>%
   # calculate population projections based on weights
@@ -487,13 +358,11 @@ rm(
   pop_change,
   pop_proj_change,
   locality_pop_trend,
-  loc_pops,
-  hscp_pop_proj_weight,
   locality_pop_proj
 )
 
 
-##################### SECTION 5: Objects for summary table #######################
+# SECTION 5: Objects for summary table ----
 
 ## Relevant lookups for creating the table objects
 HSCP <- as.character(filter(lookup, hscp_locality == LOCALITY)$hscp2019name)
@@ -611,14 +480,9 @@ scot_over65 <- pop_scot %>%
 rm(pop_hscp, pop_scot)
 
 # Housekeeping ----
-# These objects are left over after the script is run
-# but don't appear to be used in any 'downstream' process:
-# Main markdown, Summary Table, Excel data tables, SDC output.
-# TODO: Investigate if these can be removed earlier or not created at all.
+# Final objects for the main report logic
 rm(
   hist_pop_breakdown,
-  hscp_pop_proj,
-  pop_plot_dat,
-  pop_raw_data
+  pop_plot_dat
 )
 gc()
