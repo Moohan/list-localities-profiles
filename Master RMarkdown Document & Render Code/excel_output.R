@@ -13,6 +13,10 @@ lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality
 # Source in functions code
 source("Master RMarkdown Document & Render Code/Global Script.R")
 lookup <- read_in_localities()
+
+# Global data loading for services ----
+source("Services/2a. Services data loading.R")
+
 # Specify HSCP(s) ----
 # use `unique(lookup$hscp2019name)` for all
 # hscp_list <- unique(lookup$hscp2019name)
@@ -29,6 +33,9 @@ for (HSCP in hscp_list) {
     filter(hscp2019name == HSCP) |>
     distinct(hscp_locality) |>
     pull(hscp_locality)
+
+  # Services HSCP-level manipulation ----
+  source("Services/2b. Services data manipulation.R")
 
   loop_env <- c(ls(), "loop_env")
 
@@ -61,7 +68,7 @@ for (HSCP in hscp_list) {
     source("Households/Households Code.R")
 
     # services
-    source("Services/2. Services data manipulation & table.R")
+    source("Services/2c. Services table.R")
 
     # Define data frames and their corresponding sheet names
     df <- list(

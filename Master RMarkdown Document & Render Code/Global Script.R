@@ -791,7 +791,17 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("Services.Rmd" %in% chapters_oi) {
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
+    # Ensure lp_path is defined (it's often defined in the calling script)
+    if (!exists("lp_path")) {
+      lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
+    }
+    source("Services/2a. Services data loading.R")
+    # Determine HSCP for 2b
+    HSCP <- as.character(
+      dplyr::filter(read_in_localities(), hscp_locality == LOCALITY)$hscp2019name
+    )
+    source("Services/2b. Services data manipulation.R")
+    source("Services/2c. Services table.R")
     source("Services/3. Service HSCP map.R")
   }
 
