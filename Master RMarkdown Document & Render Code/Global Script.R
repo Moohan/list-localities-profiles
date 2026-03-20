@@ -798,7 +798,10 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
     source("Services/2a. Services data loading.R")
     # Determine HSCP for 2b
     HSCP <- as.character(
-      dplyr::filter(read_in_localities(), hscp_locality == LOCALITY)$hscp2019name
+      dplyr::filter(
+        read_in_localities(),
+        hscp_locality == LOCALITY
+      )$hscp2019name
     )
     source("Services/2b. Services data manipulation.R")
     source("Services/2c. Services table.R")

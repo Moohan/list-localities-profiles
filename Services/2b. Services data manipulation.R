@@ -7,7 +7,12 @@ if (!exists("lookup2")) {
 
 # 1. GP Practices ----
 prac_filtered <- prac |>
-  dplyr::select(practice_code, gp_practice_name, practice_list_size, postcode) |>
+  dplyr::select(
+    practice_code,
+    gp_practice_name,
+    practice_list_size,
+    postcode
+  ) |>
   dplyr::mutate(postcode = gsub(" ", "", postcode, fixed = TRUE))
 
 # Merge practice data with postcode and locality lookups
@@ -19,7 +24,10 @@ markers_gp <- dplyr::left_join(prac_filtered, postcode_lkp, by = "postcode") |>
 # 2. Emergency Departments and MIUs ----
 
 # rename for hospital_code to location
-hosp_postcodes_renamed <- dplyr::rename(hosp_postcodes, location = hospital_code)
+hosp_postcodes_renamed <- dplyr::rename(
+  hosp_postcodes,
+  location = hospital_code
+)
 
 # create hospital lookup table
 hosp_lookup <- hosp_types |>
@@ -46,7 +54,10 @@ markers_emergency_dep <- hosp_lookup |>
   dplyr::filter(type == "Emergency Department") |>
   dplyr::filter(hscp2019name == HSCP)
 
-Clacks_Royal <- dplyr::filter(hosp_lookup, name == "Forth Valley Royal Hospital")
+Clacks_Royal <- dplyr::filter(
+  hosp_lookup,
+  name == "Forth Valley Royal Hospital"
+)
 
 # Ninewells hospital is incorrectly mapped even though postcode ok - so corrected coords here
 if (HSCP == "Dundee City") {
