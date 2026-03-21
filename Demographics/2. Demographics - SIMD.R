@@ -33,92 +33,6 @@ library(sf)
 # LOCALITY <- "City of Dunfermline"
 # LOCALITY <- "Eastwood"
 
-# SECTION 2: Data Imports ----
-
-## Locality/DZ lookup
-lookup_dz <- read_in_localities(dz_level = TRUE)
-
-## Population data
-pop_raw_data <- read_in_dz_pops()
-
-pop_max_year <- max(pop_raw_data$year)
-
-pop_data <- pop_raw_data %>%
-  filter(year == max(year)) %>%
-  group_by(
-    year,
-    datazone2011,
-    hscp_locality,
-    hscp2019name,
-    simd2020v2_sc_quintile
-  ) %>%
-  summarise(total_pop = sum(total_pop)) %>%
-  ungroup()
-
-
-## SIMD Domains
-
-lookups_dir <- path("/conf/linkage/output/lookups/Unicode")
-
-# 2020
-simd_2020_all <- read_rds(path(
-  lookups_dir,
-  "Deprivation",
-  "DataZone2011_simd2020v2.rds"
-)) %>%
-  select(datazone2011, simd = "simd2020v2_sc_quintile")
-
-simd_2020_dom <- read_rds(path(
-  lookups_dir,
-  "Deprivation",
-  "DataZone2011_domain_level_simd.rds"
-)) %>%
-  clean_names() %>%
-  select(
-    datazone2011,
-    income = "simd2020v2_inc_quintile",
-    employment = "simd2020v2_emp_quintile",
-    education = "simd2020v2_educ_quintile",
-    access = "simd2020v2_access_quintile",
-    housing = "simd2020v2_house_quintile",
-    health = "simd2020v2_hlth_quintile",
-    crime = "simd2020v2_crime_quintile"
-  )
-
-simd2020 <- merge(simd_2020_all, simd_2020_dom, by = "datazone2011") %>%
-  left_join(pop_data, by = join_by(datazone2011))
-
-# 2016
-simd_2016_all <- read_rds(path(
-  lookups_dir,
-  "Deprivation",
-  "DataZone2011_simd2016.rds"
-)) %>%
-  select(datazone2011 = "DataZone2011", simd = "simd2016_sc_quintile")
-
-simd_2016_dom <- read_rds(path(
-  lookups_dir,
-  "Deprivation",
-  "DataZone2011_domain_level_simd.rds"
-)) %>%
-  clean_names() %>%
-  select(
-    datazone2011,
-    income = "simd2016_inc_quintile",
-    employment = "simd2016_emp_quintile",
-    education = "simd2016_educ_quintile",
-    access = "simd2016_access_quintile",
-    housing = "simd2016_house_quintile",
-    health = "simd2016_hlth_quintile",
-    crime = "simd2016_crime_quintile"
-  )
-
-simd2016 <- merge(simd_2016_all, simd_2016_dom, by = "datazone2011") %>%
-  left_join(lookup_dz, by = join_by(datazone2011))
-
-rm(simd_2020_all, simd_2020_dom, simd_2016_all, simd_2016_dom)
-
-
 # SECTION 3: Outputs ----
 
 ## 5a) SIMD summary ----
@@ -142,22 +56,8 @@ perc_top_quintile <- simd_perc_breakdown[5, ]$perc
 
 ## 5b) SIMD map ----
 
-# load in shapefile for mapping
-zones <- read_sf(path(
-  lookups_dir,
-  "Geography",
-  "Shapefiles",
-  "Data Zones 2011",
-  "SG_DataZone_Bdry_2011.shp"
-)) %>%
-  st_transform(4326) %>%
-  rename(datazone2011 = DataZone)
-
-# merge lookup and shapefile
-zones <- merge(zones, lookup_dz, by = "datazone2011")
-
-# subset for Locality
-zones <- subset(zones, hscp_locality == LOCALITY)
+# subset for Locality (using pre-loaded zones_global)
+zones <- subset(zones_global, hscp_locality == LOCALITY)
 
 # Get latitude and longitude co-ordinates for each datazone, find min and max.
 zones_coord <-
