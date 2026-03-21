@@ -3,7 +3,9 @@
 # Determine HSCP if not already defined (e.g. for testing)
 if (!exists("HSCP")) {
   lookup2 <- read_in_localities()
-  HSCP <- as.character(dplyr::filter(lookup2, hscp_locality == LOCALITY)[["hscp2019name"]])
+  HSCP <- as.character(dplyr::filter(lookup2, hscp_locality == LOCALITY)[[
+    "hscp2019name"
+  ]])
 }
 
 # Lookup without datazones
@@ -17,7 +19,12 @@ n_loc <- count_localities(lookup2, HSCP)
 ## GP Practices ----
 
 prac_filtered <- prac |>
-  dplyr::select(practice_code, gp_practice_name, practice_list_size, postcode) |>
+  dplyr::select(
+    practice_code,
+    gp_practice_name,
+    practice_list_size,
+    postcode
+  ) |>
   dplyr::mutate(postcode = gsub(" ", "", postcode, fixed = TRUE))
 
 # Merge practice data with postcode and locality lookups
@@ -29,7 +36,10 @@ markers_gp <- dplyr::left_join(prac_filtered, postcode_lkp, by = "postcode") |>
 ## Emergency Departments and MIUs ----
 
 # rename for hospital_code to location
-hosp_postcodes_renamed <- dplyr::rename(hosp_postcodes, location = hospital_code)
+hosp_postcodes_renamed <- dplyr::rename(
+  hosp_postcodes,
+  location = hospital_code
+)
 
 # create hospital lookup table
 hosp_lookup <- hosp_types |>
@@ -56,7 +66,10 @@ markers_emergency_dep <- hosp_lookup |>
   dplyr::filter(type == "Emergency Department") |>
   dplyr::filter(hscp2019name == HSCP)
 
-clacks_royal_marker <- dplyr::filter(hosp_lookup, name == "Forth Valley Royal Hospital")
+clacks_royal_marker <- dplyr::filter(
+  hosp_lookup,
+  name == "Forth Valley Royal Hospital"
+)
 
 # Ninewells hospital is incorrectly mapped even though postcode ok - so corrected coords here
 

@@ -58,7 +58,6 @@ pop_10y_groups <- pop_raw_data |>
   ungroup()
 
 
-
 ## Gender
 gender_breakdown <- pops %>%
   filter(
