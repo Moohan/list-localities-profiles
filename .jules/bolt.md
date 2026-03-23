@@ -1,0 +1,3 @@
+## 2024-11-20 - Hoisting Performance Pattern in R Batch Processing
+**Learning:** In long-running R report generation loops (e.g., generating 100+ Word/Excel reports), performing heavy I/O (reading large lookups) and expensive computations (map rendering with `ggmap`) inside the innermost loop creates a significant bottleneck. Refactoring code into a tiered structure—Global (once per session), HSCP (once per partnership), and Locality (once per report)—drastically reduces redundant operations.
+**Action:** Always identify if data loading or visualization rendering can be hoisted to a higher loop level. Ensure partnership-level objects are preserved across locality iterations but explicitly cleaned up afterwards to prevent memory leaks.

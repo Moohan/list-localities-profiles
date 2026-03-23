@@ -791,8 +791,13 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("Services.Rmd" %in% chapters_oi) {
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
+    # Note: Global Script functions like read_in_localities() must be available
+    # for these tiered scripts.
+    source("Services/2a. Services data loading.R")
+    lookup2 <- read_in_localities()
+    source("Services/2b. Services data manipulation.R")
     source("Services/3. Service HSCP map.R")
+    source("Services/2c. Services table.R")
   }
 
   if ("General-Health.Rmd" %in% chapters_oi) {

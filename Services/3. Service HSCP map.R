@@ -1,25 +1,10 @@
 # LOCALITY PROFILES SERVICES MAP & TABLE CODE
 # Code for creating the HSCP services map for the locality profiles
 
-# 0. Testing Set up ----
-
-## Select HCSP (for testing only)
-# HSCP <- "Renfrewshire"
-
-## Set file path
-
-# lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
-
-# Source in functions code (for testing only)
-# source("Master RMarkdown Document & Render Code/Global Script.R")
-
-## Select a locality based on the HSCP (for source code "2. Services Outputs" to run - it does not matter which one is chosen)
-# LOCALITY <- read_in_localities() |> filter(hscp2019name == HSCP) |> slice(1) |> pull(hscp_locality)
-
-# Source the data manipulation script for services
-# source("Services/2. Services data manipulation & table.R")
-
-# 1. Set up ----
+# 0. Set up ----
+# Note: HSCP and lookup2 (HSCP/Locality lookup) must be defined before sourcing this script.
+# Service markers (markers_gp, markers_miu, markers_emergency_dep, markers_care_home)
+# must also be defined.
 
 ## Load packages
 library(readr)
@@ -29,7 +14,7 @@ library(ggrepel)
 library(ggmap)
 library(patchwork)
 
-# 2. Read in locality shape files ----
+# 1. Read in locality shape files ----
 
 shp <- read_sf(
   "/conf/linkage/output/lookups/Unicode/Geography/Shapefiles/HSCP Locality (Datazone2011 Base)/HSCP_Locality.shp"
@@ -48,8 +33,8 @@ shp_hscp <- shp |>
     hscp_local = stringr::str_wrap(hscp_local, 24)
   )
 
-# 3. Map Code ----
-# 3.1 Palettes ----
+# 2. Map Code ----
+# 2.1 Palettes ----
 
 # Create colour palettes for different numbers of localities
 if (n_loc < 5) {
@@ -98,7 +83,7 @@ if (n_loc < 5) {
   )
 }
 
-# 3.2 Locality shapes ----
+# 2.2 Locality shapes ----
 # Get latitude and longitude coordinates for each data locality, find min and max.
 zones_coord <- shp_hscp |>
   st_coordinates() |>
@@ -148,7 +133,7 @@ places <- read_csv(paste0(
   filter(!grepl("_", name, fixed = TRUE)) |> # filter incorrect name types
   filter(type != "hamlet" & type != "village") # remove smaller places
 
-# 3.3 Background map ----
+# 2.3 Background map ----
 locality_map_id <- read_csv(paste0(lp_path, "Services/", "locality_map_id.csv"))
 api_key <- locality_map_id$id
 # upload map background from stadia maps, enter registration key, filter for max and min long/lat
@@ -163,10 +148,7 @@ service_map_background <- get_stadiamap(
   maptype = "stamen_terrain_background"
 )
 
-# preview map
-# ggmap(service_map_background)
-
-# 3.4 Map markers ----
+# 2.4 Map markers ----
 # add locality polygons and service markers to map where services are located
 service_map <- ggmap(service_map_background) +
   geom_sf(
@@ -242,10 +224,7 @@ if (nrow(markers_miu) > 0) {
     )
 }
 
-# preview HSCP map with service markers added and localities outlined
-# plot(service_map)
-
-# 3.5 Final map ----
+# 2.5 Final map ----
 # create final service map WITHOUT LEGEND
 
 service_map <- service_map +
@@ -391,47 +370,24 @@ service_map <- cowplot::plot_grid(
   rel_widths = c(1.7, 1.0)
 )
 
-# preview final service map
-# plot(service_map)
-
-# 4 Cleanup ----
+# 3. Cleanup ----
 # remove unnecessary objects
 rm(
   blank_leg,
-  Clacks_Royal,
-  data,
-  hosp_postcodes,
-  hosp_types,
   leg1,
   leg2,
   leg12,
-  markers_care_home,
-  markers_emergency_dep,
-  markers_gp,
-  markers_miu,
-  other_care_type,
-  postcode_lkp,
   service_map_1,
   service_map_2,
   service_map_background,
   shp,
   shp_hscp,
-  zones_coord
-)
-
-# Housekeeping ----
-# These objects are left over after the script is run
-# but don't appear to be used in any 'downstream' process:
-# Main markdown, Summary Table, Excel data tables, SDC output.
-# TODO: Investigate if these can be removed earlier or not created at all.
-rm(
+  zones_coord,
   all_markers,
   api_key,
   col_palette,
-  ext_year,
   hscp_loc,
   locality_map_id,
-  lookup2,
   max_lat,
   max_long,
   min_lat,
