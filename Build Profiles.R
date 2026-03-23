@@ -131,5 +131,13 @@ for (HSCP in hscp_list) {
   }
 
   # HSCP Clean up
-  rm(service_map, markers_gp, markers_miu, markers_emergency_dep, markers_care_home, lookup2, n_loc)
+  rm(
+    service_map,
+    markers_gp,
+    markers_miu,
+    markers_emergency_dep,
+    markers_care_home,
+    lookup2,
+    n_loc
+  )
 }

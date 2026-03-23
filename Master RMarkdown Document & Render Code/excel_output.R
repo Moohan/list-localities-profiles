@@ -209,5 +209,12 @@ for (HSCP in hscp_list) {
   gc()
 
   # HSCP Clean up
-  rm(markers_gp, markers_miu, markers_emergency_dep, markers_care_home, lookup2, n_loc)
+  rm(
+    markers_gp,
+    markers_miu,
+    markers_emergency_dep,
+    markers_care_home,
+    lookup2,
+    n_loc
+  )
 }
