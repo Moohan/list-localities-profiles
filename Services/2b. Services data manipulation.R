@@ -57,7 +57,10 @@ markers_emergency_dep <- hosp_lookup |>
   filter(type == "Emergency Department") |>
   filter(hscp2019name == HSCP)
 
-clacks_royal_marker <- filter(hosp_lookup, name == "Forth Valley Royal Hospital")
+clacks_royal_marker <- filter(
+  hosp_lookup,
+  name == "Forth Valley Royal Hospital"
+)
 
 # Ninewells hospital is incorrectly mapped even though postcode ok - so corrected coords here
 if (HSCP == "Dundee City") {

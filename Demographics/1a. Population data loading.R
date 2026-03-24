@@ -16,11 +16,26 @@ pop_min_year <- pop_max_year - 5
 
 # Pre-calculate age bands for all datazones
 pop_raw_data_all$Pop0_4 <- rowSums(subset(pop_raw_data_all, select = age0:age4))
-pop_raw_data_all$Pop5_17 <- rowSums(subset(pop_raw_data_all, select = age5:age17))
-pop_raw_data_all$Pop18_44 <- rowSums(subset(pop_raw_data_all, select = age18:age44))
-pop_raw_data_all$Pop45_64 <- rowSums(subset(pop_raw_data_all, select = age45:age64))
-pop_raw_data_all$Pop65_74 <- rowSums(subset(pop_raw_data_all, select = age65:age74))
-pop_raw_data_all$Pop75_84 <- rowSums(subset(pop_raw_data_all, select = age75:age84))
+pop_raw_data_all$Pop5_17 <- rowSums(subset(
+  pop_raw_data_all,
+  select = age5:age17
+))
+pop_raw_data_all$Pop18_44 <- rowSums(subset(
+  pop_raw_data_all,
+  select = age18:age44
+))
+pop_raw_data_all$Pop45_64 <- rowSums(subset(
+  pop_raw_data_all,
+  select = age45:age64
+))
+pop_raw_data_all$Pop65_74 <- rowSums(subset(
+  pop_raw_data_all,
+  select = age65:age74
+))
+pop_raw_data_all$Pop75_84 <- rowSums(subset(
+  pop_raw_data_all,
+  select = age75:age84
+))
 pop_raw_data_all$Pop85Plus <- rowSums(subset(
   pop_raw_data_all,
   select = age85:age90plus
