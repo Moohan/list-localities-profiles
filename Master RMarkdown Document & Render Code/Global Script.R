@@ -195,6 +195,32 @@ count_localities <- function(locality_lookup, hscp_name) {
   return(sum(locality_lookup[["hscp2019name"]] == hscp_name))
 }
 
+get_locality_context <- function(lookup, locality_name) {
+  hscp_name <- as.character(
+    dplyr::filter(lookup, hscp_locality == locality_name)$hscp2019name
+  )
+  hb_name <- as.character(
+    dplyr::filter(lookup, hscp_locality == locality_name)$hb2019name
+  )
+
+  # Determine other localities based on LOCALITY object
+  other_locs <- lookup |>
+    dplyr::select(hscp_locality, hscp2019name) |>
+    dplyr::filter(hscp2019name == hscp_name & hscp_locality != locality_name) |>
+    dplyr::distinct() |>
+    dplyr::arrange(hscp_locality)
+
+  # Find number of locs per partnership
+  n_loc <- count_localities(lookup, hscp_name)
+
+  return(list(
+    HSCP = hscp_name,
+    HB = hb_name,
+    other_locs = other_locs,
+    n_loc = n_loc
+  ))
+}
+
 ## Function to read in latest SPD file ----
 
 # No arguments needed, just use read_in_latest_postcodes()
@@ -780,6 +806,8 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("Demographics.Rmd" %in% chapters_oi) {
     # Demographics ----
+    source("Demographics/1a. Population data loading.R")
+    source("Demographics/2a. SIMD data loading.R")
     source("Demographics/1. Demographics - Population.R")
     source("Demographics/2. Demographics - SIMD.R")
   }
@@ -791,7 +819,9 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("Services.Rmd" %in% chapters_oi) {
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
+    source("Services/2a. Services data loading.R")
+    source("Services/2b. Services data manipulation.R")
+    source("Services/2c. Services table.R")
     source("Services/3. Service HSCP map.R")
   }
 

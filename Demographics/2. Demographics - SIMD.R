@@ -23,27 +23,17 @@ library(sf)
 # Source in global functions/themes script
 # source("Master RMarkdown Document & Render Code/Global Script.R")
 
-## Final document will loop through a list of localities
-# Create placeholder for for loop
-# LOCALITY <- "Skye, Lochalsh and West Ross"
-# LOCALITY <- "Falkirk West"
-# LOCALITY <- "Stirling City with the Eastern Villages Bridge of Allan and Dunblane"
-# LOCALITY <- "Ayr North and Former Coalfield Communities"
-# LOCALITY <- "Helensburgh and Lomond"
-# LOCALITY <- "City of Dunfermline"
-# LOCALITY <- "Eastwood"
-
 # SECTION 2: Data Imports ----
 
-## Locality/DZ lookup
-lookup_dz <- read_in_localities(dz_level = TRUE)
+# Assuming Demographics/2a. SIMD data loading.R has been sourced globally
+# and Demographics/1a. Population data loading.R (for pop_raw_data_all)
 
-## Population data
-pop_raw_data <- read_in_dz_pops()
+lookup_dz <- lookup_dz_all
+simd2020_all_global <- simd2020_global
+simd2016_all_global <- simd2016_global
 
-pop_max_year <- max(pop_raw_data$year)
-
-pop_data <- pop_raw_data %>%
+# Prepare population data for SIMD (locality-specific)
+pop_data <- pop_raw_data_all %>%
   filter(year == max(year)) %>%
   group_by(
     year,
@@ -52,72 +42,14 @@ pop_data <- pop_raw_data %>%
     hscp2019name,
     simd2020v2_sc_quintile
   ) %>%
-  summarise(total_pop = sum(total_pop)) %>%
+  summarise(total_pop = sum(total_pop), .groups = "drop") %>%
   ungroup()
 
-
-## SIMD Domains
-
-lookups_dir <- path("/conf/linkage/output/lookups/Unicode")
-
-# 2020
-simd_2020_all <- read_rds(path(
-  lookups_dir,
-  "Deprivation",
-  "DataZone2011_simd2020v2.rds"
-)) %>%
-  select(datazone2011, simd = "simd2020v2_sc_quintile")
-
-simd_2020_dom <- read_rds(path(
-  lookups_dir,
-  "Deprivation",
-  "DataZone2011_domain_level_simd.rds"
-)) %>%
-  clean_names() %>%
-  select(
-    datazone2011,
-    income = "simd2020v2_inc_quintile",
-    employment = "simd2020v2_emp_quintile",
-    education = "simd2020v2_educ_quintile",
-    access = "simd2020v2_access_quintile",
-    housing = "simd2020v2_house_quintile",
-    health = "simd2020v2_hlth_quintile",
-    crime = "simd2020v2_crime_quintile"
-  )
-
-simd2020 <- merge(simd_2020_all, simd_2020_dom, by = "datazone2011") %>%
+simd2020 <- simd2020_all_global %>%
   left_join(pop_data, by = join_by(datazone2011))
 
-# 2016
-simd_2016_all <- read_rds(path(
-  lookups_dir,
-  "Deprivation",
-  "DataZone2011_simd2016.rds"
-)) %>%
-  select(datazone2011 = "DataZone2011", simd = "simd2016_sc_quintile")
-
-simd_2016_dom <- read_rds(path(
-  lookups_dir,
-  "Deprivation",
-  "DataZone2011_domain_level_simd.rds"
-)) %>%
-  clean_names() %>%
-  select(
-    datazone2011,
-    income = "simd2016_inc_quintile",
-    employment = "simd2016_emp_quintile",
-    education = "simd2016_educ_quintile",
-    access = "simd2016_access_quintile",
-    housing = "simd2016_house_quintile",
-    health = "simd2016_hlth_quintile",
-    crime = "simd2016_crime_quintile"
-  )
-
-simd2016 <- merge(simd_2016_all, simd_2016_dom, by = "datazone2011") %>%
+simd2016 <- simd2016_all_global %>%
   left_join(lookup_dz, by = join_by(datazone2011))
-
-rm(simd_2020_all, simd_2020_dom, simd_2016_all, simd_2016_dom)
-
 
 # SECTION 3: Outputs ----
 
@@ -128,7 +60,7 @@ simd_perc_breakdown <- pop_data %>%
   mutate(simd2020v2_sc_quintile = as.factor(simd2020v2_sc_quintile)) %>%
   filter(hscp_locality == LOCALITY) %>%
   group_by(simd2020v2_sc_quintile, .drop = FALSE) %>%
-  summarise(pop = sum(total_pop)) %>%
+  summarise(pop = sum(total_pop), .groups = "drop") %>%
   mutate(
     total_pop = sum(pop),
     perc = round_half_up(100 * pop / total_pop, 1)
@@ -143,6 +75,7 @@ perc_top_quintile <- simd_perc_breakdown[5, ]$perc
 ## 5b) SIMD map ----
 
 # load in shapefile for mapping
+lookups_dir <- "/conf/linkage/output/lookups/Unicode"
 zones <- read_sf(path(
   lookups_dir,
   "Geography",
@@ -198,7 +131,8 @@ places <- read_csv(path(
     Longitude = first(Longitude),
     Latitude = first(Latitude),
     type = first(type),
-    datazone2011 = first(datazone2011)
+    datazone2011 = first(datazone2011),
+    .groups = "drop"
   ) %>%
   st_as_sf(coords = c("Longitude", "Latitude"), remove = FALSE, crs = 4326)
 
@@ -267,7 +201,7 @@ simd_domains <- simd2020 %>%
   ) %>%
   reshape2::melt(id.vars = "total_pop") %>%
   group_by(variable, value) %>%
-  summarise(total_pop = sum(total_pop)) %>%
+  summarise(total_pop = sum(total_pop), .groups = "drop") %>%
   ggplot(aes(
     fill = factor(value, levels = 1:5),
     y = total_pop,
@@ -328,12 +262,11 @@ simd2016_dom <- simd2016 %>%
 names(simd2016_dom)[2:9] <- paste0(names(simd2016_dom)[2:9], "_16")
 
 # Get most up to date datazone populations
-
-pop_16_20 <- pop_raw_data %>%
+pop_16_20 <- pop_raw_data_all %>%
   filter(year %in% c(2016, pop_max_year)) %>%
   select(year, datazone2011, sex, pop = total_pop) %>%
   group_by(datazone2011, year) %>%
-  summarise(pop = sum(pop)) %>%
+  summarise(pop = sum(pop), .groups = "drop") %>%
   ungroup() %>%
   mutate(simd_rank_year = if_else(year == 2016, "pop_16", "pop_20")) %>%
   select(-year) %>%
@@ -345,11 +278,12 @@ simd2016_dom <- simd2016_dom %>%
   select(datazone2011, contains("_16")) %>%
   reshape2::melt(id.vars = c("datazone2011", "pop_16")) %>%
   group_by(variable) %>%
-  mutate(total_pop = sum(pop_16)) %>%
+  mutate(total_pop = sum(pop_16, na.rm = TRUE)) %>%
   group_by(variable, value) %>%
   summarise(
-    pop = sum(pop_16),
-    total_pop = max(total_pop)
+    pop = sum(pop_16, na.rm = TRUE),
+    total_pop = max(total_pop),
+    .groups = "drop"
   ) %>%
   mutate(
     perc_16 = pop / total_pop,
@@ -363,11 +297,12 @@ simd2020_dom <- simd2020_dom %>%
   select(datazone2011, contains("_20")) %>%
   reshape2::melt(id.vars = c("datazone2011", "pop_20")) %>%
   group_by(variable) %>%
-  mutate(total_pop = sum(pop_20)) %>%
+  mutate(total_pop = sum(pop_20, na.rm = TRUE)) %>%
   group_by(variable, value) %>%
   summarise(
-    pop = sum(pop_20),
-    total_pop = max(total_pop)
+    pop = sum(pop_20, na.rm = TRUE),
+    total_pop = max(total_pop),
+    .groups = "drop"
   ) %>%
   mutate(
     perc_20 = pop / total_pop,
@@ -377,9 +312,9 @@ simd2020_dom <- simd2020_dom %>%
   select(domain, perc_20, quintile = value)
 
 domains <- unique(simd2020_dom[["domain"]])
-base_data <- tibble(
+base_data <- tibble::tibble(
   domain = rep(domains, each = 5),
-  quintile = rep(1:5, 8)
+  quintile = rep(1:5, length(domains))
 )
 
 ## Outputs
@@ -465,21 +400,12 @@ simd_diff_overall <- simd_16_20_dom %>%
 
 ##################### SECTION 4: Objects for summary table #######################
 
-## Relevant lookups for creating the table objects
-lookup <- read_in_localities()
-
-## Relevant lookups for creating the table objects
-HSCP <- as.character(filter(lookup, hscp_locality == LOCALITY)$hscp2019name)
-
-# Determine other localities based on LOCALITY object
-other_locs <- lookup %>%
-  select(hscp_locality, hscp2019name) %>%
-  filter(hscp2019name == HSCP & hscp_locality != LOCALITY) %>%
-  arrange(hscp_locality)
-
-# Find number of locs per partnership
-n_loc <- count_localities(lookup, HSCP)
-
+# Standard locality context: HSCP, HB, other_locs, n_loc
+loc_context <- get_locality_context(lookup_all, LOCALITY)
+HSCP <- loc_context$HSCP
+HB <- loc_context$HB
+other_locs <- loc_context$other_locs
+n_loc <- loc_context$n_loc
 
 ## Other localities in HSCP objects
 
@@ -490,7 +416,7 @@ other_locs_simd <- pop_data %>%
     hscp_locality %in% other_locs$hscp_locality
   ) %>%
   group_by(hscp_locality, simd2020v2_sc_quintile, .drop = FALSE) %>%
-  summarise(pop = sum(total_pop)) %>%
+  summarise(pop = sum(total_pop), .groups = "drop") %>%
   ungroup() %>%
   group_by(hscp_locality) %>%
   mutate(total_pop = sum(pop)) %>%
@@ -513,35 +439,21 @@ hscp_simd <- pop_data %>%
     hscp2019name == HSCP
   ) %>%
   group_by(simd2020v2_sc_quintile, .drop = FALSE) %>%
-  summarise(pop = sum(total_pop)) %>%
+  summarise(pop = sum(total_pop), .groups = "drop") %>%
   ungroup() %>%
   mutate(perc = round_half_up(pop / sum(pop) * 100, 1))
 
 hscp_simd_top <- filter(hscp_simd, simd2020v2_sc_quintile == 5)$perc
 hscp_simd_bottom <- filter(hscp_simd, simd2020v2_sc_quintile == 1)$perc
 
-# Housekeeping ----
-# These objects are left over after the script is run
-# but don't appear to be used in any 'downstream' process:
-# Main markdown, Summary Table, Excel data tables, SDC output.
-# TODO: Investigate if these can be removed earlier or not created at all.
+# Cleaning up locality-specific intermediate objects
 rm(
-  base_data,
-  domains,
   hscp_simd,
-  lookup_dz,
-  lookups_dir,
-  max_lat,
-  max_long,
-  min_lat,
-  min_long,
   pop_16_20,
   pop_data,
-  pop_raw_data,
   simd_cats,
   simd_col,
-  simd2016,
-  simd2020,
-  zones_coord
+  zones_coord,
+  loc_context
 )
 gc()

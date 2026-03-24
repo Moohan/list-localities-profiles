@@ -12,6 +12,12 @@ lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality
 
 # Source in functions code
 source("Master RMarkdown Document & Render Code/Global Script.R")
+
+# Global Data Loading (Hoisted) ----
+source("Demographics/1a. Population data loading.R")
+source("Demographics/2a. SIMD data loading.R")
+source("Services/2a. Services data loading.R")
+
 lookup <- read_in_localities()
 # Specify HSCP(s) ----
 # use `unique(lookup$hscp2019name)` for all
@@ -30,17 +36,15 @@ for (HSCP in hscp_list) {
     distinct(hscp_locality) |>
     pull(hscp_locality)
 
+  # HSCP-level Data Manipulation (Hoisted) ----
+  source("Services/2b. Services data manipulation.R")
+
   loop_env <- c(ls(), "loop_env")
 
   ## Loop to create the profiles for all the localities in the list
 
-  # Determine the number of outputs
-  # num_outputs <- length(demo_list(LOCALITY[[1]]))
-
   # Create an empty list to store dataframes for each output
   excel_output <- vector("list", length = 38)
-
-  # excel_output <- list()
 
   # 2. Loop through each locality to create the appended excel output
   for (LOCALITY in locality_list) {
@@ -61,7 +65,7 @@ for (HSCP in hscp_list) {
     source("Households/Households Code.R")
 
     # services
-    source("Services/2. Services data manipulation & table.R")
+    source("Services/2c. Services table.R")
 
     # Define data frames and their corresponding sheet names
     df <- list(
