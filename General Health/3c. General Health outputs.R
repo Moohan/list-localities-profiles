@@ -273,12 +273,18 @@ disease_hosp <- dplyr::bind_rows(
       area_type,
       levels = c("Locality", "HSCP", "Health board", "Scotland")
     ),
-    area_name = ggplot2::fct_reorder(as.factor(area_name), as.numeric(area_type))
+    area_name = ggplot2::fct_reorder(
+      as.factor(area_name),
+      as.numeric(area_type)
+    )
   ) |>
   dplyr::mutate(
     indicator = dplyr::case_when(
       stringr::str_detect(indicator, stringr::fixed("Asthma")) ~ "Asthma",
-      stringr::str_detect(indicator, stringr::fixed("CHD")) ~ "Coronary Heart Disease",
+      stringr::str_detect(
+        indicator,
+        stringr::fixed("CHD")
+      ) ~ "Coronary Heart Disease",
       stringr::str_detect(indicator, stringr::fixed("COPD")) ~ "COPD"
     )
   ) |>
@@ -385,17 +391,31 @@ ltc_infographic <- ltc |>
   dplyr::filter(total_ltc > 0) |>
   dplyr::group_by(hscp_locality, age_group) |>
   dplyr::summarise(people = sum(people), .groups = "drop") |>
-  dplyr::left_join(slf_pop_loc, by = dplyr::join_by(hscp_locality, age_group)) |>
-  dplyr::mutate(perc_with_ltc = phsmethods::round_half_up(people / slf_adj_pop, 2))
+  dplyr::left_join(
+    slf_pop_loc,
+    by = dplyr::join_by(hscp_locality, age_group)
+  ) |>
+  dplyr::mutate(
+    perc_with_ltc = phsmethods::round_half_up(people / slf_adj_pop, 2)
+  )
 
 # objects for each percentage for text + cropping images
 ltc.percent.u65 <- dplyr::filter(
   ltc_infographic,
   age_group == "Under 65"
 )$perc_with_ltc
-ltc.percent.6574 <- dplyr::filter(ltc_infographic, age_group == "65-74")$perc_with_ltc
-ltc.percent.7584 <- dplyr::filter(ltc_infographic, age_group == "75-84")$perc_with_ltc
-ltc.percent.o85 <- dplyr::filter(ltc_infographic, age_group == "85+")$perc_with_ltc
+ltc.percent.6574 <- dplyr::filter(
+  ltc_infographic,
+  age_group == "65-74"
+)$perc_with_ltc
+ltc.percent.7584 <- dplyr::filter(
+  ltc_infographic,
+  age_group == "75-84"
+)$perc_with_ltc
+ltc.percent.o85 <- dplyr::filter(
+  ltc_infographic,
+  age_group == "85+"
+)$perc_with_ltc
 
 ## Crop images - use raw images from global load
 
@@ -410,7 +430,10 @@ ppl_faint_u65 <- ppl_faint_u65_raw[
 
 # 65-74
 dm1 <- dim(ppl_bold_6574_raw)
-ppl_bold_6574 <- ppl_bold_6574_raw[1:dm1[1], 1:floor(dm1[2] * ltc.percent.6574), ]
+ppl_bold_6574 <- ppl_bold_6574_raw[
+  1:dm1[1],
+  1:floor(dm1[2] * ltc.percent.6574),
+]
 dm2 <- dim(ppl_faint_6574_raw)
 ppl_faint_6574 <- ppl_faint_6574_raw[
   1:dm2[1],
@@ -419,7 +442,10 @@ ppl_faint_6574 <- ppl_faint_6574_raw[
 
 # 75-84
 dm1 <- dim(ppl_bold_7584_raw)
-ppl_bold_7584 <- ppl_bold_7584_raw[1:dm1[1], 1:floor(dm1[2] * ltc.percent.7584), ]
+ppl_bold_7584 <- ppl_bold_7584_raw[
+  1:dm1[1],
+  1:floor(dm1[2] * ltc.percent.7584),
+]
 dm2 <- dim(ppl_faint_7584_raw)
 ppl_faint_7584 <- ppl_faint_7584_raw[
   1:dm2[1],
@@ -517,7 +543,9 @@ rm(
 ## Create df with under 65 vs over 65 - will be used for rest of LTC work
 ltc_age_grouped <- ltc |>
   dplyr::select(-year) |>
-  dplyr::mutate(age_group = if_else(age_group == "Under 65", "Under 65", "65+")) |>
+  dplyr::mutate(
+    age_group = if_else(age_group == "Under 65", "Under 65", "65+")
+  ) |>
   dplyr::group_by(hscp2019name, hscp_locality, age_group, total_ltc) |>
   dplyr::summarise(dplyr::across(everything(), sum), .groups = "drop")
 
@@ -551,7 +579,9 @@ ltc_multimorbidity <- ltc_age_grouped |>
     )
   ) |>
   dplyr::group_by(age_group) |>
-  dplyr::mutate(percent = phsmethods::round_half_up(people / ltc_pop * 100, 1)) |>
+  dplyr::mutate(
+    percent = phsmethods::round_half_up(people / ltc_pop * 100, 1)
+  ) |>
   dplyr::ungroup()
 
 
@@ -636,7 +666,11 @@ rm(max_ltc_types_pct)
 
 ltc_plot_left <- ltc_types |>
   dplyr::filter(age_group == "Under 65") |>
-  ggplot2::ggplot(ggplot2::aes(x = percent, y = key, label = phsmethods::round_half_up(percent, 1))) +
+  ggplot2::ggplot(ggplot2::aes(
+    x = percent,
+    y = key,
+    label = phsmethods::round_half_up(percent, 1)
+  )) +
   ggplot2::geom_point(colour = palette[1], size = 3) +
   ggplot2::geom_segment(
     ggplot2::aes(x = 0, y = key, xend = percent, yend = key),
@@ -668,7 +702,11 @@ ltc_axis <- ltc_types |>
 
 ltc_plot_right <- ltc_types |>
   dplyr::filter(age_group == "65+") |>
-  ggplot2::ggplot(ggplot2::aes(x = percent, y = key, label = phsmethods::round_half_up(percent, 1))) +
+  ggplot2::ggplot(ggplot2::aes(
+    x = percent,
+    y = key,
+    label = phsmethods::round_half_up(percent, 1)
+  )) +
   ggplot2::geom_point(colour = palette[2], size = 3) +
   ggplot2::geom_segment(
     ggplot2::aes(x = 0, y = key, xend = percent, yend = key),
@@ -743,7 +781,13 @@ rm(
 # Top 5 locality
 top5ltc_loc <- ltc |>
   dplyr::filter(hscp_locality == LOCALITY) |>
-  dplyr::select(-year, -hscp_locality, -hscp2019name, -total_ltc, -slf_adj_pop) |>
+  dplyr::select(
+    -year,
+    -hscp_locality,
+    -hscp2019name,
+    -total_ltc,
+    -slf_adj_pop
+  ) |>
   dplyr::group_by(age_group) |>
   dplyr::summarise(dplyr::across(everything(), sum), .groups = "drop") |>
   dplyr::select(-age_group, -people) |>
@@ -754,9 +798,13 @@ top5ltc_loc <- ltc |>
     values_to = "value"
   ) |>
   dplyr::slice_max(n = 5, order_by = value, with_ties = FALSE) |>
-  dplyr::mutate(percent = phsmethods::round_half_up((value / ltc_pops_total_loc) * 100, 2)) |>
+  dplyr::mutate(
+    percent = phsmethods::round_half_up((value / ltc_pops_total_loc) * 100, 2)
+  ) |>
   dplyr::left_join(ltc_colours_global, by = dplyr::join_by(topltc)) |>
-  dplyr::mutate(Prevalence = stringr::str_c(topltc, paste(percent, "%"), sep = "\n"))
+  dplyr::mutate(
+    Prevalence = stringr::str_c(topltc, paste(percent, "%"), sep = "\n")
+  )
 
 
 ## Create column headers
@@ -782,7 +830,10 @@ top5_ltc_table <- dplyr::bind_cols(
   flextable::font(fontname = "Arial", part = "all") |>
   flextable::color(color = "white", part = "body") |>
   flextable::bold(part = "header") |>
-  flextable::border(border = officer::fp_border(color = "white", width = 5), part = "all")
+  flextable::border(
+    border = officer::fp_border(color = "white", width = 5),
+    part = "all"
+  )
 
 rm(
   top5ltc_loc,
@@ -858,13 +909,18 @@ otherloc_ltc_pops <- slf_pops_all |>
   dplyr::summarise(slf_adj_pop = sum(slf_adj_pop), .groups = "drop")
 
 other_locs_ltc <- ltc |>
-  dplyr::inner_join(other_locs, by = dplyr::join_by(hscp2019name, hscp_locality)) |>
+  dplyr::inner_join(
+    other_locs,
+    by = dplyr::join_by(hscp2019name, hscp_locality)
+  ) |>
   dplyr::select(hscp_locality, total_ltc, people) |>
   dplyr::filter(total_ltc >= 1) |>
   dplyr::group_by(hscp_locality) |>
   dplyr::summarise(ltc_people = sum(people), .groups = "drop") |>
   dplyr::left_join(otherloc_ltc_pops, by = "hscp_locality") |>
-  dplyr::mutate(percent = phsmethods::round_half_up(ltc_people / slf_adj_pop * 100, 1)) |>
+  dplyr::mutate(
+    percent = phsmethods::round_half_up(ltc_people / slf_adj_pop * 100, 1)
+  ) |>
   dplyr::arrange(hscp_locality) |>
   dplyr::select(hscp_locality, percent) |>
   tidyr::pivot_wider(names_from = hscp_locality, values_from = percent)

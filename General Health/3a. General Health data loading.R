@@ -11,7 +11,11 @@
 ext_year <- 2024
 
 # Set file path for data directory
-gen_health_data_dir <- fs::path(lp_path, "General Health", glue::glue("DATA {ext_year}"))
+gen_health_data_dir <- fs::path(
+  lp_path,
+  "General Health",
+  glue::glue("DATA {ext_year}")
+)
 
 ### Import + clean datasets ----
 
@@ -49,7 +53,9 @@ deaths_15_44 <- arrow::read_parquet(fs::path(
   "scotpho_data_extract_deaths_15_44.parquet"
 )) |>
   clean_scotpho_dat() |>
-  dplyr::mutate(period_short = gsub("to", "-", substr(period, 1, 12), fixed = TRUE))
+  dplyr::mutate(
+    period_short = gsub("to", "-", substr(period, 1, 12), fixed = TRUE)
+  )
 
 ## Cancer registrations
 cancer_reg <- arrow::read_parquet(fs::path(
@@ -57,7 +63,9 @@ cancer_reg <- arrow::read_parquet(fs::path(
   "scotpho_data_extract_cancer_reg.parquet"
 )) |>
   clean_scotpho_dat() |>
-  dplyr::mutate(period_short = gsub("to", "-", substr(period, 1, 12), fixed = TRUE))
+  dplyr::mutate(
+    period_short = gsub("to", "-", substr(period, 1, 12), fixed = TRUE)
+  )
 
 ## Early deaths cancer
 early_deaths_cancer <- arrow::read_parquet(fs::path(
@@ -65,7 +73,9 @@ early_deaths_cancer <- arrow::read_parquet(fs::path(
   "scotpho_data_extract_early_deaths_cancer.parquet"
 )) |>
   clean_scotpho_dat() |>
-  dplyr::mutate(period_short = gsub("to", "-", substr(period, 1, 12), fixed = TRUE))
+  dplyr::mutate(
+    period_short = gsub("to", "-", substr(period, 1, 12), fixed = TRUE)
+  )
 
 ## Asthma hospitalisations
 asthma_hosp <- arrow::read_parquet(fs::path(
@@ -73,7 +83,9 @@ asthma_hosp <- arrow::read_parquet(fs::path(
   "scotpho_data_extract_asthma_hosp.parquet"
 )) |>
   clean_scotpho_dat() |>
-  dplyr::mutate(period_short = gsub("to", "-", substr(period, 1, 18), fixed = TRUE))
+  dplyr::mutate(
+    period_short = gsub("to", "-", substr(period, 1, 18), fixed = TRUE)
+  )
 
 ## CHD hospitalisations
 chd_hosp <- arrow::read_parquet(fs::path(
@@ -81,7 +93,9 @@ chd_hosp <- arrow::read_parquet(fs::path(
   "scotpho_data_extract_chd_hosp.parquet"
 )) |>
   clean_scotpho_dat() |>
-  dplyr::mutate(period_short = gsub("to", "-", substr(period, 1, 18), fixed = TRUE))
+  dplyr::mutate(
+    period_short = gsub("to", "-", substr(period, 1, 18), fixed = TRUE)
+  )
 
 ## COPD hospitalisations
 copd_hosp <- arrow::read_parquet(fs::path(
@@ -89,7 +103,9 @@ copd_hosp <- arrow::read_parquet(fs::path(
   "scotpho_data_extract_copd_hosp.parquet"
 )) |>
   clean_scotpho_dat() |>
-  dplyr::mutate(period_short = gsub("to", "-", substr(period, 1, 18), fixed = TRUE))
+  dplyr::mutate(
+    period_short = gsub("to", "-", substr(period, 1, 18), fixed = TRUE)
+  )
 
 ## Anxiety/depression/psychosis prescriptions
 adp_presc <- arrow::read_parquet(fs::path(
@@ -100,7 +116,10 @@ adp_presc <- arrow::read_parquet(fs::path(
   dplyr::mutate(period_short = substr(period, 1, 7))
 
 # Long-term conditions
-ltc <- arrow::read_parquet(fs::path(gen_health_data_dir, "LTC_from_SLF.parquet")) |>
+ltc <- arrow::read_parquet(fs::path(
+  gen_health_data_dir,
+  "LTC_from_SLF.parquet"
+)) |>
   dplyr::rename(
     "Arthritis" = "arth",
     "Asthma" = "asthma",
@@ -126,7 +145,13 @@ ltc <- arrow::read_parquet(fs::path(gen_health_data_dir, "LTC_from_SLF.parquet")
 ############################### SCOTLAND DATA ####################################
 
 # Extract SLF adjusted populations for all
-slf_pops_all <- dplyr::distinct(ltc, age_group, hscp_locality, hscp2019name, slf_adj_pop)
+slf_pops_all <- dplyr::distinct(
+  ltc,
+  age_group,
+  hscp_locality,
+  hscp2019name,
+  slf_adj_pop
+)
 ltc_pops_total_scot <- sum(slf_pops_all$slf_adj_pop)
 
 # Determine year
@@ -139,7 +164,8 @@ ltc_scot <- ltc |>
   dplyr::summarise(dplyr::across(everything(), sum), .groups = "drop")
 
 ltc_perc_scot <- phsmethods::round_half_up(
-  (sum(dplyr::filter(ltc_scot, total_ltc > 0)$people) / ltc_pops_total_scot) * 100,
+  (sum(dplyr::filter(ltc_scot, total_ltc > 0)$people) / ltc_pops_total_scot) *
+    100,
   1
 )
 
@@ -204,7 +230,13 @@ scot_adp_presc <- adp_presc |>
 
 # Top 5 Scotland LTCs
 ltc_totals_scot <- ltc |>
-  dplyr::select(-year, -hscp_locality, -hscp2019name, -total_ltc, -slf_adj_pop) |>
+  dplyr::select(
+    -year,
+    -hscp_locality,
+    -hscp2019name,
+    -total_ltc,
+    -slf_adj_pop
+  ) |>
   dplyr::group_by(age_group) |>
   dplyr::summarise(dplyr::across(everything(), sum), .groups = "drop") |>
   dplyr::select(-age_group, -people) |>
@@ -215,12 +247,20 @@ ltc_totals_scot <- ltc |>
     values_to = "value"
   ) |>
   dplyr::slice_max(n = 5, order_by = value, with_ties = FALSE) |>
-  dplyr::mutate(percent = phsmethods::round_half_up((value / ltc_pops_total_scot) * 100, 2))
+  dplyr::mutate(
+    percent = phsmethods::round_half_up((value / ltc_pops_total_scot) * 100, 2)
+  )
 
 # Global colour lookup for LTC table
 palette <- phsstyles::phs_colours(c(
-  "phs-purple", "phs-magenta", "phs-blue", "phs-green",
-  "phs-graphite", "phs-teal", "phs-liberty", "phs-rust"
+  "phs-purple",
+  "phs-magenta",
+  "phs-blue",
+  "phs-green",
+  "phs-graphite",
+  "phs-teal",
+  "phs-liberty",
+  "phs-rust"
 ))
 
 ltc_colours_global <- ltc_scot |>
@@ -236,15 +276,22 @@ ltc_colours_global <- ltc_scot |>
     colours = c(
       palette,
       c(
-        "navy", "lightsalmon4", "deeppink4", "forestgreen",
-        "steelblue", "purple3", "red4"
+        "navy",
+        "lightsalmon4",
+        "deeppink4",
+        "forestgreen",
+        "steelblue",
+        "purple3",
+        "red4"
       )
     )
   )
 
 top5ltc_scot <- ltc_totals_scot |>
   dplyr::left_join(ltc_colours_global, by = dplyr::join_by(topltc)) |>
-  dplyr::mutate(Prevalence = stringr::str_c(topltc, paste(percent, "%"), sep = "\n"))
+  dplyr::mutate(
+    Prevalence = stringr::str_c(topltc, paste(percent, "%"), sep = "\n")
+  )
 
 
 ############################ WAFFLE CHART IMAGES ####################################
@@ -253,13 +300,19 @@ top5ltc_scot <- ltc_totals_scot |>
 img_path <- fs::path(lp_path, "General Health", "infographics")
 
 ppl_bold_u65_raw <- png::readPNG(fs::path(img_path, "people bold under 65.png"))
-ppl_faint_u65_raw <- png::readPNG(fs::path(img_path, "people faint under 65.png"))
+ppl_faint_u65_raw <- png::readPNG(fs::path(
+  img_path,
+  "people faint under 65.png"
+))
 ppl_bold_6574_raw <- png::readPNG(fs::path(img_path, "people bold 65-74.png"))
 ppl_faint_6574_raw <- png::readPNG(fs::path(img_path, "people faint 65-74.png"))
 ppl_bold_7584_raw <- png::readPNG(fs::path(img_path, "people bold 75-84.png"))
 ppl_faint_7584_raw <- png::readPNG(fs::path(img_path, "people faint 75-84.png"))
 ppl_bold_o85_raw <- png::readPNG(fs::path(img_path, "people bold over 85.png"))
-ppl_faint_o85_raw <- png::readPNG(fs::path(img_path, "people faint over 85.png"))
+ppl_faint_o85_raw <- png::readPNG(fs::path(
+  img_path,
+  "people faint over 85.png"
+))
 
 # LTC infographic waffle chart function
 create_infographic <- function(
@@ -281,10 +334,22 @@ create_infographic <- function(
     ) +
     ggplot2::theme_void() +
     ggplot2::theme(
-      panel.background = ggplot2::element_rect(fill = "transparent", colour = NA),
-      plot.background = ggplot2::element_rect(fill = "transparent", colour = NA),
-      legend.background = ggplot2::element_rect(fill = "transparent", colour = NA),
-      legend.box.background = ggplot2::element_rect(fill = "transparent", colour = NA)
+      panel.background = ggplot2::element_rect(
+        fill = "transparent",
+        colour = NA
+      ),
+      plot.background = ggplot2::element_rect(
+        fill = "transparent",
+        colour = NA
+      ),
+      legend.background = ggplot2::element_rect(
+        fill = "transparent",
+        colour = NA
+      ),
+      legend.box.background = ggplot2::element_rect(
+        fill = "transparent",
+        colour = NA
+      )
     ) +
     ggplot2::annotation_raster(
       image1,

@@ -9,10 +9,14 @@
 
 # Determine HSCP and HB if not already set (defensive for testing)
 if (!exists("HSCP") && exists("LOCALITY")) {
-  HSCP <- as.character(dplyr::filter(lookup, hscp_locality == LOCALITY)$hscp2019name)
+  HSCP <- as.character(
+    dplyr::filter(lookup, hscp_locality == LOCALITY)$hscp2019name
+  )
 }
 if (!exists("HB") && exists("LOCALITY")) {
-  HB <- as.character(dplyr::filter(lookup, hscp_locality == LOCALITY)$hb2019name)
+  HB <- as.character(
+    dplyr::filter(lookup, hscp_locality == LOCALITY)$hb2019name
+  )
 }
 
 # Find number of locs per partnership
@@ -85,7 +89,13 @@ hscp_adp <- adp_presc |>
 # Top 5 HSCP LTCs
 ltc_totals_hscp <- ltc |>
   dplyr::filter(hscp2019name == HSCP) |>
-  dplyr::select(-year, -hscp_locality, -hscp2019name, -total_ltc, -slf_adj_pop) |>
+  dplyr::select(
+    -year,
+    -hscp_locality,
+    -hscp2019name,
+    -total_ltc,
+    -slf_adj_pop
+  ) |>
   dplyr::group_by(age_group) |>
   dplyr::summarise(dplyr::across(everything(), sum), .groups = "drop") |>
   dplyr::select(-age_group, -people) |>
@@ -96,15 +106,24 @@ ltc_totals_hscp <- ltc |>
     values_to = "value"
   ) |>
   dplyr::slice_max(n = 5, order_by = value, with_ties = FALSE) |>
-  dplyr::mutate(percent = phsmethods::round_half_up((value / ltc_pops_total_hscp) * 100, 2))
+  dplyr::mutate(
+    percent = phsmethods::round_half_up((value / ltc_pops_total_hscp) * 100, 2)
+  )
 
 top5ltc_hscp <- ltc_totals_hscp |>
   dplyr::left_join(ltc_colours_global, by = dplyr::join_by(topltc)) |>
-  dplyr::mutate(Prevalence = stringr::str_c(topltc, paste(percent, "%"), sep = "\n"))
+  dplyr::mutate(
+    Prevalence = stringr::str_c(topltc, paste(percent, "%"), sep = "\n")
+  )
 
 # Pre-calculate LTC percentage for HSCP for summary table
-ltc_hscp_people <- sum(dplyr::filter(ltc, hscp2019name == HSCP, total_ltc > 0)$people)
-hscp_ltc_summary_val <- phsmethods::round_half_up(ltc_hscp_people / ltc_pops_total_hscp * 100, 1)
+ltc_hscp_people <- sum(
+  dplyr::filter(ltc, hscp2019name == HSCP, total_ltc > 0)$people
+)
+hscp_ltc_summary_val <- phsmethods::round_half_up(
+  ltc_hscp_people / ltc_pops_total_hscp * 100,
+  1
+)
 
 # Clean up temporary objects
 rm(ltc_hscp_people, ltc_totals_hscp, slf_pops_hscp)
