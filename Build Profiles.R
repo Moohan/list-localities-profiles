@@ -18,6 +18,11 @@ source("Master RMarkdown Document & Render Code/Global Script.R")
 
 # Set file path
 lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
+
+# Load General Health data once
+source("General Health/3a. General Health data loading.R")
+
+# Set file path
 output_dir <- path(lp_path, "Profiles Output")
 
 # Below creates locality list of all the localities in a chosen HSCP
@@ -41,6 +46,9 @@ for (HSCP in hscp_list) {
   locality_list <- lookup |>
     filter(hscp2019name == HSCP) |>
     pull(hscp_locality)
+
+  # General Health HSCP manipulation
+  source("General Health/3b. General Health data manipulation.R")
 
   # Loop to create the profiles for all the localities in the list
 
@@ -68,7 +76,7 @@ for (HSCP in hscp_list) {
     source("Services/3. Service HSCP map.R")
 
     # General Health ----
-    source("General Health/3. General Health Outputs.R")
+    source("General Health/3c. General Health outputs.R")
 
     # Lifestyle & Risk Factors ----
     source("Lifestyle & Risk Factors/2. Lifestyle & Risk Factors Outputs.R")

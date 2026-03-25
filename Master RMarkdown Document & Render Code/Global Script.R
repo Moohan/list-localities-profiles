@@ -797,7 +797,9 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("General-Health.Rmd" %in% chapters_oi) {
     # General Health ----
-    source("General Health/3. General Health Outputs.R")
+    source("General Health/3a. General Health data loading.R")
+    source("General Health/3b. General Health data manipulation.R")
+    source("General Health/3c. General Health outputs.R")
   }
 
   if ("Lifestyle-Risk-Factors.Rmd" %in% chapters_oi) {

@@ -12,6 +12,10 @@ lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality
 
 # Source in functions code
 source("Master RMarkdown Document & Render Code/Global Script.R")
+
+# Load General Health data once
+source("General Health/3a. General Health data loading.R")
+
 lookup <- read_in_localities()
 # Specify HSCP(s) ----
 # use `unique(lookup$hscp2019name)` for all
@@ -29,6 +33,9 @@ for (HSCP in hscp_list) {
     filter(hscp2019name == HSCP) |>
     distinct(hscp_locality) |>
     pull(hscp_locality)
+
+  # General Health HSCP manipulation
+  source("General Health/3b. General Health data manipulation.R")
 
   loop_env <- c(ls(), "loop_env")
 
@@ -55,7 +62,7 @@ for (HSCP in hscp_list) {
     source("Unscheduled Care/2. Unscheduled Care outputs.R")
 
     # general health
-    source("General Health/3. General Health Outputs.R")
+    source("General Health/3c. General Health outputs.R")
 
     # housing
     source("Households/Households Code.R")

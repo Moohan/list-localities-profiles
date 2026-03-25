@@ -27,6 +27,9 @@ output_dir <- path(
 # Read in locality lookup table
 lookup <- read_in_localities()
 
+# Load General Health data once
+source("General Health/3a. General Health data loading.R")
+
 # Specify HSCP(s) to process ----
 # By default, process all HSCPs.
 # To process specific HSCPs, replace `unique(lookup$hscp2019name)`,
@@ -45,6 +48,9 @@ for (HSCP in hscp_list) {
   locality_list <- lookup |>
     filter(hscp2019name == HSCP) |>
     pull(hscp_locality)
+
+  # General Health HSCP manipulation
+  source("General Health/3b. General Health data manipulation.R")
 
   # Initialise empty lists to store data for all localities in the current HSCP
   smr01_based_all <- vector("list", length(locality_list)) |>
@@ -147,7 +153,7 @@ for (HSCP in hscp_list) {
 
     # **General Health Data Processing** ----
     # Extract and filter general health data for the current locality
-    source("General Health/3. General Health Outputs.R")
+    source("General Health/3c. General Health outputs.R")
 
     stopifnot(
       exists("ltc_multimorbidity"),
