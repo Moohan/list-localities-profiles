@@ -791,7 +791,10 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("Services.Rmd" %in% chapters_oi) {
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
+    # For testing a single locality, we source everything in sequence
+    source("Services/2a. Services data loading.R")
+    source("Services/2b. Services data manipulation.R")
+    source("Services/2c. Services table.R")
     source("Services/3. Service HSCP map.R")
   }
 

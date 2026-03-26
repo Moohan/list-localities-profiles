@@ -1,0 +1,3 @@
+## 2025-05-14 - [Hoisting Optimization for R Loops]
+**Learning:** In R report generation pipelines that loop over many areas (localities), redundant data loading and expensive geospatial operations (like map rendering with `ggmap`) inside the inner loop are a major bottleneck. Hoisting these to global or partnership-level scripts ensures they run once instead of N times.
+**Action:** Always identify logic that only depends on the Health and Social Care Partnership (HSCP) or the global session and move it out of the locality-level loop. Use a tiered structure (e.g., 2a Data Loading, 2b HSCP Manipulation, 2c Locality Outputs) to maintain modularity while optimizing performance.
