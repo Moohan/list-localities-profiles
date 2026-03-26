@@ -5,7 +5,9 @@
 
 # Ensure HSCP is defined if this is run outside the loop
 if (!exists("HSCP") && exists("LOCALITY")) {
-  HSCP <- as.character(filter(read_in_localities(), hscp_locality == LOCALITY)[["hscp2019name"]])
+  HSCP <- as.character(filter(read_in_localities(), hscp_locality == LOCALITY)[[
+    "hscp2019name"
+  ]])
 }
 
 # Lookup without datazones
@@ -28,7 +30,10 @@ markers_emergency_dep <- hosp_lookup |>
   filter(hscp2019name == HSCP)
 
 # Forth Valley Royal Hospital Special Case
-clacks_royal_marker <- filter(hosp_lookup, name == "Forth Valley Royal Hospital")
+clacks_royal_marker <- filter(
+  hosp_lookup,
+  name == "Forth Valley Royal Hospital"
+)
 
 # Ninewells hospital correction
 if (HSCP == "Dundee City") {
