@@ -209,7 +209,8 @@ read_in_postcodes_raw <- function() {
     max() |>
     arrow::read_parquet(
       col_select = -c(hscp2019, hscp2019name, hb2019, hb2019name)
-    )
+    ) |>
+    dplyr::mutate(postcode = gsub(" ", "", pc7, fixed = TRUE))
 
   data <- dplyr::left_join(
     data,
@@ -262,7 +263,17 @@ read_in_dz_pops_raw <- function() {
       read_in_localities(dz_level = TRUE),
       by = join_by(datazone2011)
     ) |>
-    mutate(year = as.integer(year))
+    mutate(
+      Pop0_4 = rowSums(across(age0:age4)),
+      Pop5_17 = rowSums(across(age5:age17)),
+      Pop18_44 = rowSums(across(age18:age44)),
+      Pop45_64 = rowSums(across(age45:age64)),
+      Pop65_74 = rowSums(across(age65:age74)),
+      Pop75_84 = rowSums(across(age75:age84)),
+      Pop85Plus = rowSums(across(age85:age90plus)),
+      Pop65Plus = rowSums(across(age65:age90plus)),
+      year = as.integer(year)
+    )
 }
 read_in_dz_pops <- memoise(read_in_dz_pops_raw)
 
@@ -791,7 +802,9 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("Services.Rmd" %in% chapters_oi) {
     # Services ----
-    source("Services/2. Services data manipulation & table.R")
+    source("Services/2a. Services data loading.R")
+    source("Services/2b. Services data manipulation.R")
+    source("Services/2c. Services table.R")
     source("Services/3. Service HSCP map.R")
   }
 

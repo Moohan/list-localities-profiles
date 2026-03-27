@@ -1,0 +1,3 @@
+## 2026-03-27 - [Hoisting in R Report Pipelines]
+**Learning:** In long-running R report generation loops, I/O for large lookups (postcodes) and data summaries (population age bands) are major bottlenecks. Moving these to global loading scripts ('hoisting') ensures they are only computed/loaded once per session. Further partitioning scripts into HSCP-level (outer loop) and locality-level (inner loop) logic minimizes redundant spatial processing and data filtering.
+**Action:** When optimizing R projects involving loops over geographic areas, look for memoized loading functions that can be pre-calculated and tiered sourcing patterns to reduce redundant execution.

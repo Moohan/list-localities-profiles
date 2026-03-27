@@ -73,22 +73,7 @@ pop_10y_groups <- pop_raw_data |>
   summarise(pop = sum(pop)) |>
   ungroup()
 
-# compute age bands
-pop_raw_data$"Pop0_4" <- rowSums(subset(pop_raw_data, select = age0:age4))
-pop_raw_data$"Pop5_17" <- rowSums(subset(pop_raw_data, select = age5:age17))
-pop_raw_data$"Pop18_44" <- rowSums(subset(pop_raw_data, select = age18:age44))
-pop_raw_data$"Pop45_64" <- rowSums(subset(pop_raw_data, select = age45:age64))
-pop_raw_data$"Pop65_74" <- rowSums(subset(pop_raw_data, select = age65:age74))
-pop_raw_data$"Pop75_84" <- rowSums(subset(pop_raw_data, select = age75:age84))
-pop_raw_data$"Pop85Plus" <- rowSums(subset(
-  pop_raw_data,
-  select = age85:age90plus
-))
-pop_raw_data$"Pop65Plus" <- rowSums(subset(
-  pop_raw_data,
-  select = age65:age90plus
-))
-
+# Age bands (Pop0_4, Pop5_17, etc.) are pre-calculated in read_in_dz_pops()
 pops <- select(
   pop_raw_data,
   year,

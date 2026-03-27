@@ -12,6 +12,10 @@ lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality
 
 # Source in functions code
 source("Master RMarkdown Document & Render Code/Global Script.R")
+
+# Load services data once per session
+source("Services/2a. Services data loading.R")
+
 lookup <- read_in_localities()
 # Specify HSCP(s) ----
 # use `unique(lookup$hscp2019name)` for all
@@ -31,6 +35,9 @@ for (HSCP in hscp_list) {
     pull(hscp_locality)
 
   loop_env <- c(ls(), "loop_env")
+
+  # Services HSCP marker preparation ----
+  source("Services/2b. Services data manipulation.R")
 
   ## Loop to create the profiles for all the localities in the list
 
@@ -60,8 +67,8 @@ for (HSCP in hscp_list) {
     # housing
     source("Households/Households Code.R")
 
-    # services
-    source("Services/2. Services data manipulation & table.R")
+    # Services ----
+    source("Services/2c. Services table.R")
 
     # Define data frames and their corresponding sheet names
     df <- list(
