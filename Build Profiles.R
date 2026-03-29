@@ -18,6 +18,9 @@ source("Master RMarkdown Document & Render Code/Global Script.R")
 
 # Set file path
 lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
+
+# Households ----
+source("Households/1a. Households data loading.R")
 output_dir <- path(lp_path, "Profiles Output")
 
 # Below creates locality list of all the localities in a chosen HSCP
@@ -52,6 +55,9 @@ for (HSCP in hscp_list) {
 
   loop_env <- c(ls(), "loop_env")
 
+  # Households ----
+  source("Households/1b. Households data manipulation.R")
+
   # 1. Loop through each locality to create the main body of the profiles and the summary table
   for (LOCALITY in locality_list) {
     # 1a) Source in all the scripts for a given LOCALITY
@@ -61,7 +67,7 @@ for (HSCP in hscp_list) {
     source("Demographics/2. Demographics - SIMD.R")
 
     # Housing ----
-    source("Households/Households Code.R")
+    source("Households/1c. Households outputs.R")
 
     # Services ----
     source("Services/2. Services data manipulation & table.R")

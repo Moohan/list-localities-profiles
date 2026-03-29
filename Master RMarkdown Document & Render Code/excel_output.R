@@ -7,11 +7,15 @@ rm(list = ls())
 # system unmask function so files have read-write permissions
 Sys.umask("006")
 
+# Source in functions code
+source("Master RMarkdown Document & Render Code/Global Script.R")
+
 # Set file path
 lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
 
-# Source in functions code
-source("Master RMarkdown Document & Render Code/Global Script.R")
+# Households ----
+source("Households/1a. Households data loading.R")
+
 lookup <- read_in_localities()
 # Specify HSCP(s) ----
 # use `unique(lookup$hscp2019name)` for all
@@ -31,6 +35,9 @@ for (HSCP in hscp_list) {
     pull(hscp_locality)
 
   loop_env <- c(ls(), "loop_env")
+
+  # Households ----
+  source("Households/1b. Households data manipulation.R")
 
   ## Loop to create the profiles for all the localities in the list
 
@@ -58,7 +65,7 @@ for (HSCP in hscp_list) {
     source("General Health/3. General Health Outputs.R")
 
     # housing
-    source("Households/Households Code.R")
+    source("Households/1c. Households outputs.R")
 
     # services
     source("Services/2. Services data manipulation & table.R")
