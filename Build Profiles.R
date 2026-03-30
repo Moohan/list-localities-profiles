@@ -23,6 +23,9 @@ output_dir <- path(lp_path, "Profiles Output")
 # Below creates locality list of all the localities in a chosen HSCP
 lookup <- read_in_localities()
 
+# Lifestyle & Risk Factors (Global) ----
+source("Lifestyle & Risk Factors/2a. Lifestyle & Risk Factors data loading.R")
+
 # Specify HSCP(s) ----
 # use `unique(lookup$hscp2019name)` for all
 # or create a vector for multiple e.g. `c("Angus", "West Lothian")`
@@ -41,6 +44,11 @@ for (HSCP in hscp_list) {
   locality_list <- lookup |>
     filter(hscp2019name == HSCP) |>
     pull(hscp_locality)
+
+  # Lifestyle & Risk Factors (HSCP) ----
+  source(
+    "Lifestyle & Risk Factors/2b. Lifestyle & Risk Factors data manipulation.R"
+  )
 
   # Loop to create the profiles for all the localities in the list
 
@@ -71,7 +79,7 @@ for (HSCP in hscp_list) {
     source("General Health/3. General Health Outputs.R")
 
     # Lifestyle & Risk Factors ----
-    source("Lifestyle & Risk Factors/2. Lifestyle & Risk Factors Outputs.R")
+    source("Lifestyle & Risk Factors/2c. Lifestyle & Risk Factors outputs.R")
 
     # Unscheduled Care ----
     source("Unscheduled Care/2. Unscheduled Care outputs.R")

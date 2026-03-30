@@ -13,6 +13,10 @@ lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality
 # Source in functions code
 source("Master RMarkdown Document & Render Code/Global Script.R")
 lookup <- read_in_localities()
+
+# Lifestyle & Risk Factors (Global) ----
+source("Lifestyle & Risk Factors/2a. Lifestyle & Risk Factors data loading.R")
+
 # Specify HSCP(s) ----
 # use `unique(lookup$hscp2019name)` for all
 # hscp_list <- unique(lookup$hscp2019name)
@@ -29,6 +33,11 @@ for (HSCP in hscp_list) {
     filter(hscp2019name == HSCP) |>
     distinct(hscp_locality) |>
     pull(hscp_locality)
+
+  # Lifestyle & Risk Factors (HSCP) ----
+  source(
+    "Lifestyle & Risk Factors/2b. Lifestyle & Risk Factors data manipulation.R"
+  )
 
   loop_env <- c(ls(), "loop_env")
 
@@ -49,7 +58,7 @@ for (HSCP in hscp_list) {
     source("Demographics/1. Demographics - Population.R")
     source("Demographics/2. Demographics - SIMD.R")
     # lifestyle & risk factors
-    source("Lifestyle & Risk Factors/2. Lifestyle & Risk Factors Outputs.R")
+    source("Lifestyle & Risk Factors/2c. Lifestyle & Risk Factors outputs.R")
 
     # unscheduled care
     source("Unscheduled Care/2. Unscheduled Care outputs.R")

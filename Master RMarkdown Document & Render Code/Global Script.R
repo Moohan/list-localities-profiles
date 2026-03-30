@@ -804,7 +804,13 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("Lifestyle-Risk-Factors.Rmd" %in% chapters_oi) {
     # Lifestyle & Risk Factors ----
-    source("Lifestyle & Risk Factors/2. Lifestyle & Risk Factors Outputs.R")
+    source(
+      "Lifestyle & Risk Factors/2a. Lifestyle & Risk Factors data loading.R"
+    )
+    source(
+      "Lifestyle & Risk Factors/2b. Lifestyle & Risk Factors data manipulation.R"
+    )
+    source("Lifestyle & Risk Factors/2c. Lifestyle & Risk Factors outputs.R")
   }
 
   if ("Unscheduled-Care.Rmd" %in% chapters_oi) {
