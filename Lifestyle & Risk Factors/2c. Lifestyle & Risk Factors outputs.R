@@ -128,7 +128,6 @@ alcohol_hosp_bar <- alcohol_hosp %>%
 
 # alcohol_hosp_bar
 
-
 ## Numbers for text
 
 alcohol_hosp_latest <- filter(
@@ -193,7 +192,6 @@ alcohol_deaths_bar <- alcohol_deaths %>%
   )
 
 # alcohol_deaths_bar
-
 
 ## Numbers for text
 
@@ -261,7 +259,6 @@ bowel_screening_bar <- bowel_screening %>%
   )
 
 # bowel_screening_bar
-
 
 ## Numbers for text
 

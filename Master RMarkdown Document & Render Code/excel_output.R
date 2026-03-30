@@ -35,7 +35,9 @@ for (HSCP in hscp_list) {
     pull(hscp_locality)
 
   # Lifestyle & Risk Factors (HSCP) ----
-  source("Lifestyle & Risk Factors/2b. Lifestyle & Risk Factors data manipulation.R")
+  source(
+    "Lifestyle & Risk Factors/2b. Lifestyle & Risk Factors data manipulation.R"
+  )
 
   loop_env <- c(ls(), "loop_env")
 

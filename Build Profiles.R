@@ -46,7 +46,9 @@ for (HSCP in hscp_list) {
     pull(hscp_locality)
 
   # Lifestyle & Risk Factors (HSCP) ----
-  source("Lifestyle & Risk Factors/2b. Lifestyle & Risk Factors data manipulation.R")
+  source(
+    "Lifestyle & Risk Factors/2b. Lifestyle & Risk Factors data manipulation.R"
+  )
 
   # Loop to create the profiles for all the localities in the list
 
