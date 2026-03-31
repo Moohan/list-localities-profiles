@@ -8,10 +8,14 @@ localities_lkp <- read_in_localities()
 
 # Defensive logic for HSCP and HB
 if (!exists("HSCP")) {
-  HSCP <- as.character(filter(localities_lkp, hscp_locality == LOCALITY)$hscp2019name)
+  HSCP <- as.character(
+    filter(localities_lkp, hscp_locality == LOCALITY)$hscp2019name
+  )
 }
 if (!exists("HB")) {
-  HB <- as.character(filter(localities_lkp, hscp_locality == LOCALITY)$hb2019name)
+  HB <- as.character(
+    filter(localities_lkp, hscp_locality == LOCALITY)$hb2019name
+  )
 }
 
 # Determine other localities based on LOCALITY object
@@ -1487,8 +1491,7 @@ ppa_under65 <- ppa %>%
   aggregate_usc_area_data() %>%
   rename(under65tot = n) %>%
   left_join(ppa_total, by = join_by(financial_year, location)) %>%
-  left_join(pop_areas_all_ages, by = join_by(financial_year,
-                                            location)) %>%
+  left_join(pop_areas_all_ages, by = join_by(financial_year, location)) %>%
   mutate(data = round_half_up(under65tot / n * 100, 1)) %>%
   drop_na(year)
 

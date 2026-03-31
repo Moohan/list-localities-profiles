@@ -5,8 +5,12 @@
 # Defensive logic for HSCP and HB
 if (!exists("HSCP") && exists("LOCALITY")) {
   localities_lkp <- read_in_localities()
-  HSCP <- as.character(filter(localities_lkp, hscp_locality == LOCALITY)$hscp2019name)
-  HB <- as.character(filter(localities_lkp, hscp_locality == LOCALITY)$hb2019name)
+  HSCP <- as.character(
+    filter(localities_lkp, hscp_locality == LOCALITY)$hscp2019name
+  )
+  HB <- as.character(
+    filter(localities_lkp, hscp_locality == LOCALITY)$hb2019name
+  )
 }
 
 # Find number of locs per partnership

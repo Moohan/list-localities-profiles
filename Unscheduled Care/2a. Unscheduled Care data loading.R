@@ -2,7 +2,11 @@
 
 ## Manually set year that the profiles are being run (year on data folder)
 ext_year <- 2025
-import_folder <- fs::path(lp_path, "Unscheduled Care", paste0("DATA ", ext_year))
+import_folder <- fs::path(
+  lp_path,
+  "Unscheduled Care",
+  paste0("DATA ", ext_year)
+)
 max_fy <- "2024/25" # TODO Change this to be dynamic and move to general!
 
 ## Packages
@@ -155,12 +159,30 @@ word_change_calc <- function(latest, first) {
 
 ## Load Data ----
 
-emergency_adm_raw <- read_parquet(fs::path(import_folder, "emergency_admissions_msg.parquet"))
+emergency_adm_raw <- read_parquet(fs::path(
+  import_folder,
+  "emergency_admissions_msg.parquet"
+))
 bed_days_raw <- read_parquet(fs::path(import_folder, "bed_days_msg.parquet"))
-bed_days_mh_raw <- read_parquet(fs::path(import_folder, "bed_days_mh_msg.parquet"))
-ae_attendances_raw <- read_parquet(fs::path(import_folder, "ae_attendances_msg.parquet"))
-delayed_disch_raw <- read_parquet(fs::path(import_folder, "delayed_discharges_msg.parquet"))
+bed_days_mh_raw <- read_parquet(fs::path(
+  import_folder,
+  "bed_days_mh_msg.parquet"
+))
+ae_attendances_raw <- read_parquet(fs::path(
+  import_folder,
+  "ae_attendances_msg.parquet"
+))
+delayed_disch_raw <- read_parquet(fs::path(
+  import_folder,
+  "delayed_discharges_msg.parquet"
+))
 falls_raw <- read_parquet(fs::path(import_folder, "falls_smr.parquet"))
-readmissions_raw <- read_parquet(fs::path(import_folder, "readmissions_smr.parquet"))
+readmissions_raw <- read_parquet(fs::path(
+  import_folder,
+  "readmissions_smr.parquet"
+))
 ppa_raw <- read_parquet(fs::path(import_folder, "ppa_smr.parquet"))
-psych_hosp_raw <- read_csv(fs::path(import_folder, "scotpho_data_extract_psychiatric_admissions.csv"))
+psych_hosp_raw <- read_csv(fs::path(
+  import_folder,
+  "scotpho_data_extract_psychiatric_admissions.csv"
+))
