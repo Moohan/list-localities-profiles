@@ -12,6 +12,10 @@ lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality
 
 # Source in functions code
 source("Master RMarkdown Document & Render Code/Global Script.R")
+
+# Unscheduled Care (data loading) ----
+source("Unscheduled Care/2a. Unscheduled Care data loading.R")
+
 lookup <- read_in_localities()
 # Specify HSCP(s) ----
 # use `unique(lookup$hscp2019name)` for all
@@ -24,6 +28,9 @@ stopifnot(all(hscp_list %in% unique(lookup$hscp2019name)))
 # Loop over HSCP ----
 # 'looping' over one HSCP is fine.
 for (HSCP in hscp_list) {
+  # Unscheduled Care (HSCP data manipulation) ----
+  source("Unscheduled Care/2b. Unscheduled Care data manipulation.R")
+
   # Create list of localities in chosen HSCP
   locality_list <- lookup |>
     filter(hscp2019name == HSCP) |>
@@ -52,7 +59,7 @@ for (HSCP in hscp_list) {
     source("Lifestyle & Risk Factors/2. Lifestyle & Risk Factors Outputs.R")
 
     # unscheduled care
-    source("Unscheduled Care/2. Unscheduled Care outputs.R")
+    source("Unscheduled Care/2c. Unscheduled Care outputs.R")
 
     # general health
     source("General Health/3. General Health Outputs.R")

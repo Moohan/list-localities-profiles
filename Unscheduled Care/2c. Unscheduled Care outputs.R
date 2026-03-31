@@ -1,100 +1,26 @@
 ##################### LOCALITY PROFILES UNSCHEDULED CARE: OUTPUTS ######################.
 
-####################### SECTION 1: Packages, file paths, etc #########################
+if (!exists("LOCALITY")) {
+  stop("LOCALITY must be defined before sourcing this script.")
+}
 
-## Manually set year that the profiles are being run (year on data folder)
-ext_year <- 2025
+localities_lkp <- read_in_localities()
 
-# Set locality profiles file path
-#lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
-import_folder <- paste0(lp_path, "Unscheduled Care/DATA ", ext_year, "/")
-
-### for testing run global script and locality placeholder below
-
-## Packages
-library(scales)
-
-## Functions
-#source("Master RMarkdown Document & Render Code/Global Script.R")
-
-## Define locality
-# LOCALITY <- "Stirling City with the Eastern Villages Bridge of Allan and Dunblane"
-#LOCALITY <- "Inverness"
-# LOCALITY <- "Ayr North and Former Coalfield Communities"
-# LOCALITY <- "Whalsay and Skerries"
-# LOCALITY <- "North Perthshire"
-# LOCALITY <- "Inverclyde East"
-# Set date limit for financial year
-# Unless we're in Q4 use the previous FY as the max
-# max_fy <- ifelse(
-#   lubridate::quarter(Sys.Date(), fiscal_start = 4) != 4,
-#   phsmethods::extract_fin_year(Sys.Date() - years(1)),
-#   phsmethods::extract_fin_year(Sys.Date())
-# )
-max_fy <- "2024/25" # TODO Change this to be dynamic and move to general!
-
-########################## SECTION 2: Lookups & Populations ###############################
-
-## 1. Lookups ----
-
-localities <- read_in_localities()
-
-HSCP <- as.character(filter(localities, hscp_locality == LOCALITY)$hscp2019name)
-HB <- as.character(filter(localities, hscp_locality == LOCALITY)$hb2019name)
+# Defensive logic for HSCP and HB
+if (!exists("HSCP")) {
+  HSCP <- as.character(filter(localities_lkp, hscp_locality == LOCALITY)$hscp2019name)
+}
+if (!exists("HB")) {
+  HB <- as.character(filter(localities_lkp, hscp_locality == LOCALITY)$hb2019name)
+}
 
 # Determine other localities based on LOCALITY object
-other_locs <- localities %>%
+other_locs <- localities_lkp %>%
   select(hscp_locality, hscp2019name) %>%
   filter(hscp2019name == HSCP & hscp_locality != LOCALITY) %>%
   arrange(hscp_locality)
 
-# Find number of locs per partnership
-n_loc <- count_localities(localities, HSCP)
-
-
-## 2. Populations (for rates) ----
-
-populations <- read_in_dz_pops()
-
-#populations_proxy_year <- read_in_dz_pops_proxy_year() - Removed due to updated SAPE - keep as placeholder for future?
-
-#populations <- rbind(populations, populations_proxy_year)
-
-# compute age bands
-populations$"Pop0_17" <- rowSums(subset(populations, select = age0:age17))
-populations$"Pop18_44" <- rowSums(subset(populations, select = age18:age44))
-populations$"Pop45_64" <- rowSums(subset(populations, select = age45:age64))
-populations$"Pop65_74" <- rowSums(subset(populations, select = age65:age74))
-populations$"Pop75Plus" <- rowSums(subset(
-  populations,
-  select = age75:age90plus
-))
-populations$"Pop65Plus" <- rowSums(subset(
-  populations,
-  select = age65:age90plus
-))
-
-pops <- populations %>%
-  select(
-    year,
-    hb2019name,
-    hscp2019name,
-    hscp_locality,
-    Pop0_17,
-    Pop18_44,
-    Pop45_64,
-    Pop65_74,
-    Pop75Plus,
-    Pop65Plus,
-    total_pop
-  ) %>%
-  mutate(financial_year = paste0(year, "/", substr(year + 1, 3, 4))) %>%
-  group_by(financial_year, year, hb2019name, hscp2019name, hscp_locality) %>%
-  summarise(across(everything(), sum)) %>%
-  ungroup()
-
-
-# Aggregate and add partnership + HB + Scotland totals
+# Populations for LOCALITY ----
 
 pop_areas <- pops %>%
   filter(hscp_locality == LOCALITY) %>%
@@ -129,25 +55,6 @@ pop_areas <- pops %>%
       ungroup() %>%
       mutate(location = "Scotland")
   ) %>%
-  pivot_longer(
-    "Pop0_17":"total_pop",
-    names_to = "age_group",
-    values_to = "pop"
-  ) %>%
-  mutate(
-    age_group = case_when(
-      age_group == "Pop0_17" ~ "0 - 17",
-      age_group == "Pop18_44" ~ "18 - 44",
-      age_group == "Pop45_64" ~ "45 - 64",
-      age_group == "Pop65_74" ~ "65 - 74",
-      age_group == "Pop75Plus" ~ "75+",
-      age_group == "Pop65Plus" ~ "65+",
-      age_group == "total_pop" ~ "Total"
-    )
-  )
-
-
-loc_pop <- pops %>%
   pivot_longer(
     "Pop0_17":"total_pop",
     names_to = "age_group",
@@ -215,162 +122,10 @@ pops_other_locs_65plus <- inner_join(
   select(financial_year, year, hscp_locality, pop)
 
 
-########################## SECTION 3: Functions ###############################
-
-# Functions for aggregating data
-# For this function to work, the main variable of the data (ex: number of admissions) must be renamed "n"
-
-aggregate_usc_area_data <- function(data) {
-  pts_locality <- data %>%
-    filter(hscp_locality == LOCALITY) %>%
-    mutate(location = hscp_locality) %>%
-    group_by(financial_year, location) %>%
-    summarise(n = sum(n)) %>%
-    ungroup() %>%
-    mutate(area_type = "Locality")
-
-  pts_hscp <- data %>%
-    filter(hscp2019name == HSCP) %>%
-    mutate(location = hscp2019name) %>%
-    group_by(financial_year, location) %>%
-    summarise(n = sum(n)) %>%
-    ungroup() %>%
-    mutate(area_type = "HSCP")
-
-  pts_hb <- data %>%
-    left_join(
-      select(localities, hscp_locality, hb2019name),
-      by = join_by(hscp_locality)
-    ) %>%
-    filter(hb2019name == HB) %>%
-    mutate(location = hb2019name) %>%
-    group_by(financial_year, location) %>%
-    summarise(n = sum(n)) %>%
-    ungroup() %>%
-    mutate(area_type = "HB")
-
-  pts_scot <- data %>%
-    group_by(financial_year) %>%
-    summarise(n = sum(n)) %>%
-    ungroup() %>%
-    mutate(
-      location = "Scotland",
-      area_type = "Scotland"
-    )
-
-  bind_rows(pts_locality, pts_hscp, pts_hb, pts_scot) %>%
-    mutate(
-      area_type = factor(
-        area_type,
-        levels = c("Locality", "HSCP", "HB", "Scotland")
-      )
-    )
-}
-
-# Functions for creating time trends
-age_group_trend_usc <- function(
-  data_for_plot,
-  plot_title,
-  yaxis_title,
-  source
-) {
-  data_for_plot %>%
-    ggplot(aes(
-      x = financial_year,
-      y = data,
-      group = age_group,
-      color = age_group
-    )) +
-    geom_line(linewidth = 1) +
-    geom_point() +
-    scale_colour_manual(values = c(palette)) +
-    scale_x_discrete(breaks = data_for_plot$financial_year) +
-    scale_y_continuous(
-      labels = comma,
-      limits = c(0, 1.1 * max(data_for_plot$data))
-    ) +
-    theme_profiles() +
-    labs(
-      title = plot_title,
-      y = yaxis_title,
-      x = "Financial Year",
-      color = "Age Group",
-      caption = source
-    ) +
-    theme(plot.title = element_text(hjust = 0.5, size = 12))
-}
-
-area_trend_usc <- function(data_for_plot, plot_title, yaxis_title, source) {
-  data_for_plot %>%
-    mutate(
-      location = fct_reorder(
-        as.factor(str_wrap(location, 23)),
-        as.numeric(area_type)
-      )
-    ) %>%
-    ggplot() +
-    aes(
-      x = financial_year,
-      y = data,
-      group = location,
-      fill = location,
-      linetype = area_type
-    ) +
-    geom_line(aes(colour = location), linewidth = 1) +
-    geom_point(aes(colour = location), size = 2) +
-    scale_fill_manual(values = palette) +
-    scale_colour_manual(values = palette) +
-    theme_profiles() +
-    expand_limits(y = 0) +
-    scale_x_discrete(breaks = data_for_plot$financial_year) +
-    scale_y_continuous(
-      labels = comma,
-      limits = c(0, 1.1 * max(data_for_plot$data))
-    ) +
-    labs(
-      title = plot_title,
-      y = yaxis_title,
-      x = "Financial Year",
-      caption = source
-    ) +
-    theme(
-      plot.title = element_text(hjust = 0.5, size = 12),
-      legend.title = element_blank()
-    ) +
-    guides(
-      linetype = "none",
-      shape = "none",
-      fill = "none",
-      colour = guide_legend(nrow = 1, byrow = TRUE)
-    )
-}
-
-# Functions for text variables
-
-percent_change_calc <- function(numerator, denominator, digits = 1) {
-  round_half_up(
-    abs(numerator - denominator) / denominator * 100,
-    digits = digits
-  )
-}
-
-word_change_calc <- function(latest, first) {
-  dplyr::case_when(
-    dplyr::near(latest, first) ~ "change",
-    latest > first ~ "increase",
-    latest < first ~ "decrease"
-  )
-}
-
-####################### SECTION 4: Data manipulation & outputs #########################
-
 # 1. Emergency Admissions ----
 # _________________________________________________________________________
 
-emergency_adm <- read_parquet(paste0(
-  import_folder,
-  "emergency_admissions_msg.parquet"
-)) %>%
+emergency_adm <- emergency_adm_raw %>%
   filter(financial_year <= max_fy)
 
 # Plotting by age
@@ -575,7 +330,7 @@ min_word_change_ea <- word_change_calc(latest_ea_min_age2, first_ea_min_age1)
 # 2a. Unscheduled bed days ----
 # _________________________________________________________________________
 
-bed_days <- read_parquet(paste0(import_folder, "bed_days_msg.parquet")) %>%
+bed_days <- bed_days_raw %>%
   filter(financial_year <= max_fy)
 
 # Plotting by age
@@ -761,10 +516,7 @@ min_word_change_ubd <- word_change_calc(latest_ubd_min_age2, first_ubd_min_age1)
 # 2b. Unscheduled bed days - Mental Health ----
 # _________________________________________________________________________
 
-bed_days_mh <- read_parquet(paste0(
-  import_folder,
-  "bed_days_mh_msg.parquet"
-)) %>%
+bed_days_mh <- bed_days_mh_raw %>%
   filter(financial_year <= max_fy)
 
 # Plotting by age
@@ -996,10 +748,7 @@ other_loc_bed_days_mh <- bed_days_mh %>%
 # 3. A&E Attendances ----
 # _________________________________________________________________________
 
-ae_attendances <- read_parquet(paste0(
-  import_folder,
-  "ae_attendances_msg.parquet"
-)) %>%
+ae_attendances <- ae_attendances_raw %>%
   filter(financial_year <= max_fy)
 
 # Plotting by age
@@ -1227,10 +976,7 @@ other_loc_ae_att <- ae_attendances %>%
 # 4. Delayed Discharges ----
 # _________________________________________________________________________
 
-delayed_disch <- read_parquet(paste0(
-  import_folder,
-  "delayed_discharges_msg.parquet"
-)) %>%
+delayed_disch <- delayed_disch_raw %>%
   filter(financial_year <= max_fy) %>%
   filter(age_group %in% c("65 - 74", "75+")) %>%
   group_by(financial_year, hscp2019name, hscp_locality) %>%
@@ -1364,7 +1110,7 @@ other_loc_dd <- delayed_disch %>%
 # 5. Fall Admissions ----
 # _________________________________________________________________________
 
-falls <- read_parquet(paste0(import_folder, "falls_smr.parquet")) %>%
+falls <- falls_raw %>%
   filter(financial_year <= max_fy) %>%
   filter(age_group %in% c("65 - 74", "75+"))
 
@@ -1438,7 +1184,10 @@ percent_rate_change_falls_hscp <- percent_change_calc(
   hscp_falls2,
   first_falls_hscp
 )
-word_change_rate_falls_hscp <- word_change_calc(hscp_falls2, first_falls_hscp)
+word_change_rate_falls_hscp <- word_change_calc(
+  hscp_falls2,
+  first_falls_hscp
+)
 
 scot_falls <- falls_areas %>%
   filter(
@@ -1461,7 +1210,10 @@ percent_rate_change_falls_scot <- percent_change_calc(
   scot_falls2,
   first_falls_scot
 )
-word_change_rate_falls_scot <- word_change_calc(scot_falls2, first_falls_scot)
+word_change_rate_falls_scot <- word_change_calc(
+  scot_falls2,
+  first_falls_scot
+)
 
 # NHS health board
 hb_falls <- falls_areas %>%
@@ -1489,10 +1241,7 @@ word_change_hb_falls <- word_change_calc(hb_falls2, first_fy_hb_falls)
 # 6. Readmissions (28 days) ----
 # _________________________________________________________________________
 
-readmissions <- read_parquet(paste0(
-  import_folder,
-  "readmissions_smr.parquet"
-)) %>%
+readmissions <- readmissions_raw %>%
   filter(financial_year <= max_fy)
 
 # Plotting by age
@@ -1702,95 +1451,12 @@ word_change_hb_read <- word_change_calc(hb_read2, first_fy_hb_read)
 # 7. Comm 6 months ----
 # _________________________________________________________________________________
 #
-# comm_6mo <- readRDS(paste0(import_folder, "comm_6mo_smr.rds")) %>%
-#   rename(financial_year = financial_death) %>%
-#   filter(financial_year <= max_fy)
-#
-# # Aggregate data
-# # First use aggregating function on bed days, then on deaths, then join
-#
-# comm_6mo1 <- comm_6mo %>%
-#   select(-total_deaths) %>%
-#   rename(n = total_bddys) %>%
-#   aggregate_usc_area_data() %>%
-#   rename(total_bddys = n)
-#
-# comm_6mo2 <- comm_6mo %>%
-#   select(-total_bddys) %>%
-#   rename(n = total_deaths) %>%
-#   aggregate_usc_area_data() %>%
-#   rename(total_deaths = n)
-#
-# comm_6mo_areas <- left_join(comm_6mo1, comm_6mo2) %>%
-#   left_join(pop_areas_all_ages) %>%
-#   mutate(data = round_half_up(100*(1 - total_bddys/total_deaths/182.5), 1))
-#
-# #Locality Table
-#
-# comm_6mo_loc_table <- comm_6mo_areas %>%
-#   filter(location == LOCALITY) %>%
-#   mutate(data = paste0(data, "%"),
-#          financial_year = paste0("**", financial_year, "**"),
-#          financial_year = fct_reorder(financial_year, year)) %>%
-#   select(location, financial_year, data) %>%
-#   pivot_wider(names_from = financial_year, values_from = data) %>%
-#   select(-location)
-#
-# # Bar plot comparing areas in latest year
-#
-# comm_loc_bar <- comm_6mo_areas %>%
-#   filter(year == max(year)) %>%
-#   mutate(location = fct_reorder(as.factor(str_wrap(location, 28)), as.numeric(area_type))) %>%
-#
-#   ggplot(aes(x = location, y = data, fill = location, weight = data)) +
-#   geom_col(position = position_dodge()) +
-#   geom_text(aes(y = data, label = round_half_up(data, 1)),
-#             position=position_dodge(width=0.9),
-#             vjust=-0.25, color = "#4a4a4a", size = 4, fontface = "bold") +
-#   scale_y_continuous(labels = comma, limits = c(0, 1.1*max(comm_6mo_areas$data))) +
-#   scale_fill_manual(values = palette) +
-#   theme_profiles() +
-#   theme(panel.grid.major.y = element_line(color = "grey85"),
-#         panel.grid.major.x = element_blank(),
-#         axis.title.x = element_blank(),
-#         axis.text.x = element_text(size = 10)) +
-#   labs(y = "% Last 6 months in community",
-#        caption = "Source: NRS Death Records, PHS SMR01, SMR01E and SMR04") +
-#   guides(fill= "none")
-#
-#
-# # Objects for text and summary table
-# latest_comm_6mo_loc <- comm_6mo_areas %>%
-#   filter(location == LOCALITY,
-#          year == max(year)) %>%
-#   pull(data)
-#
-# hscp_comm_6mo <- comm_6mo_areas %>%
-#   filter(location == HSCP,
-#          year == max(year)) %>%
-#   pull(data)
-#
-# scot_comm_6mo <- comm_6mo_areas %>%
-#   filter(location == "Scotland",
-#          year == max(year)) %>%
-#   pull(data)
-#
-# other_loc_comm_6mo <- comm_6mo %>%
-#   group_by(financial_year, hscp_locality) %>%
-#   summarise(total_bddys = sum(total_bddys),
-#             total_deaths = sum(total_deaths)) %>%
-#   ungroup() %>%
-#   right_join(pops_other_locs) %>%
-#   mutate(total_bddys = replace_na(total_bddys, 0),
-#          total_deaths = replace_na(total_deaths, 0)) %>%
-#   mutate(data = as.character(round_half_up(100*(1 - total_bddys/total_deaths/182.5), 1))) %>%
-#   select(hscp_locality, data) %>%
-#   pivot_wider(names_from = hscp_locality, values_from = data)
+# (Logic omitted as it was commented out in original)
 
 # 8. Potentially Preventable Admissions ----
 # _______________________________________________________________________________________________________
 
-ppa <- read_parquet(paste0(import_folder, "ppa_smr.parquet")) %>%
+ppa <- ppa_raw %>%
   filter(financial_year <= max_fy)
 
 # % PPAs in locality under and over 65
@@ -1821,7 +1487,8 @@ ppa_under65 <- ppa %>%
   aggregate_usc_area_data() %>%
   rename(under65tot = n) %>%
   left_join(ppa_total, by = join_by(financial_year, location)) %>%
-  left_join(pop_areas_all_ages, by = join_by(financial_year, location)) %>%
+  left_join(pop_areas_all_ages, by = join_by(financial_year,
+                                            location)) %>%
   mutate(data = round_half_up(under65tot / n * 100, 1)) %>%
   drop_na(year)
 
@@ -1922,12 +1589,7 @@ other_loc_ppa <- ppa %>%
 # 9. Psychiatric hospital admissions (ScotPHO) ----
 # ___________________________________________________________________________
 
-psych_hosp <- read_csv(paste0(
-  import_folder,
-  "scotpho_data_extract_psychiatric_admissions.csv"
-)) %>%
-  clean_scotpho_dat() %>%
-  mutate(period_short = gsub("to", "-", substr(period, 1, 18), fixed = TRUE))
+psych_hosp <- psych_hosp_clean
 
 check_missing_data_scotpho(psych_hosp)
 
@@ -2008,7 +1670,7 @@ word_change_loc_psych <- word_change_calc(
 )
 
 # HSCP
-hscp_psych_hosp <- psych_hosp %>%
+hscp_psych_hosp_data <- psych_hosp %>%
   filter(period %in% list_years_latest) %>%
   filter(
     area_name == HSCP &
@@ -2018,12 +1680,12 @@ hscp_psych_hosp <- psych_hosp %>%
   mutate(measure2 = format(measure, big.mark = ","))
 
 diff_hscp_psych <- percent_change_calc(
-  hscp_psych_hosp$measure[2],
-  hscp_psych_hosp$measure[1]
+  hscp_psych_hosp_data$measure[2],
+  hscp_psych_hosp_data$measure[1]
 )
 word_change_hscp_psych <- word_change_calc(
-  hscp_psych_hosp$measure[2],
-  hscp_psych_hosp$measure[1]
+  hscp_psych_hosp_data$measure[2],
+  hscp_psych_hosp_data$measure[1]
 )
 
 # NHS health board
@@ -2046,7 +1708,7 @@ word_change_hb_psych <- word_change_calc(
 )
 
 # Scotland
-scot_psych_hosp <- psych_hosp %>%
+scot_psych_hosp_data <- psych_hosp %>%
   filter(period %in% list_years_latest) %>%
   filter(
     area_name == "Scotland" &
@@ -2056,12 +1718,12 @@ scot_psych_hosp <- psych_hosp %>%
   mutate(measure2 = format(measure, big.mark = ","))
 
 diff_scot_psych <- percent_change_calc(
-  scot_psych_hosp$measure[2],
-  scot_psych_hosp$measure[1]
+  scot_psych_hosp_data$measure[2],
+  scot_psych_hosp_data$measure[1]
 )
 word_change_scot_psych <- word_change_calc(
-  scot_psych_hosp$measure[2],
-  scot_psych_hosp$measure[1]
+  scot_psych_hosp_data$measure[2],
+  scot_psych_hosp_data$measure[1]
 )
 
 # Housekeeping ----
@@ -2180,7 +1842,7 @@ rm(
   loc_pop,
   loc_pop_age1,
   loc_pop_age2,
-  localities,
+  localities_lkp,
   # max_fy,
   min_year_ea_age1,
   min_year_ubd_age1,
@@ -2190,7 +1852,6 @@ rm(
   pops_other_locs,
   pops_other_locs_65plus,
   populations,
-  populations_proxy_year,
   ppa,
   ppa_65plus,
   ppa_total,
@@ -2206,22 +1867,3 @@ rm(
   word_change_calc
 )
 gc()
-
-## Stat disclosure control
-
-# writexl::write_xlsx(x = list("Emergency Adm" = emergency_adm,
-#                              "Unsch Bed Days" = bed_days,
-#                              "Unsch Bed Days (SMR4)" = bed_days_mh,
-#                              "A&E Att" = ae_attendances,
-#                              "Delayed Disch" = delayed_disch),
-#                     path = paste0(lp_path, "Publishing/MSG Data.xlsx"))
-
-# falls_sdc <- falls %>%
-#   group_by(financial_year, hscp2019name, hscp_locality) %>%
-#   summarise(falls_admission = sum(admissions)) %>%
-#   ungroup()
-
-# writexl::write_xlsx(x = list("Falls" = falls_sdc,
-#                              "Readmissions 28" = readmissions,
-#                              "PPA" = ppa),
-#                     path = paste0(lp_path, "Publishing/SMR Data.xlsx"))
