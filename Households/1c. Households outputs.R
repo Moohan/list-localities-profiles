@@ -14,7 +14,10 @@ lookup_loc <- lookup_dz_all |>
 
 
 # filter housing data for locality of interest
-house_dat <- filter(house_raw_dat, data_zone_code %in% lookup_loc[["datazone2011"]])
+house_dat <- filter(
+  house_raw_dat,
+  data_zone_code %in% lookup_loc[["datazone2011"]]
+)
 
 # aggregate data
 house_dat1 <- house_dat |>
