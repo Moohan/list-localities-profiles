@@ -10,6 +10,9 @@ Sys.umask("006")
 # Set file path
 lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
 
+# Households global loading ----
+source("Households/1a. Households data loading.R")
+
 # Source in functions code
 source("Master RMarkdown Document & Render Code/Global Script.R")
 lookup <- read_in_localities()
@@ -24,6 +27,9 @@ stopifnot(all(hscp_list %in% unique(lookup$hscp2019name)))
 # Loop over HSCP ----
 # 'looping' over one HSCP is fine.
 for (HSCP in hscp_list) {
+  # Households HSCP level manipulation ----
+  source("Households/1b. Households data manipulation.R")
+
   # Create list of localities in chosen HSCP
   locality_list <- lookup |>
     filter(hscp2019name == HSCP) |>
@@ -58,7 +64,7 @@ for (HSCP in hscp_list) {
     source("General Health/3. General Health Outputs.R")
 
     # housing
-    source("Households/Households Code.R")
+    source("Households/1c. Households outputs.R")
 
     # services
     source("Services/2. Services data manipulation & table.R")
