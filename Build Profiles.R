@@ -18,6 +18,14 @@ source("Master RMarkdown Document & Render Code/Global Script.R")
 
 # Set file path
 lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
+
+# Demographics Loading ----
+# Source in data loading scripts once per session
+# source("Demographics/1a. Population data loading.R")
+# source("Demographics/2a. SIMD data loading.R")
+
+# Households Loading ----
+source("Households/1a. Households data loading.R")
 output_dir <- path(lp_path, "Profiles Output")
 
 # Below creates locality list of all the localities in a chosen HSCP
@@ -37,6 +45,9 @@ stopifnot(all(hscp_list %in% unique(lookup[["hscp2019name"]])))
 # Loop over HSCP ----
 # 'looping' over one HSCP is fine.
 for (HSCP in hscp_list) {
+  # Households Manipulation ----
+  source("Households/1b. Households data manipulation.R")
+
   # Create list of localities in chosen HSCP
   locality_list <- lookup |>
     filter(hscp2019name == HSCP) |>
@@ -60,8 +71,8 @@ for (HSCP in hscp_list) {
     source("Demographics/1. Demographics - Population.R")
     source("Demographics/2. Demographics - SIMD.R")
 
-    # Housing ----
-    source("Households/Households Code.R")
+    # Households Outputs ----
+    source("Households/1c. Households outputs.R")
 
     # Services ----
     source("Services/2. Services data manipulation & table.R")
