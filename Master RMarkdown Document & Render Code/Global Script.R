@@ -791,7 +791,9 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
     source("Households/1a. Households data loading.R")
 
     # Derive HSCP for Households 1b
-    HSCP <- as.character(dplyr::filter(lookup, hscp_locality == LOCALITY)$hscp2019name)
+    HSCP <- as.character(
+      dplyr::filter(lookup, hscp_locality == LOCALITY)$hscp2019name
+    )
 
     source("Households/1b. Households data manipulation.R")
     source("Households/1c. Households outputs.R")

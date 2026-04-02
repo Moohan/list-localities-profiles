@@ -35,7 +35,12 @@ house_raw_dat <- purrr::map(
 # 2. Council Tax Band Data ----
 
 house_raw_dat2 <- readxl::read_excel(
-  fs::path(lp_path, "Households", glue::glue("Data {ext_year}"), "council_tax.xlsx"),
+  fs::path(
+    lp_path,
+    "Households",
+    glue::glue("Data {ext_year}"),
+    "council_tax.xlsx"
+  ),
   sheet = as.character(max_year_housing),
   skip = 4
 ) |>

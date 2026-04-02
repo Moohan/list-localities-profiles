@@ -69,7 +69,10 @@ perc_second_homes <- format_number_for_text(
 # 3. Plots and Tables ----
 
 # Total dwellings over time
-houses_ts <- ggplot2::ggplot(house_dat1, ggplot2::aes(x = year, y = total_dwellings, group = 1)) +
+houses_ts <- ggplot2::ggplot(
+  house_dat1,
+  ggplot2::aes(x = year, y = total_dwellings, group = 1)
+) +
   ggplot2::geom_line(linewidth = 1, colour = "#3F3685") +
   theme_profiles() +
   ggplot2::geom_point(color = "#3F3685") +
@@ -137,7 +140,12 @@ ctb_plot <- ctb |>
     y = 1,
     fill = factor(variable, levels = rev(variable))
   )) +
-  ggplot2::geom_col(position = "fill", colour = "black", size = 0.5, orientation = "y") +
+  ggplot2::geom_col(
+    position = "fill",
+    colour = "black",
+    size = 0.5,
+    orientation = "y"
+  ) +
   ggplot2::theme_classic() +
   ggplot2::labs(
     x = "Proportion of Households",
@@ -208,11 +216,17 @@ other_locs_data <- house_dat_all_locs |>
 
 other_locs_n_houses <- other_locs_data |>
   dplyr::select(hscp_locality, tot_dwellings_chr) |>
-  tidyr::pivot_wider(names_from = hscp_locality, values_from = tot_dwellings_chr)
+  tidyr::pivot_wider(
+    names_from = hscp_locality,
+    values_from = tot_dwellings_chr
+  )
 
 other_locs_perc_discount <- other_locs_data |>
   dplyr::select(hscp_locality, tax_discount_perc) |>
-  tidyr::pivot_wider(names_from = hscp_locality, values_from = tax_discount_perc)
+  tidyr::pivot_wider(
+    names_from = hscp_locality,
+    values_from = tax_discount_perc
+  )
 
 other_locs_data2 <- house_dat2_all_locs |>
   dplyr::filter(hscp_locality != LOCALITY) |>
