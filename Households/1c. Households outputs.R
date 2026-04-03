@@ -198,23 +198,35 @@ other_locs_n_houses <- other_locs_dat_raw %>%
   ) %>%
   dplyr::arrange(hscp_locality) %>%
   dplyr::select(hscp_locality, tot_dwellings_chr) %>%
-  tidyr::pivot_wider(names_from = hscp_locality, values_from = tot_dwellings_chr)
+  tidyr::pivot_wider(
+    names_from = hscp_locality,
+    values_from = tot_dwellings_chr
+  )
 
 other_locs_perc_discount <- other_locs_dat_raw %>%
-  dplyr::mutate(tax_discount_perc = janitor::round_half_up(tax_discount_perc, 1)) %>%
+  dplyr::mutate(
+    tax_discount_perc = janitor::round_half_up(tax_discount_perc, 1)
+  ) %>%
   dplyr::select(hscp_locality, tax_discount_perc) %>%
   dplyr::arrange(hscp_locality) %>%
-  tidyr::pivot_wider(names_from = hscp_locality, values_from = tax_discount_perc)
+  tidyr::pivot_wider(
+    names_from = hscp_locality,
+    values_from = tax_discount_perc
+  )
 
 other_locs_dat2_raw <- all_locs_dat2 %>%
   dplyr::filter(hscp_locality %in% other_locs$hscp_locality) %>%
   dplyr::mutate(
     perc_houses_AC = janitor::round_half_up(
-      (council_tax_band_a + council_tax_band_b + council_tax_band_c) / total_number_of_dwellings * 100,
+      (council_tax_band_a + council_tax_band_b + council_tax_band_c) /
+        total_number_of_dwellings *
+        100,
       1
     ),
     perc_houses_FH = janitor::round_half_up(
-      (council_tax_band_f + council_tax_band_g + council_tax_band_h) / total_number_of_dwellings * 100,
+      (council_tax_band_f + council_tax_band_g + council_tax_band_h) /
+        total_number_of_dwellings *
+        100,
       1
     )
   )
