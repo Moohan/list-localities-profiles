@@ -23,6 +23,9 @@ output_dir <- path(lp_path, "Profiles Output")
 # Below creates locality list of all the localities in a chosen HSCP
 lookup <- read_in_localities()
 
+# Load Households data once per session
+source("Households/1a. Households data loading.R")
+
 # Specify HSCP(s) ----
 # use `unique(lookup$hscp2019name)` for all
 # or create a vector for multiple e.g. `c("Angus", "West Lothian")`
@@ -41,6 +44,9 @@ for (HSCP in hscp_list) {
   locality_list <- lookup |>
     filter(hscp2019name == HSCP) |>
     pull(hscp_locality)
+
+  # Pre-calculate Households data for all localities in the HSCP
+  source("Households/1b. Households data manipulation.R")
 
   # Loop to create the profiles for all the localities in the list
 
@@ -61,7 +67,7 @@ for (HSCP in hscp_list) {
     source("Demographics/2. Demographics - SIMD.R")
 
     # Housing ----
-    source("Households/Households Code.R")
+    source("Households/1c. Households outputs.R")
 
     # Services ----
     source("Services/2. Services data manipulation & table.R")

@@ -788,7 +788,12 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("Housing.Rmd" %in% chapters_oi) {
     # Housing ----
-    source("Households/Households Code.R")
+    if (!exists("HSCP")) {
+      HSCP <- as.character(dplyr::filter(read_in_localities(), hscp_locality == LOCALITY)$hscp2019name)
+    }
+    source("Households/1a. Households data loading.R")
+    source("Households/1b. Households data manipulation.R")
+    source("Households/1c. Households outputs.R")
   }
 
   if ("Services.Rmd" %in% chapters_oi) {

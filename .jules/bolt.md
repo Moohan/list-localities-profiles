@@ -1,0 +1,3 @@
+## 2025-05-15 - [Hoisting R Scripts in Nested Loops]
+**Learning:** In report generation pipelines where scripts are sourced inside nested loops, moving heavy I/O and non-locality-specific data manipulation to outer loops (hoisting) can yield massive performance gains. For Households, moving Excel I/O from the locality loop (once per locality) to the global level (once per session) reduces file reads by 90-95% for typical HSCPs.
+**Action:** Always identify scripts that perform the same I/O or aggregation for every iteration of a loop and refactor them into a tiered structure (Loading/Manipulation/Outputs).
