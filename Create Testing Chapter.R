@@ -12,8 +12,8 @@ source("Master RMarkdown Document & Render Code/Global Script.R")
 # Enter Rmarkdown file of Chapter(s) You Wish To Test
 # More than 1 can be entered at a time (c() format)
 
-chapter_oi <- c("Demographics.Rmd")
-LOCALITY <- "Falkirk West"
+chapter_oi <- c("Housing.Rmd")
+LOCALITY <- "Inverness"
 
 # Output Directory
 lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
