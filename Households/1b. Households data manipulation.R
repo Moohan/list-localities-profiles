@@ -21,7 +21,12 @@ house_dat_hscp <- house_raw_dat %>%
     tax_discount = sum(dwellings_with_a_single_adult_council_tax_discount)
   ) %>%
   dplyr::ungroup() %>%
-  dplyr::mutate(perc_discount = phsmethods::round_half_up(tax_discount / total_dwellings * 100, 1))
+  dplyr::mutate(
+    perc_discount = phsmethods::round_half_up(
+      tax_discount / total_dwellings * 100,
+      1
+    )
+  )
 
 hscp_n_houses <- format_number_for_text(house_dat_hscp$total_dwellings)
 hscp_perc_discount <- house_dat_hscp$perc_discount
@@ -65,7 +70,10 @@ house_dat_all_locs <- house_raw_dat %>%
   ) %>%
   dplyr::ungroup() %>%
   dplyr::mutate(
-    tax_discount_perc = phsmethods::round_half_up(tax_discount / total_dwellings * 100, 1)
+    tax_discount_perc = phsmethods::round_half_up(
+      tax_discount / total_dwellings * 100,
+      1
+    )
   )
 
 house_dat2_all_locs <- house_raw_dat2 %>%
