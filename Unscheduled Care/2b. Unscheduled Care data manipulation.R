@@ -3,7 +3,9 @@
 # Derive HSCP and HB if not already defined
 localities <- read_in_localities()
 if (!exists("HSCP") && exists("LOCALITY")) {
-  HSCP <- as.character(filter(localities, hscp_locality == LOCALITY)$hscp2019name)
+  HSCP <- as.character(
+    filter(localities, hscp_locality == LOCALITY)$hscp2019name
+  )
 }
 if (!exists("HB")) {
   if (exists("LOCALITY")) {
