@@ -809,7 +809,9 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
 
   if ("Unscheduled-Care.Rmd" %in% chapters_oi) {
     # Unscheduled Care ----
-    source("Unscheduled Care/2. Unscheduled Care outputs.R")
+    source("Unscheduled Care/2a. Unscheduled Care data loading.R")
+    source("Unscheduled Care/2b. Unscheduled Care data manipulation.R")
+    source("Unscheduled Care/2c. Unscheduled Care outputs.R")
   }
 
   chapters_oi_name <- chapters_oi %>%
