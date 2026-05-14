@@ -88,41 +88,28 @@ house_dat1 <- house_dat %>%
 ## 2b) Text objects ----
 
 # numbers
-n_houses <- (
-  filter(house_dat1, year == max(year))$total_dwellings
-)
+n_houses <- (filter(house_dat1, year == max(year))$total_dwellings)
 n_occupied <- format_number_for_text(
   filter(house_dat1, year == max(year))$occupied_dwellings
 )
 n_vacant <- format_number_for_text(
   filter(house_dat1, year == max(year))$vacant_dwellings
 )
-n_single_discount <- (
-  filter(house_dat1, year == max(year))$tax_discount
-)
-n_exempt <- (
-  filter(house_dat1, year == max(year))$tax_exempt
-)
-n_second_homes <- (
-  filter(house_dat1, year == max(year))$second_homes
-)
+n_single_discount <- (filter(house_dat1, year == max(year))$tax_discount)
+n_exempt <- (filter(house_dat1, year == max(year))$tax_exempt)
+n_second_homes <- (filter(house_dat1, year == max(year))$second_homes)
 
 # percentages
-perc_occupied <- (
-  filter(house_dat1, year == max(year))$occupied_dwellings_perc
-)
+perc_occupied <- (filter(house_dat1, year == max(year))$occupied_dwellings_perc)
 perc_vacant <- format_number_for_text(
   filter(house_dat1, year == max(year))$vacant_dwellings_perc
 )
-perc_single_discount <- (
-  filter(house_dat1, year == max(year))$tax_discount_perc
-)
-perc_exempt <- (
-  filter(house_dat1, year == max(year))$tax_exempt_perc
-)
-perc_second_homes <- (
-  filter(house_dat1, year == max(year))$second_homes_perc
-)
+perc_single_discount <- (filter(
+  house_dat1,
+  year == max(year)
+)$tax_discount_perc)
+perc_exempt <- (filter(house_dat1, year == max(year))$tax_exempt_perc)
+perc_second_homes <- (filter(house_dat1, year == max(year))$second_homes_perc)
 
 
 ## 2c) Plots and Tables ----
@@ -259,25 +246,21 @@ ctb_table <- ctb %>%
 
 
 ## Objects for locality
-perc_houses_AC <- (
-  sum(
-    house_dat2$council_tax_band_a,
-    house_dat2$council_tax_band_b,
-    house_dat2$council_tax_band_c
-  ) /
-    house_dat2$total_number_of_dwellings *
-    100
-)
+perc_houses_AC <- (sum(
+  house_dat2$council_tax_band_a,
+  house_dat2$council_tax_band_b,
+  house_dat2$council_tax_band_c
+) /
+  house_dat2$total_number_of_dwellings *
+  100)
 
-perc_houses_FH <- (
-  sum(
-    house_dat2$council_tax_band_f,
-    house_dat2$council_tax_band_g,
-    house_dat2$council_tax_band_h
-  ) /
-    house_dat2$total_number_of_dwellings *
-    100
-)
+perc_houses_FH <- (sum(
+  house_dat2$council_tax_band_f,
+  house_dat2$council_tax_band_g,
+  house_dat2$council_tax_band_h
+) /
+  house_dat2$total_number_of_dwellings *
+  100)
 
 
 ########################## Section 4 - Objects for Summary Table ########################

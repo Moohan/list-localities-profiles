@@ -352,7 +352,6 @@ percent_change_calc <- function(numerator, denominator, digits = 1) {
 }
 
 
-
 ####################### SECTION 4: Data manipulation & outputs #########################
 
 # 1. Emergency Admissions ----
@@ -433,7 +432,10 @@ percent_rate_change <- percent_change_calc(
   latest_emergency_adm_loc2,
   first_fy_rate
 )
-word_change_rate <- calculate_change_word(latest_emergency_adm_loc2, first_fy_rate)
+word_change_rate <- calculate_change_word(
+  latest_emergency_adm_loc2,
+  first_fy_rate
+)
 
 # HSCP
 hscp_emergency_adm <- emergency_adm_areas %>%
@@ -537,7 +539,10 @@ first_ea_max_age <- emergency_adm_age %>%
   pull(data)
 
 max_rate_change_ea <- percent_change_calc(latest_ea_max_age2, first_ea_max_age)
-max_word_change_ea <- calculate_change_word(latest_ea_max_age2, first_ea_max_age)
+max_word_change_ea <- calculate_change_word(
+  latest_ea_max_age2,
+  first_ea_max_age
+)
 
 latest_ea_min_age <- emergency_adm_age %>%
   filter(
@@ -563,7 +568,10 @@ min_year_ea_age1 <- first_ea_min_age %>% pull(year)
 
 
 min_rate_change_ea <- percent_change_calc(latest_ea_min_age2, first_ea_min_age1)
-min_word_change_ea <- calculate_change_word(latest_ea_min_age2, first_ea_min_age1)
+min_word_change_ea <- calculate_change_word(
+  latest_ea_min_age2,
+  first_ea_min_age1
+)
 
 # 2a. Unscheduled bed days ----
 # _________________________________________________________________________
@@ -628,7 +636,10 @@ latest_bed_days_loc1 <- latest_bed_days_loc %>% pull(formatted_data)
 latest_bed_days_loc2 <- latest_bed_days_loc %>% pull(data)
 
 rate_change_ubd <- percent_change_calc(latest_bed_days_loc2, first_fy_rate_ubd)
-word_change_ubd <- calculate_change_word(latest_bed_days_loc2, first_fy_rate_ubd)
+word_change_ubd <- calculate_change_word(
+  latest_bed_days_loc2,
+  first_fy_rate_ubd
+)
 # HSCP
 first_fy_hscp_ubd <- filter(
   bed_days_areas,
@@ -724,7 +735,10 @@ max_rate_change_ubd <- percent_change_calc(
   latest_ubd_max_age2,
   first_ubd_max_age
 )
-max_word_change_ubd <- calculate_change_word(latest_ubd_max_age2, first_ubd_max_age)
+max_word_change_ubd <- calculate_change_word(
+  latest_ubd_max_age2,
+  first_ubd_max_age
+)
 
 latest_ubd_min_age <- bed_days_age %>%
   filter(
@@ -753,7 +767,10 @@ min_rate_change_ubd <- percent_change_calc(
   latest_ubd_min_age2,
   first_ubd_min_age1
 )
-min_word_change_ubd <- calculate_change_word(latest_ubd_min_age2, first_ubd_min_age1)
+min_word_change_ubd <- calculate_change_word(
+  latest_ubd_min_age2,
+  first_ubd_min_age1
+)
 
 # 2b. Unscheduled bed days - Mental Health ----
 # _________________________________________________________________________
@@ -1441,7 +1458,10 @@ percent_rate_change_falls_hscp <- percent_change_calc(
   hscp_falls2,
   first_falls_hscp
 )
-word_change_rate_falls_hscp <- calculate_change_word(hscp_falls2, first_falls_hscp)
+word_change_rate_falls_hscp <- calculate_change_word(
+  hscp_falls2,
+  first_falls_hscp
+)
 
 scot_falls <- falls_areas %>%
   filter(
@@ -1464,7 +1484,10 @@ percent_rate_change_falls_scot <- percent_change_calc(
   scot_falls2,
   first_falls_scot
 )
-word_change_rate_falls_scot <- calculate_change_word(scot_falls2, first_falls_scot)
+word_change_rate_falls_scot <- calculate_change_word(
+  scot_falls2,
+  first_falls_scot
+)
 
 # NHS health board
 hb_falls <- falls_areas %>%
@@ -1639,7 +1662,10 @@ percent_rate_change_re_area <- percent_change_calc(
   latest_read_loc1,
   first_read_loc1
 )
-word_change_rate_re_area <- calculate_change_word(latest_read_loc1, first_read_loc1)
+word_change_rate_re_area <- calculate_change_word(
+  latest_read_loc1,
+  first_read_loc1
+)
 
 first_hscp_read <- readmissions_areas %>%
   filter(
@@ -1659,7 +1685,10 @@ percent_rate_change_re_area_hscp <- percent_change_calc(
   hscp_read,
   first_hscp_read
 )
-word_change_rate_re_area_hscp <- calculate_change_word(hscp_read, first_hscp_read)
+word_change_rate_re_area_hscp <- calculate_change_word(
+  hscp_read,
+  first_hscp_read
+)
 
 first_scot_read <- readmissions_areas %>%
   filter(
@@ -1680,7 +1709,10 @@ percent_rate_change_re_area_scot <- percent_change_calc(
   scot_read,
   first_scot_read
 )
-word_change_rate_re_area_scot <- calculate_change_word(scot_read, first_scot_read)
+word_change_rate_re_area_scot <- calculate_change_word(
+  scot_read,
+  first_scot_read
+)
 
 # NHS health board
 hb_read <- readmissions_areas %>%
@@ -1887,7 +1919,10 @@ hscp_ppa <- ppa_areas %>%
   mutate(formatted_data = data)
 
 ppa_diff_hscp <- percent_change_calc(hscp_ppa$data[2], hscp_ppa$data[1])
-ppa_word_change_hscp <- calculate_change_word(hscp_ppa$data[2], hscp_ppa$data[1])
+ppa_word_change_hscp <- calculate_change_word(
+  hscp_ppa$data[2],
+  hscp_ppa$data[1]
+)
 
 scot_ppa <- ppa_areas %>%
   filter(
@@ -1897,7 +1932,10 @@ scot_ppa <- ppa_areas %>%
   mutate(formatted_data = data)
 
 diff_scot_ppa <- percent_change_calc(scot_ppa$data[2], scot_ppa$data[1])
-word_change_scot_ppa <- calculate_change_word(scot_ppa$data[2], scot_ppa$data[1])
+word_change_scot_ppa <- calculate_change_word(
+  scot_ppa$data[2],
+  scot_ppa$data[1]
+)
 
 # NHS health board
 hb_ppa <- ppa_areas %>%
