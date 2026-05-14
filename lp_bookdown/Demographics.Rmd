@@ -6,14 +6,14 @@
 
 For the most recent time period available, `r LOCALITY` Locality had:
 
--   A total population of **`r total_population`** people, where **`r gender_breakdown[gender_breakdown$sex == "M",]$perc`** were male, and **`r over65`%** were aged over 65.
--   **`r perc_top_quintile`%** of people lived in the least deprived SIMD quintile, and **`r perc_bottom_quintile`%** lived in the most deprived quintile.
+-   A total population of **`r format_number_for_text(total_population)`** people, where **`r gender_breakdown[gender_breakdown$sex == "M",]$perc`** were male, and **`r format_number_for_text(over65)`%** were aged over 65.
+-   **`r format_number_for_text(perc_top_quintile)`%** of people lived in the least deprived SIMD quintile, and **`r format_number_for_text(perc_bottom_quintile)`%** lived in the most deprived quintile.
 
 ## Population
 
 <!-- Total Population Text -->
 
-In `r pop_max_year`, the total population of `r LOCALITY` locality was `r total_population`. The graph below shows the population distribution of the locality. Overall, **`r gender_breakdown[gender_breakdown$sex == "M",]$perc`** of the population are male, and **`r gender_breakdown[gender_breakdown$sex == "F",]$perc`** are female.
+In `r pop_max_year`, the total population of `r LOCALITY` locality was `r format_number_for_text(total_population)`. The graph below shows the population distribution of the locality. Overall, **`r gender_breakdown[gender_breakdown$sex == "M",]$perc`** of the population are male, and **`r gender_breakdown[gender_breakdown$sex == "F",]$perc`** are female.
 
 ```{r fig.width = 7, fig.height = 4, warning = FALSE, fig.cap = "A bar chart showing the population distribution of the locality grouped by age and sex"}
 ftext(paste0("Figure ", figure_num, ": Population by age and sex."), table_heading_style)
@@ -51,7 +51,7 @@ figure_num <- figure_num + 1
 
 The following section explores the deprivation structure of `r LOCALITY` through the Scottish Index of Multiple Deprivation (SIMD). The SIMD ranks all datazones in Scotland by a number of factors; Access, Crime, Education, Employment, Health, Housing and Income. Based on these ranks, each datazone is then given an overall deprivation rank, which is used to split datazones into Deprivation Quintiles (Quintile 1 being the most deprived, and Quintile 5 the least). The most recent SIMD ranking was carried out in 2020. This section mainly focuses on the SIMD 2020 classifications, however, the 2016 classifications are used to assess how deprivation has changed in `r LOCALITY` when compared to the rest of Scotland.
 
-Of the `r pop_max_year` population in `r LOCALITY`, **`r perc_bottom_quintile`%** live in the most deprived Quintile (SIMD 1), and **`r perc_top_quintile`%** live in the least deprived Quintile (SIMD 5).
+Of the `r pop_max_year` population in `r LOCALITY`, **`r format_number_for_text(perc_bottom_quintile)`%** live in the most deprived Quintile (SIMD 1), and **`r format_number_for_text(perc_top_quintile)`%** live in the least deprived Quintile (SIMD 5).
 
 ```{r fig.width = 8, warning = FALSE, fig.cap = 'A map of the locality which is broken down by data zones with the colouring showing the SIMD quintile for each.'}
 ftext(paste0("Figure ", figure_num, ": Map of Data Zones within ", LOCALITY, " coloured by SIMD quintiles."), table_heading_style)

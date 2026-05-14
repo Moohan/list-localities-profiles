@@ -50,12 +50,14 @@ palette <- phsstyles::phs_colours(c(
 # Then adds a comma for numbers over 1000 (becomes "1,000")
 
 format_number_for_text <- function(x) {
+  if (is.null(x) || length(x) == 0) return("")
+  if (is.character(x)) return(x)
   x <- ifelse(
     abs(x) < 1,
     round_half_up(x, 2), # if x < 1 then show 2dp
     ifelse(
-      abs(x) < 100,
-      round_half_up(x, 1), # if 1 =< x < 100 then 1dp
+      abs(x) < 10,
+      round_half_up(x, 1), # if 1 =< x < 10 then 1dp
       round_half_up(x)
     )
   ) # if 10 =< x then no decimal places
@@ -83,6 +85,57 @@ get_article <- function(number) {
   } else {
     return("a")
   }
+}
+
+# This will return the correct word for a change between two values
+# e.g.
+# 10, 5 -> "increase"
+# 5, 10 -> "decrease"
+# 5, 5 -> "change"
+calculate_change_word <- function(latest, previous, type = "standard") {
+  if (is.na(latest) || is.na(previous)) {
+    return("change")
+  }
+
+  word <- dplyr::case_when(
+    dplyr::near(latest, previous) ~ "change",
+    latest > previous ~ "increase",
+    latest < previous ~ "decrease"
+  )
+
+  if (type == "percentage point" && word != "change") {
+    return(paste("percentage point", word))
+  }
+
+  return(word)
+}
+
+# This will return the correct word for a comparison between two values
+# e.g.
+# 10, 5 -> "higher"
+# 5, 10 -> "lower"
+# 5, 5 -> "similar"
+calculate_comparison_word <- function(current, comparator, type = "higher") {
+  if (is.na(current) || is.na(comparator)) {
+    return("similar")
+  }
+
+  res <- dplyr::case_when(
+    dplyr::near(current, comparator) ~ "similar",
+    current > comparator ~ "higher",
+    current < comparator ~ "lower"
+  )
+
+  if (type == "larger") {
+    res <- dplyr::case_match(
+      res,
+      "higher" ~ "larger",
+      "lower" ~ "smaller",
+      .default = res
+    )
+  }
+
+  return(res)
 }
 
 ## Theme for charts ----

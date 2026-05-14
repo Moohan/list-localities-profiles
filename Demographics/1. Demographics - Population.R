@@ -132,7 +132,7 @@ gender_breakdown <- pops %>%
   select(sex, total_pop) %>%
   mutate(
     total = sum(total_pop),
-    perc = paste0(round_half_up(100 * total_pop / total, 1), "%")
+    perc = paste0(format_number_for_text(100 * total_pop / total), "%")
   )
 
 ## Age & Gender
@@ -335,7 +335,7 @@ pop_plot_dat <- bind_rows(
   mutate(
     plot_lab = if_else(
       year %% 2 == 0,
-      format(pop, big.mark = ","),
+      format_number_for_text(pop),
       ""
     )
   )
@@ -499,18 +499,15 @@ other_locs <- lookup %>%
 n_loc <- count_localities(lookup, HSCP)
 
 ## Locality objects
-total_population <- format_number_for_text(gender_breakdown$total[1])
+total_population <- gender_breakdown$total[1]
 gender_ratio <- round_half_up(
   filter(gender_breakdown, sex == "F")$total_pop /
     filter(gender_breakdown, sex == "M")$total_pop,
   2
 )
-over65 <- round_half_up(
-  sum(filter(pop_breakdown, Age %in% c("65-74", "75-84", "85+"))$Population) /
+over65 <- sum(filter(pop_breakdown, Age %in% c("65-74", "75-84", "85+"))$Population) /
     gender_breakdown$total[1] *
-    100,
-  1
-)
+    100
 
 
 ## Other localities in HSCP objects
@@ -522,7 +519,7 @@ other_locs_total_pop <- pops %>%
   group_by(hscp_locality) %>%
   summarise(total_pop = sum(total_pop)) %>%
   ungroup() %>%
-  mutate(total_pop = format(total_pop, big.mark = ",")) %>%
+  mutate(total_pop = format_number_for_text(total_pop)) %>%
   arrange(hscp_locality) %>%
   pivot_wider(names_from = hscp_locality, values_from = total_pop)
 

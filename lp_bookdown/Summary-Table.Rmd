@@ -169,7 +169,7 @@ time <- c(
 
 # Values
 
-loc_values <- round_half_up(c(avg_life_exp_latest_male, avg_life_exp_latest_fem, deaths_15_44_latest, ltc_percent_total_latest, cancer_reg_rate_latest, adp_presc_latest), 1)
+loc_values <- format_number_for_text(c(avg_life_exp_latest_male, avg_life_exp_latest_fem, deaths_15_44_latest, ltc_percent_total_latest, cancer_reg_rate_latest, adp_presc_latest))
 other_loc_values <- rbind(other_locs_life_exp_male, other_locs_life_exp_fem, other_locs_deaths_15_44, other_locs_ltc, other_locs_cancer, other_locs_adp)
 hscp_values <- c(hscp_life_exp_male, hscp_life_exp_fem, hscp_deaths_15_44, hscp_ltc, hscp_cancer, hscp_adp)
 scot_values <- c(scot_life_exp_male, scot_life_exp_fem, scot_deaths_15_44, ltc_perc_scot, scot_cancer, scot_adp_presc)
@@ -206,7 +206,7 @@ time <- c(
 )
 
 # Values
-loc_values <- round_half_up(c(alcohol_hosp_latest, alcohol_deaths_latest, drug_hosp_latest, bowel_screening_latest), 1)
+loc_values <- format_number_for_text(c(alcohol_hosp_latest, alcohol_deaths_latest, drug_hosp_latest, bowel_screening_latest))
 other_loc_values <- rbind(other_locs_alcohol_hosp, other_locs_alcohol_deaths, other_locs_drug_hosp, other_locs_bowel_screening)
 hscp_values <- c(hscp_alcohol_hosp, hscp_alcohol_deaths, hscp_drug_hosp, hscp_bowel_screening)
 scot_values <- c(scot_alcohol_hosp, scot_alcohol_deaths, scot_drug_hosp, scot_bowel_screening)
@@ -237,19 +237,10 @@ datatype <- c("rate", "rate", "rate", "rate", "rate")
 time <- c(max_fy, max_fy, max_fy, max_fy, max_fy)
 
 # Values
-loc_values <- format(
-  c(latest_emergency_adm_loc1, latest_bed_days_loc1, latest_ae_att_loc1, latest_dd_loc1, latest_ppa_loc1),
-  big.mark = ","
-)
+loc_values <- format_number_for_text(c(latest_emergency_adm_loc2, latest_bed_days_loc2, latest_ae_att_loc2, latest_dd_loc2, latest_ppa_loc$data[2]))
 other_loc_values <- bind_rows(other_loc_emergency_adm, other_loc_bed_days, other_loc_ae_att, other_loc_dd, other_loc_ppa)
-hscp_values <- format(
-  c(hscp_emergency_adm$data, hscp_bed_days$data, hscp_ae_att$data, hscp_dd$data, filter(hscp_ppa, year == max(year))$data),
-  big.mark = ","
-)
-scot_values <- format(
-  c(scot_emergency_adm$data, scot_bed_days$data, scot_ae_att$data, scot_dd$data, filter(scot_ppa, year == max(year))$data),
-  big.mark = ","
-)
+hscp_values <- format_number_for_text(c(hscp_emergency_adm$data, hscp_bed_days$data, hscp_ae_att$data, hscp_dd$data, filter(hscp_ppa, year == max(year))$data))
+scot_values <- format_number_for_text(c(scot_emergency_adm$data, scot_bed_days$data, scot_ae_att$data, scot_dd$data, filter(scot_ppa, year == max(year))$data))
 
 usc_values <- tibble(
   Section = "Hospital & Community Care",
@@ -275,21 +266,18 @@ time <- c(str_wrap(latest_period_psych_hosp, 9), max_fy)
 
 # Values
 loc_values <- c(
-  format(psych_hosp_latest, big.mark = ","),
-  format(
-    ifelse(is_empty(latest_bed_days_mh_loc1), NA_real_, latest_bed_days_mh_loc1),
-    big.mark = ","
-  )
+  format_number_for_text(psych_hosp_latest),
+  format_number_for_text(ifelse(is_empty(latest_bed_days_mh_loc2), NA_real_, latest_bed_days_mh_loc2))
 )
 
 other_loc_values <- bind_rows(other_locs_psych_hosp, other_loc_bed_days_mh)
 hscp_values <- c(
-  format(filter(hscp_psych_hosp, year == max(year))$measure, big.mark = ","),
-  format(hscp_bed_days_mh$data, big.mark = ",")
+  format_number_for_text(filter(hscp_psych_hosp, year == max(year))$measure),
+  format_number_for_text(hscp_bed_days_mh$data)
 )
 scot_values <- c(
-  format(filter(scot_psych_hosp, year == max(year))$measure, big.mark = ","),
-  format(scot_bed_days_mh$data, big.mark = ",")
+  format_number_for_text(filter(scot_psych_hosp, year == max(year))$measure),
+  format_number_for_text(scot_bed_days_mh$data)
 )
 
 

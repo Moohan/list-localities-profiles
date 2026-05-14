@@ -88,7 +88,7 @@ house_dat1 <- house_dat %>%
 ## 2b) Text objects ----
 
 # numbers
-n_houses <- format_number_for_text(
+n_houses <- (
   filter(house_dat1, year == max(year))$total_dwellings
 )
 n_occupied <- format_number_for_text(
@@ -97,30 +97,30 @@ n_occupied <- format_number_for_text(
 n_vacant <- format_number_for_text(
   filter(house_dat1, year == max(year))$vacant_dwellings
 )
-n_single_discount <- format_number_for_text(
+n_single_discount <- (
   filter(house_dat1, year == max(year))$tax_discount
 )
-n_exempt <- format_number_for_text(
+n_exempt <- (
   filter(house_dat1, year == max(year))$tax_exempt
 )
-n_second_homes <- format_number_for_text(
+n_second_homes <- (
   filter(house_dat1, year == max(year))$second_homes
 )
 
 # percentages
-perc_occupied <- format_number_for_text(
+perc_occupied <- (
   filter(house_dat1, year == max(year))$occupied_dwellings_perc
 )
 perc_vacant <- format_number_for_text(
   filter(house_dat1, year == max(year))$vacant_dwellings_perc
 )
-perc_single_discount <- format_number_for_text(
+perc_single_discount <- (
   filter(house_dat1, year == max(year))$tax_discount_perc
 )
-perc_exempt <- format_number_for_text(
+perc_exempt <- (
   filter(house_dat1, year == max(year))$tax_exempt_perc
 )
-perc_second_homes <- format_number_for_text(
+perc_second_homes <- (
   filter(house_dat1, year == max(year))$second_homes_perc
 )
 
@@ -133,7 +133,7 @@ houses_ts <- ggplot(house_dat1, aes(x = year, y = total_dwellings, group = 1)) +
   theme_profiles() +
   geom_point(color = "#3F3685") +
   geom_text(
-    aes(label = format(total_dwellings, big.mark = ",")),
+    aes(label = format_number_for_text(total_dwellings)),
     vjust = 2,
     color = "#4a4a4a",
     size = 3.5
@@ -167,7 +167,7 @@ house_table <- house_dat1 %>%
     tax_exempt,
     second_homes
   ) %>%
-  mutate(across(2:7, ~ format(.x, big.mark = ",")))
+  mutate(across(2:7, ~ format_number_for_text(.x)))
 
 
 ######################## Section 3 - Council Tax Band Data ############################
@@ -259,7 +259,7 @@ ctb_table <- ctb %>%
 
 
 ## Objects for locality
-perc_houses_AC <- format_number_for_text(
+perc_houses_AC <- (
   sum(
     house_dat2$council_tax_band_a,
     house_dat2$council_tax_band_b,
@@ -269,7 +269,7 @@ perc_houses_AC <- format_number_for_text(
     100
 )
 
-perc_houses_FH <- format_number_for_text(
+perc_houses_FH <- (
   sum(
     house_dat2$council_tax_band_f,
     house_dat2$council_tax_band_g,
@@ -392,7 +392,7 @@ house_dat_hscp <- house_raw_dat %>%
   ungroup() %>%
   mutate(perc_discount = round_half_up(tax_discount / total_dwellings * 100, 1))
 
-hscp_n_houses <- format_number_for_text(house_dat_hscp$total_dwellings)
+hscp_n_houses <- (house_dat_hscp$total_dwellings)
 hscp_perc_discount <- house_dat_hscp$perc_discount
 
 
@@ -427,7 +427,7 @@ rm(hscp_dz, house_dat_hscp, house_dat2_hscp)
 
 
 # 3. Scotland
-scot_n_houses <- format_number_for_text(sum(
+scot_n_houses <- (sum(
   filter(house_raw_dat, year == max(year))$total_number_of_dwellings,
   na.rm = TRUE
 ))
