@@ -132,7 +132,7 @@ gender_breakdown <- pops %>%
   select(sex, total_pop) %>%
   mutate(
     total = sum(total_pop),
-    perc = paste0(format_number_for_text(100 * total_pop / total), "%")
+    perc = 100 * total_pop / total
   )
 
 ## Age & Gender
@@ -335,7 +335,7 @@ pop_plot_dat <- bind_rows(
   mutate(
     plot_lab = if_else(
       year %% 2 == 0,
-      format_number_for_text(pop),
+      pop,
       ""
     )
   )
@@ -519,7 +519,7 @@ other_locs_total_pop <- pops %>%
   group_by(hscp_locality) %>%
   summarise(total_pop = sum(total_pop)) %>%
   ungroup() %>%
-  mutate(total_pop = format_number_for_text(total_pop)) %>%
+  mutate(total_pop = total_pop) %>%
   arrange(hscp_locality) %>%
   pivot_wider(names_from = hscp_locality, values_from = total_pop)
 

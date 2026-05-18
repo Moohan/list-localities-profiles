@@ -91,10 +91,10 @@ house_dat1 <- house_dat %>%
 n_houses <- (
   filter(house_dat1, year == max(year))$total_dwellings
 )
-n_occupied <- format_number_for_text(
+n_occupied <- (
   filter(house_dat1, year == max(year))$occupied_dwellings
 )
-n_vacant <- format_number_for_text(
+n_vacant <- (
   filter(house_dat1, year == max(year))$vacant_dwellings
 )
 n_single_discount <- (
@@ -111,7 +111,7 @@ n_second_homes <- (
 perc_occupied <- (
   filter(house_dat1, year == max(year))$occupied_dwellings_perc
 )
-perc_vacant <- format_number_for_text(
+perc_vacant <- (
   filter(house_dat1, year == max(year))$vacant_dwellings_perc
 )
 perc_single_discount <- (
@@ -167,7 +167,7 @@ house_table <- house_dat1 %>%
     tax_exempt,
     second_homes
   ) %>%
-  mutate(across(2:7, ~ format_number_for_text(.x)))
+  mutate(across(2:7, ~ .x))
 
 
 ######################## Section 3 - Council Tax Band Data ############################
@@ -240,7 +240,7 @@ ctb_plot <- ctb %>%
 
 ctb_table <- ctb %>%
   mutate(
-    percent = paste0(format_number_for_text(100 * value / sum(value)), "%")
+    percent = 100 * value / sum(value)
   ) %>%
   select(-value) %>%
   pivot_wider(names_from = variable, values_from = percent) %>%
@@ -431,7 +431,7 @@ scot_n_houses <- (sum(
   filter(house_raw_dat, year == max(year))$total_number_of_dwellings,
   na.rm = TRUE
 ))
-scot_perc_discount <- format_number_for_text(
+scot_perc_discount <- (
   sum(
     filter(
       house_raw_dat,
@@ -446,7 +446,7 @@ scot_perc_discount <- format_number_for_text(
     100
 )
 
-scot_perc_housesAC <- format_number_for_text(
+scot_perc_housesAC <- (
   sum(
     house_raw_dat2$council_tax_band_a,
     house_raw_dat2$council_tax_band_b,
@@ -456,7 +456,7 @@ scot_perc_housesAC <- format_number_for_text(
     sum(house_raw_dat2$total_number_of_dwellings, na.rm = TRUE) *
     100
 )
-scot_perc_housesFH <- format_number_for_text(
+scot_perc_housesFH <- (
   sum(
     house_raw_dat2$council_tax_band_f,
     house_raw_dat2$council_tax_band_g,
