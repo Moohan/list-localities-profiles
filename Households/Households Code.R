@@ -88,41 +88,22 @@ house_dat1 <- house_dat %>%
 ## 2b) Text objects ----
 
 # numbers
-n_houses <- (
-  filter(house_dat1, year == max(year))$total_dwellings
-)
-n_occupied <- (
-  filter(house_dat1, year == max(year))$occupied_dwellings
-)
-n_vacant <- (
-  filter(house_dat1, year == max(year))$vacant_dwellings
-)
-n_single_discount <- (
-  filter(house_dat1, year == max(year))$tax_discount
-)
-n_exempt <- (
-  filter(house_dat1, year == max(year))$tax_exempt
-)
-n_second_homes <- (
-  filter(house_dat1, year == max(year))$second_homes
-)
+n_houses <- (filter(house_dat1, year == max(year))$total_dwellings)
+n_occupied <- (filter(house_dat1, year == max(year))$occupied_dwellings)
+n_vacant <- (filter(house_dat1, year == max(year))$vacant_dwellings)
+n_single_discount <- (filter(house_dat1, year == max(year))$tax_discount)
+n_exempt <- (filter(house_dat1, year == max(year))$tax_exempt)
+n_second_homes <- (filter(house_dat1, year == max(year))$second_homes)
 
 # percentages
-perc_occupied <- (
-  filter(house_dat1, year == max(year))$occupied_dwellings_perc
-)
-perc_vacant <- (
-  filter(house_dat1, year == max(year))$vacant_dwellings_perc
-)
-perc_single_discount <- (
-  filter(house_dat1, year == max(year))$tax_discount_perc
-)
-perc_exempt <- (
-  filter(house_dat1, year == max(year))$tax_exempt_perc
-)
-perc_second_homes <- (
-  filter(house_dat1, year == max(year))$second_homes_perc
-)
+perc_occupied <- (filter(house_dat1, year == max(year))$occupied_dwellings_perc)
+perc_vacant <- (filter(house_dat1, year == max(year))$vacant_dwellings_perc)
+perc_single_discount <- (filter(
+  house_dat1,
+  year == max(year)
+)$tax_discount_perc)
+perc_exempt <- (filter(house_dat1, year == max(year))$tax_exempt_perc)
+perc_second_homes <- (filter(house_dat1, year == max(year))$second_homes_perc)
 
 
 ## 2c) Plots and Tables ----
@@ -167,7 +148,7 @@ house_table <- house_dat1 %>%
     tax_exempt,
     second_homes
   ) %>%
-  mutate(across(2:7, ~ .x))
+  mutate(across(2:7, ~.x))
 
 
 ######################## Section 3 - Council Tax Band Data ############################
@@ -259,25 +240,21 @@ ctb_table <- ctb %>%
 
 
 ## Objects for locality
-perc_houses_AC <- (
-  sum(
-    house_dat2$council_tax_band_a,
-    house_dat2$council_tax_band_b,
-    house_dat2$council_tax_band_c
-  ) /
-    house_dat2$total_number_of_dwellings *
-    100
-)
+perc_houses_AC <- (sum(
+  house_dat2$council_tax_band_a,
+  house_dat2$council_tax_band_b,
+  house_dat2$council_tax_band_c
+) /
+  house_dat2$total_number_of_dwellings *
+  100)
 
-perc_houses_FH <- (
-  sum(
-    house_dat2$council_tax_band_f,
-    house_dat2$council_tax_band_g,
-    house_dat2$council_tax_band_h
-  ) /
-    house_dat2$total_number_of_dwellings *
-    100
-)
+perc_houses_FH <- (sum(
+  house_dat2$council_tax_band_f,
+  house_dat2$council_tax_band_g,
+  house_dat2$council_tax_band_h
+) /
+  house_dat2$total_number_of_dwellings *
+  100)
 
 
 ########################## Section 4 - Objects for Summary Table ########################
@@ -431,41 +408,35 @@ scot_n_houses <- (sum(
   filter(house_raw_dat, year == max(year))$total_number_of_dwellings,
   na.rm = TRUE
 ))
-scot_perc_discount <- (
+scot_perc_discount <- (sum(
+  filter(
+    house_raw_dat,
+    year == max(year)
+  )$dwellings_with_a_single_adult_council_tax_discount,
+  na.rm = TRUE
+) /
   sum(
-    filter(
-      house_raw_dat,
-      year == max(year)
-    )$dwellings_with_a_single_adult_council_tax_discount,
+    filter(house_raw_dat, year == max(year))$total_number_of_dwellings,
     na.rm = TRUE
-  ) /
-    sum(
-      filter(house_raw_dat, year == max(year))$total_number_of_dwellings,
-      na.rm = TRUE
-    ) *
-    100
-)
+  ) *
+  100)
 
-scot_perc_housesAC <- (
-  sum(
-    house_raw_dat2$council_tax_band_a,
-    house_raw_dat2$council_tax_band_b,
-    house_raw_dat2$council_tax_band_c,
-    na.rm = TRUE
-  ) /
-    sum(house_raw_dat2$total_number_of_dwellings, na.rm = TRUE) *
-    100
-)
-scot_perc_housesFH <- (
-  sum(
-    house_raw_dat2$council_tax_band_f,
-    house_raw_dat2$council_tax_band_g,
-    house_raw_dat2$council_tax_band_h,
-    na.rm = TRUE
-  ) /
-    sum(house_raw_dat2$total_number_of_dwellings, na.rm = TRUE) *
-    100
-)
+scot_perc_housesAC <- (sum(
+  house_raw_dat2$council_tax_band_a,
+  house_raw_dat2$council_tax_band_b,
+  house_raw_dat2$council_tax_band_c,
+  na.rm = TRUE
+) /
+  sum(house_raw_dat2$total_number_of_dwellings, na.rm = TRUE) *
+  100)
+scot_perc_housesFH <- (sum(
+  house_raw_dat2$council_tax_band_f,
+  house_raw_dat2$council_tax_band_g,
+  house_raw_dat2$council_tax_band_h,
+  na.rm = TRUE
+) /
+  sum(house_raw_dat2$total_number_of_dwellings, na.rm = TRUE) *
+  100)
 
 # Housekeeping ----
 # These objects are left over after the script is run
