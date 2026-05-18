@@ -344,10 +344,7 @@ scot_deaths_15_44 <- filter(
   area_name == "Scotland"
 )$measure
 
-deaths_15_44_diff_scot <- calculate_comparison_word(
-  deaths_15_44_latest,
-  scot_deaths_15_44
-)
+deaths_15_44_diff_scot <- calculate_comparison_word(deaths_15_44_latest, scot_deaths_15_44)
 
 
 ##### 2c Cancer #####
@@ -428,10 +425,7 @@ cancer_deaths_perc_change <- abs(
     early_deaths_cancer_rate_earliest
 )
 
-cancer_deaths_changeword <- calculate_change_word(
-  early_deaths_cancer_rate_latest,
-  early_deaths_cancer_rate_earliest
-)
+cancer_deaths_changeword <- calculate_change_word(early_deaths_cancer_rate_latest, early_deaths_cancer_rate_earliest)
 
 
 ##### 2d Hospitalisations from diseases #####
@@ -540,11 +534,7 @@ adp_presc_earliest <- filter(
 adp_presc_perc_change <- abs(
   (adp_presc_latest - adp_presc_earliest) #* 100 / adp_presc_earliest
 )
-adp_presc_changeword <- calculate_change_word(
-  adp_presc_latest,
-  adp_presc_earliest,
-  type = "percentage point"
-)
+adp_presc_changeword <- calculate_change_word(adp_presc_latest, adp_presc_earliest, type = "percentage point")
 
 scot_adp_presc <- filter(
   adp_presc,
@@ -552,11 +542,7 @@ scot_adp_presc <- filter(
   area_name == "Scotland"
 )$measure
 
-adp_presc_diff_scot <- calculate_comparison_word(
-  adp_presc_latest,
-  scot_adp_presc,
-  type = "larger"
-)
+adp_presc_diff_scot <- calculate_comparison_word(adp_presc_latest, scot_adp_presc, type = "larger")
 
 
 ############################ 3) SLF DATA (LTCs) ####################################
@@ -1120,10 +1106,7 @@ ltc_perc_scot <- round_half_up(
   1
 )
 
-ltc_diff_scot <- calculate_comparison_word(
-  ltc_percent_total_latest,
-  ltc_perc_scot
-)
+ltc_diff_scot <- calculate_comparison_word(ltc_percent_total_latest, ltc_perc_scot)
 
 
 ############################### 4) CODE FOR SUMMARY TABLE ###############################

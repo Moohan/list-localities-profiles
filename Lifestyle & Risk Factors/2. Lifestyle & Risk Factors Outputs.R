@@ -172,10 +172,7 @@ drug_hosp_earliest <- filter(
 drug_hosp_change <- abs(
   (drug_hosp_latest - drug_hosp_earliest) / drug_hosp_earliest * 100
 )
-drug_hosp_change_word <- calculate_change_word(
-  drug_hosp_latest,
-  drug_hosp_earliest
-)
+drug_hosp_change_word <- calculate_change_word(drug_hosp_latest, drug_hosp_earliest)
 
 scot_drug_hosp <- filter(
   drug_hosp,
@@ -184,10 +181,7 @@ scot_drug_hosp <- filter(
 ) |>
   pull(measure)
 
-drug_hosp_diff_scot <- calculate_comparison_word(
-  drug_hosp_latest,
-  scot_drug_hosp
-)
+drug_hosp_diff_scot <- calculate_comparison_word(drug_hosp_latest, scot_drug_hosp)
 
 
 ##### 2b Alcohol-related hospital admissions #####
@@ -255,20 +249,14 @@ alcohol_hosp_earliest <- filter(
 alcohol_hosp_change <- abs(
   (alcohol_hosp_latest - alcohol_hosp_earliest) / alcohol_hosp_earliest * 100
 )
-alcohol_hosp_change_word <- calculate_change_word(
-  alcohol_hosp_latest,
-  alcohol_hosp_earliest
-)
+alcohol_hosp_change_word <- calculate_change_word(alcohol_hosp_latest, alcohol_hosp_earliest)
 
 scot_alcohol_hosp <- filter(
   alcohol_hosp,
   year == max_year_alcohol_hosp & area_name == "Scotland"
 )$measure
 
-alcohol_hosp_diff_scot <- calculate_comparison_word(
-  alcohol_hosp_latest,
-  scot_alcohol_hosp
-)
+alcohol_hosp_diff_scot <- calculate_comparison_word(alcohol_hosp_latest, scot_alcohol_hosp)
 
 
 ##### 2c Alcohol specific deaths #####
@@ -338,20 +326,14 @@ alcohol_deaths_change <- abs(
     alcohol_deaths_earliest *
     100
 )
-alcohol_deaths_change_word <- calculate_comparison_word(
-  alcohol_deaths_latest,
-  alcohol_deaths_earliest
-)
+alcohol_deaths_change_word <- calculate_comparison_word(alcohol_deaths_latest, alcohol_deaths_earliest)
 
 scot_alcohol_deaths <- filter(
   alcohol_deaths,
   year == max_year_alcohol_deaths & area_name == "Scotland"
 )$measure
 
-alcohol_deaths_diff_scot <- calculate_comparison_word(
-  alcohol_deaths_latest,
-  scot_alcohol_deaths
-)
+alcohol_deaths_diff_scot <- calculate_comparison_word(alcohol_deaths_latest, scot_alcohol_deaths)
 
 
 ##### 2d Bowel Screening Uptake #####
@@ -420,11 +402,7 @@ bowel_screening_change <- abs(
   #bowel_screening_earliest *
   #100
 )
-bowel_screening_change_word <- calculate_change_word(
-  bowel_screening_latest,
-  bowel_screening_earliest,
-  type = "percentage point"
-)
+bowel_screening_change_word <- calculate_change_word(bowel_screening_latest, bowel_screening_earliest, type = "percentage point")
 
 
 scot_bowel_screening <- filter(
@@ -432,10 +410,7 @@ scot_bowel_screening <- filter(
   year == max_year_bowel_screening & area_name == "Scotland"
 )$measure
 
-bowel_screening_diff_scot <- calculate_comparison_word(
-  bowel_screening_latest,
-  scot_bowel_screening
-)
+bowel_screening_diff_scot <- calculate_comparison_word(bowel_screening_latest, scot_bowel_screening)
 
 
 ############################### 3) CODE FOR SUMMARY TABLE ###############################
