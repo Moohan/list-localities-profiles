@@ -50,12 +50,8 @@ palette <- phsstyles::phs_colours(c(
 # Then adds a comma for numbers over 1000 (becomes "1,000")
 
 format_number_for_text <- function(x) {
-  if (is.null(x) || length(x) == 0) {
-    return("")
-  }
-  if (is.character(x)) {
-    return(x)
-  }
+  if (is.null(x) || length(x) == 0) return("")
+  if (is.character(x)) return(x)
   x <- ifelse(
     abs(x) < 1,
     round_half_up(x, 2), # if x < 1 then show 2dp
