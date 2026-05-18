@@ -131,7 +131,7 @@ simd_perc_breakdown <- pop_data %>%
   summarise(pop = sum(total_pop)) %>%
   mutate(
     total_pop = sum(pop),
-    perc = round_half_up(100 * pop / total_pop, 1),
+    perc = 100 * pop / total_pop,
     perc = replace_na(perc, 0)
   ) %>%
   arrange(simd2020v2_sc_quintile)

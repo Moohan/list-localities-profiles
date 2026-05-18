@@ -294,12 +294,10 @@ if (LOCALITY %in% check_missing_data_scotpho(life_exp)$area_name) {
 
   avg_life_exp_latest_male <- avg_life_exp_latest |>
     filter(sex == "Male") |>
-    pull(measure) |>
-    round_half_up(digits = 1)
+    pull(measure)
   avg_life_exp_latest_fem <- avg_life_exp_latest |>
     filter(sex == "Female") |>
-    pull(measure) |>
-    round_half_up(digits = 1)
+    pull(measure)
   rm(avg_life_exp_latest)
 }
 
@@ -346,10 +344,9 @@ scot_deaths_15_44 <- filter(
   area_name == "Scotland"
 )$measure
 
-deaths_15_44_diff_scot <- if_else(
-  deaths_15_44_latest > scot_deaths_15_44,
-  "higher",
-  "lower"
+deaths_15_44_diff_scot <- calculate_comparison_word(
+  deaths_15_44_latest,
+  scot_deaths_15_44
 )
 
 
@@ -431,10 +428,9 @@ cancer_deaths_perc_change <- abs(
     early_deaths_cancer_rate_earliest
 )
 
-cancer_deaths_changeword <- if_else(
-  early_deaths_cancer_rate_latest > early_deaths_cancer_rate_earliest,
-  "increase",
-  "decrease"
+cancer_deaths_changeword <- calculate_change_word(
+  early_deaths_cancer_rate_latest,
+  early_deaths_cancer_rate_earliest
 )
 
 
@@ -544,10 +540,10 @@ adp_presc_earliest <- filter(
 adp_presc_perc_change <- abs(
   (adp_presc_latest - adp_presc_earliest) #* 100 / adp_presc_earliest
 )
-adp_presc_changeword <- if_else(
-  adp_presc_latest > adp_presc_earliest,
-  "percentage point increase",
-  "percentage point decrease"
+adp_presc_changeword <- calculate_change_word(
+  adp_presc_latest,
+  adp_presc_earliest,
+  type = "percentage point"
 )
 
 scot_adp_presc <- filter(
@@ -556,10 +552,10 @@ scot_adp_presc <- filter(
   area_name == "Scotland"
 )$measure
 
-adp_presc_diff_scot <- if_else(
-  adp_presc_latest > scot_adp_presc,
-  "larger",
-  "smaller"
+adp_presc_diff_scot <- calculate_comparison_word(
+  adp_presc_latest,
+  scot_adp_presc,
+  type = "larger"
 )
 
 
@@ -1124,10 +1120,9 @@ ltc_perc_scot <- round_half_up(
   1
 )
 
-ltc_diff_scot <- if_else(
-  ltc_percent_total_latest > ltc_perc_scot,
-  "higher",
-  "lower"
+ltc_diff_scot <- calculate_comparison_word(
+  ltc_percent_total_latest,
+  ltc_perc_scot
 )
 
 
@@ -1160,7 +1155,7 @@ hscp_scot_summary_table <- function(data, latest_year, area) {
     area_type == area_type
   )
 
-  round_half_up(temp[["measure"]], digits = 1)
+  temp[["measure"]]
 }
 
 # 1. Other localities
