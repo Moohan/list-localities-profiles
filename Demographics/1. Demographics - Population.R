@@ -505,9 +505,11 @@ gender_ratio <- round_half_up(
     filter(gender_breakdown, sex == "M")$total_pop,
   2
 )
-over65 <- sum(filter(pop_breakdown, Age %in% c("65-74", "75-84", "85+"))$Population) /
-    gender_breakdown$total[1] *
-    100
+over65 <- sum(
+  filter(pop_breakdown, Age %in% c("65-74", "75-84", "85+"))$Population
+) /
+  gender_breakdown$total[1] *
+  100
 
 
 ## Other localities in HSCP objects
