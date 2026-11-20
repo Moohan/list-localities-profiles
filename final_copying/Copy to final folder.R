@@ -3,7 +3,9 @@
 # Requires: cli, fs. The shared LIST paths must be mounted.
 
 required <- c("cli", "fs")
-missing <- required[!vapply(required, requireNamespace, logical(1), quietly = TRUE)]
+missing <- required[
+  !vapply(required, requireNamespace, logical(1), quietly = TRUE)
+]
 if (length(missing)) {
   stop(
     "Install the missing packages before running: ",
@@ -31,7 +33,9 @@ ask_text <- function(question, default = NULL) {
     readLines(stdin(), n = 1L, warn = FALSE)
   }
   if (!length(answer)) {
-    cli::cli_abort("No input received. Run this script in an interactive console.")
+    cli::cli_abort(
+      "No input received. Run this script in an interactive console."
+    )
   }
   answer <- trimws(answer)
   if (!nzchar(answer) && !is.null(default)) default else answer
@@ -41,9 +45,15 @@ ask_yes_no <- function(question, default = FALSE) {
   hint <- if (default) "[Y/n]" else "[y/N]"
   repeat {
     answer <- tolower(ask_text(paste(question, hint), default = ""))
-    if (!nzchar(answer)) return(default)
-    if (answer %in% c("y", "yes")) return(TRUE)
-    if (answer %in% c("n", "no")) return(FALSE)
+    if (!nzchar(answer)) {
+      return(default)
+    }
+    if (answer %in% c("y", "yes")) {
+      return(TRUE)
+    }
+    if (answer %in% c("n", "no")) {
+      return(FALSE)
+    }
     cli::cli_alert_warning("Please answer y or n.")
   }
 }
@@ -51,10 +61,16 @@ ask_yes_no <- function(question, default = FALSE) {
 choose_profile_dir <- function(root) {
   dirs <- fs::dir_ls(root, type = "directory", recurse = FALSE)
   dirs <- dirs[grepl("^Profiles Output($| )", fs::path_file(dirs))]
-  dirs <- dirs[vapply(dirs, function(dir) {
-    any(endsWith(fs::path_file(fs::dir_ls(dir, type = "file")),
-                 " - Locality Profile.docx"))
-  }, logical(1))]
+  dirs <- dirs[vapply(
+    dirs,
+    function(dir) {
+      any(endsWith(
+        fs::path_file(fs::dir_ls(dir, type = "file")),
+        " - Locality Profile.docx"
+      ))
+    },
+    logical(1)
+  )]
 
   if (!length(dirs)) {
     cli::cli_abort(c(
@@ -62,7 +78,9 @@ choose_profile_dir <- function(root) {
       "i" = "Expected a {.file Profiles Output} or {.file Profiles Output ...} folder under the locality profiles root."
     ))
   }
-  if (length(dirs) == 1L) return(dirs[[1L]])
+  if (length(dirs) == 1L) {
+    return(dirs[[1L]])
+  }
 
   cli::cli_h2("Choose the Word profile source folder")
   for (i in seq_along(dirs)) {
@@ -88,7 +106,9 @@ read_locality_lookup <- function(directory) {
     type = "file",
     regexp = "HSCP Localities_DZ11_Lookup_.+?\\.rds$"
   )
-  if (!length(files)) cli::cli_abort("No HSCP locality lookup RDS file found.")
+  if (!length(files)) {
+    cli::cli_abort("No HSCP locality lookup RDS file found.")
+  }
   latest <- sort(files)[[length(files)]]
   cli::cli_alert_info("Using locality lookup {.file {fs::path_file(latest)}}")
   lookup <- readRDS(latest)
@@ -97,7 +117,12 @@ read_locality_lookup <- function(directory) {
   }
 
   result <- unique(data.frame(
-    locality = sub("&", "and", as.character(lookup$hscp_locality), fixed = TRUE),
+    locality = sub(
+      "&",
+      "and",
+      as.character(lookup$hscp_locality),
+      fixed = TRUE
+    ),
     hscp = as.character(lookup$hscp2019name),
     stringsAsFactors = FALSE
   ))
@@ -112,7 +137,14 @@ read_locality_lookup <- function(directory) {
 }
 
 # Identify only expected output filenames, then associate each with an HSCP.
-make_manifest <- function(source, suffix, kind, lookup, destination, by_locality) {
+make_manifest <- function(
+  source,
+  suffix,
+  kind,
+  lookup,
+  destination,
+  by_locality
+) {
   if (!fs::dir_exists(source)) {
     cli::cli_abort("Missing source directory for {kind}: {.path {source}}")
   }
@@ -124,7 +156,11 @@ make_manifest <- function(source, suffix, kind, lookup, destination, by_locality
 
   if (!length(paths)) {
     cli::cli_alert_warning("No {kind} files found in {.path {source}}")
-    return(data.frame(kind = character(), source = character(), target = character()))
+    return(data.frame(
+      kind = character(),
+      source = character(),
+      target = character()
+    ))
   }
 
   area <- substr(names, 1L, nchar(names) - nchar(suffix))
@@ -137,7 +173,9 @@ make_manifest <- function(source, suffix, kind, lookup, destination, by_locality
 
   unmatched <- is.na(hscp)
   if (any(unmatched)) {
-    cli::cli_alert_warning("Skipping {sum(unmatched)} unrecognised {kind} filename{?s}.")
+    cli::cli_alert_warning(
+      "Skipping {sum(unmatched)} unrecognised {kind} filename{?s}."
+    )
     for (name in head(names[unmatched], 8L)) {
       cli::cli_text("  - {.file {name}}")
     }
@@ -153,25 +191,42 @@ make_manifest <- function(source, suffix, kind, lookup, destination, by_locality
 
 # Retain the original LIST group setting where the filesystem permits it.
 set_group <- function(path) {
-  if (.Platform$OS.type != "unix") return(TRUE)
-  tryCatch({
-    fs::file_chown(path, group_id = output_group)
-    TRUE
-  }, error = function(e) FALSE)
+  if (.Platform$OS.type != "unix") {
+    return(TRUE)
+  }
+  tryCatch(
+    {
+      fs::file_chown(path, group_id = output_group)
+      TRUE
+    },
+    error = function(e) FALSE
+  )
 }
 
 copy_stage <- function(files, label, overwrite) {
   cli::cli_h2("Copy {label}")
   if (!nrow(files)) {
     cli::cli_alert_warning("No matching files to copy.")
-    return(c(copied = 0L, replaced = 0L, skipped = 0L, failed = 0L,
-             group_warnings = 0L))
+    return(c(
+      copied = 0L,
+      replaced = 0L,
+      skipped = 0L,
+      failed = 0L,
+      group_warnings = 0L
+    ))
   }
 
-  results <- c(copied = 0L, replaced = 0L, skipped = 0L, failed = 0L,
-               group_warnings = 0L)
+  results <- c(
+    copied = 0L,
+    replaced = 0L,
+    skipped = 0L,
+    failed = 0L,
+    group_warnings = 0L
+  )
   progress <- cli::cli_progress_bar(
-    name = paste("Processing", label), total = nrow(files), clear = FALSE
+    name = paste("Processing", label),
+    total = nrow(files),
+    clear = FALSE
   )
   for (i in seq_len(nrow(files))) {
     src <- files$source[[i]]
@@ -183,24 +238,27 @@ copy_stage <- function(files, label, overwrite) {
       next
     }
 
-    success <- tryCatch({
-      folder <- fs::path_dir(dst)
-      new_folder <- !fs::dir_exists(folder)
-      fs::dir_create(folder, recurse = TRUE, mode = "ug=rwx,o=rx")
-      if (new_folder && !set_group(folder)) {
-        results[["group_warnings"]] <- results[["group_warnings"]] + 1L
+    success <- tryCatch(
+      {
+        folder <- fs::path_dir(dst)
+        new_folder <- !fs::dir_exists(folder)
+        fs::dir_create(folder, recurse = TRUE, mode = "ug=rwx,o=rx")
+        if (new_folder && !set_group(folder)) {
+          results[["group_warnings"]] <- results[["group_warnings"]] + 1L
+        }
+        fs::file_copy(src, dst, overwrite = overwrite)
+        if (!set_group(dst)) {
+          results[["group_warnings"]] <- results[["group_warnings"]] + 1L
+        }
+        TRUE
+      },
+      error = function(e) {
+        message <- conditionMessage(e)
+        name <- fs::path_file(src)
+        cli::cli_alert_danger("Failed {.file {name}}: {message}")
+        FALSE
       }
-      fs::file_copy(src, dst, overwrite = overwrite)
-      if (!set_group(dst)) {
-        results[["group_warnings"]] <- results[["group_warnings"]] + 1L
-      }
-      TRUE
-    }, error = function(e) {
-      message <- conditionMessage(e)
-      name <- fs::path_file(src)
-      cli::cli_alert_danger("Failed {.file {name}}: {message}")
-      FALSE
-    })
+    )
     if (success) {
       key <- if (existed) "replaced" else "copied"
       results[[key]] <- results[[key]] + 1L
@@ -226,39 +284,66 @@ main <- function() {
   if (!fs::dir_exists(lp_path)) {
     cli::cli_abort("Locality profiles root is unavailable: {.path {lp_path}}")
   }
-  cli::cli_alert_info("Copying checked files only; source files will not be moved.")
+  cli::cli_alert_info(
+    "Copying checked files only; source files will not be moved."
+  )
 
-  release <- ask_text(paste0("Release label [", default_release, "]:"),
-                      default = default_release)
+  release <- ask_text(
+    paste0("Release label [", default_release, "]:"),
+    default = default_release
+  )
   if (!grepl("^[0-9]{4}-[A-Za-z]+$", release)) {
     cli::cli_abort("Release label must use YYYY-Month, e.g. 2026-April.")
   }
-  final_dir <- fs::path(lp_path, "Final Profiles", paste0(release, " Final Profiles"))
+  final_dir <- fs::path(
+    lp_path,
+    "Final Profiles",
+    paste0(release, " Final Profiles")
+  )
   profile_dir <- choose_profile_dir(lp_path)
   background_dir <- fs::path(
-    lp_path, "Master RMarkdown Document & Render Code", "Output", "background data"
+    lp_path,
+    "Master RMarkdown Document & Render Code",
+    "Output",
+    "background data"
   )
 
   cli::cli_h2("Discover files")
   lookup <- read_locality_lookup(lookup_dir)
   stages <- list(
     "Word profiles" = make_manifest(
-      profile_dir, " - Locality Profile.docx", "Word profiles", lookup,
-      final_dir, by_locality = TRUE
+      profile_dir,
+      " - Locality Profile.docx",
+      "Word profiles",
+      lookup,
+      final_dir,
+      by_locality = TRUE
     ),
     "SDC workbooks" = make_manifest(
-      background_dir, " - Locality Profile SDC highlight.xlsx",
-      "SDC workbooks", lookup, final_dir, by_locality = FALSE
+      background_dir,
+      " - Locality Profile SDC highlight.xlsx",
+      "SDC workbooks",
+      lookup,
+      final_dir,
+      by_locality = FALSE
     ),
     "Background data workbooks" = make_manifest(
-      background_dir, " - Locality Profile data.xlsx",
-      "Background data workbooks", lookup, final_dir, by_locality = FALSE
+      background_dir,
+      " - Locality Profile data.xlsx",
+      "Background data workbooks",
+      lookup,
+      final_dir,
+      by_locality = FALSE
     )
   )
   files <- do.call(rbind, stages)
-  if (!nrow(files)) cli::cli_abort("No eligible files were found; nothing was changed.")
+  if (!nrow(files)) {
+    cli::cli_abort("No eligible files were found; nothing was changed.")
+  }
   if (anyDuplicated(files$target)) {
-    cli::cli_abort("Multiple sources would write to the same destination. Nothing was copied.")
+    cli::cli_abort(
+      "Multiple sources would write to the same destination. Nothing was copied."
+    )
   }
 
   cli::cli_h2("Review copy plan")
@@ -271,9 +356,14 @@ main <- function() {
   }
   existing <- sum(fs::file_exists(files$target))
   cli::cli_text("Existing destination files: {existing}")
-  overwrite <- ask_yes_no("Overwrite existing destination files?", default = FALSE)
+  overwrite <- ask_yes_no(
+    "Overwrite existing destination files?",
+    default = FALSE
+  )
   pending <- if (overwrite) nrow(files) else nrow(files) - existing
-  cli::cli_alert_info("{pending} file{?s} to copy; {if (overwrite) existing else 0L} replacement{?s}.")
+  cli::cli_alert_info(
+    "{pending} file{?s} to copy; {if (overwrite) existing else 0L} replacement{?s}."
+  )
   if (!pending) {
     cli::cli_alert_success("Everything already exists. No files changed.")
     return(invisible(NULL))
@@ -283,8 +373,13 @@ main <- function() {
     return(invisible(NULL))
   }
 
-  totals <- c(copied = 0L, replaced = 0L, skipped = 0L, failed = 0L,
-              group_warnings = 0L)
+  totals <- c(
+    copied = 0L,
+    replaced = 0L,
+    skipped = 0L,
+    failed = 0L,
+    group_warnings = 0L
+  )
   for (label in names(stages)) {
     totals <- totals + copy_stage(stages[[label]], label, overwrite)
   }
@@ -301,7 +396,9 @@ main <- function() {
     )
   }
   if (totals[["failed"]] > 0L) {
-    cli::cli_abort("{totals[['failed']]} file{?s} failed to copy. See messages above.")
+    cli::cli_abort(
+      "{totals[['failed']]} file{?s} failed to copy. See messages above."
+    )
   }
   cli::cli_alert_success("Files are ready in {.path {final_dir}}")
   invisible(totals)
