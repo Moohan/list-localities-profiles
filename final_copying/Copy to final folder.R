@@ -109,7 +109,11 @@ make_manifest <- function(
   }
 
   area <- substr(names, 1L, nchar(names) - nchar(suffix))
-  match_against <- if (by_locality) lookup$hscp_locality else unique(lookup$hscp2019name)
+  match_against <- if (by_locality) {
+    lookup$hscp_locality
+  } else {
+    unique(lookup$hscp2019name)
+  }
   hscp <- if (by_locality) {
     lookup$hscp2019name[match(area, lookup$hscp_locality)]
   } else {
