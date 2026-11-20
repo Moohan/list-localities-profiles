@@ -1,25 +1,9 @@
 # Publish checked locality profiles, SDC workbooks and background data.
-# Run from RStudio (Source) or with Rscript for interactive prompts.
-# Requires: cli, fs. The shared LIST paths must be mounted.
+# Run from the repository root in RStudio (Source) or an interactive R console.
 
-required <- c("cli", "fs")
-missing <- required[
-  !vapply(required, requireNamespace, logical(1), quietly = TRUE)
-]
-if (length(missing)) {
-  stop(
-    "Install the missing packages before running: ",
-    paste(missing, collapse = ", "),
-    "\nFor example: install.packages(c(\"cli\", \"fs\"))",
-    call. = FALSE
-  )
-}
+source("Master RMarkdown Document & Render Code/Global Script.R")
+library(cli)
 
-# Paths and defaults. Users can choose the release and source folder at runtime.
-lp_path <- fs::path(
-  "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles"
-)
-lookup_dir <- "/conf/linkage/output/lookups/Unicode/Geography/HSCP Locality"
 default_release <- "2026-April"
 output_group <- "LIST_analytics"
 
@@ -97,45 +81,6 @@ choose_profile_dir <- function(root) {
   }
 }
 
-read_locality_lookup <- function(directory) {
-  if (!fs::dir_exists(directory)) {
-    cli::cli_abort("Locality lookup directory is missing: {.path {directory}}")
-  }
-  files <- fs::dir_ls(
-    directory,
-    type = "file",
-    regexp = "HSCP Localities_DZ11_Lookup_.+?\\.rds$"
-  )
-  if (!length(files)) {
-    cli::cli_abort("No HSCP locality lookup RDS file found.")
-  }
-  latest <- sort(files)[[length(files)]]
-  cli::cli_alert_info("Using locality lookup {.file {fs::path_file(latest)}}")
-  lookup <- readRDS(latest)
-  if (!all(c("hscp_locality", "hscp2019name") %in% names(lookup))) {
-    cli::cli_abort("The locality lookup is missing required columns.")
-  }
-
-  result <- unique(data.frame(
-    locality = sub(
-      "&",
-      "and",
-      as.character(lookup$hscp_locality),
-      fixed = TRUE
-    ),
-    hscp = as.character(lookup$hscp2019name),
-    stringsAsFactors = FALSE
-  ))
-  # Keep the filename correction from the original Word-copying script.
-  result$locality[result$locality == "Dumbarton/Alexandria"] <-
-    "Dumbarton-Alexandria"
-  result <- unique(result[!is.na(result$locality) & !is.na(result$hscp), ])
-  if (anyDuplicated(result$locality)) {
-    cli::cli_abort("A locality maps to multiple HSCPs in the lookup.")
-  }
-  result
-}
-
 # Identify only expected output filenames, then associate each with an HSCP.
 make_manifest <- function(
   source,
@@ -164,9 +109,9 @@ make_manifest <- function(
   }
 
   area <- substr(names, 1L, nchar(names) - nchar(suffix))
-  match_against <- if (by_locality) lookup$locality else unique(lookup$hscp)
+  match_against <- if (by_locality) lookup$hscp_locality else unique(lookup$hscp2019name)
   hscp <- if (by_locality) {
-    lookup$hscp[match(area, lookup$locality)]
+    lookup$hscp2019name[match(area, lookup$hscp_locality)]
   } else {
     area[match(area, match_against)]
   }
@@ -309,7 +254,15 @@ main <- function() {
   )
 
   cli::cli_h2("Discover files")
-  lookup <- read_locality_lookup(lookup_dir)
+  lookup <- read_in_localities() |>
+    dplyr::distinct(hscp_locality, hscp2019name) |>
+    dplyr::mutate(
+      hscp_locality = dplyr::case_match(
+        hscp_locality,
+        "Dumbarton/Alexandria" ~ "Dumbarton-Alexandria",
+        .default = hscp_locality
+      )
+    )
   stages <- list(
     "Word profiles" = make_manifest(
       profile_dir,
