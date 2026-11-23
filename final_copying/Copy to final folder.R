@@ -9,7 +9,9 @@ cli_h1("Copy final Locality Profiles")
 options(cli.progress_show_after = 0)
 
 release <- readline("Release [2026-April]: ")
-if (!nzchar(release)) release <- "2026-April"
+if (!nzchar(release)) {
+  release <- "2026-April"
+}
 
 final_dir <- path(lp_path, "Final Profiles", paste0(release, " Final Profiles"))
 background_dir <- path(
@@ -21,8 +23,13 @@ background_dir <- path(
 
 # Choose the Word profiles folder (e.g. Profiles Output Apr26).
 profile_dirs <- dir_ls(lp_path, type = "directory")
-profile_dirs <- profile_dirs[startsWith(path_file(profile_dirs), "Profiles Output")]
-if (!length(profile_dirs)) cli_abort("No Profiles Output folder found.")
+profile_dirs <- profile_dirs[startsWith(
+  path_file(profile_dirs),
+  "Profiles Output"
+)]
+if (!length(profile_dirs)) {
+  cli_abort("No Profiles Output folder found.")
+}
 
 profile_dir <- if (length(profile_dirs) == 1L) {
   profile_dirs[[1L]]
@@ -31,7 +38,9 @@ profile_dir <- if (length(profile_dirs) == 1L) {
     path_file(profile_dirs),
     title = "Select the completed Word profiles folder"
   )
-  if (!choice) cli_abort("No Word profiles folder selected.")
+  if (!choice) {
+    cli_abort("No Word profiles folder selected.")
+  }
   profile_dirs[[choice]]
 }
 
@@ -49,7 +58,11 @@ lookup <- read_in_localities() |>
   distinct(hscp_locality, hscp2019name)
 
 word_files <- tibble(
-  path = dir_ls(profile_dir, type = "file", regexp = " - Locality Profile\\.docx$")
+  path = dir_ls(
+    profile_dir,
+    type = "file",
+    regexp = " - Locality Profile\\.docx$"
+  )
 ) |>
   mutate(
     file_name = path_file(path),
@@ -85,7 +98,9 @@ unmatched <- files |>
   filter(is.na(hscp2019name) | !hscp2019name %in% lookup$hscp2019name)
 if (nrow(unmatched)) {
   cli_alert_warning("Skipping {nrow(unmatched)} file(s) with no HSCP match:")
-  for (file in unmatched$file_name) cli_text("  {.file {file}}")
+  for (file in unmatched$file_name) {
+    cli_text("  {.file {file}}")
+  }
 }
 
 files <- files |>
@@ -96,7 +111,9 @@ files <- files |>
     exists = file_exists(new_path)
   )
 
-if (!nrow(files)) cli_abort("No matching files to copy.")
+if (!nrow(files)) {
+  cli_abort("No matching files to copy.")
+}
 
 # Review and confirm ----
 cli_h2("Review copy plan")
@@ -109,10 +126,15 @@ for (type in c("Word profiles", "SDC workbooks", "Background data workbooks")) {
 }
 cli_text("Already in destination: {sum(files$exists)}")
 
-overwrite <- isTRUE(utils::askYesNo("Overwrite existing files?", default = FALSE))
+overwrite <- isTRUE(utils::askYesNo(
+  "Overwrite existing files?",
+  default = FALSE
+))
 to_copy <- if (overwrite) nrow(files) else sum(!files$exists)
 replacements <- if (overwrite) sum(files$exists) else 0L
-cli_alert_info("{to_copy} files to copy, including {replacements} replacements.")
+cli_alert_info(
+  "{to_copy} files to copy, including {replacements} replacements."
+)
 
 # Copy with progress and permission warnings ----
 if (!to_copy) {
@@ -122,12 +144,22 @@ if (!to_copy) {
 } else {
   totals <- c(copied = 0L, overwritten = 0L, skipped = 0L, failed = 0L)
 
-  for (type in c("Word profiles", "SDC workbooks", "Background data workbooks")) {
+  for (type in c(
+    "Word profiles",
+    "SDC workbooks",
+    "Background data workbooks"
+  )) {
     stage <- files |> filter(.data$type == .env$type)
     cli_h2("Copy {type}")
-    if (!nrow(stage)) next
+    if (!nrow(stage)) {
+      next
+    }
 
-    progress <- cli_progress_bar(name = type, total = nrow(stage), clear = FALSE)
+    progress <- cli_progress_bar(
+      name = type,
+      total = nrow(stage),
+      clear = FALSE
+    )
     for (i in seq_len(nrow(stage))) {
       src <- stage$path[[i]]
       dst <- stage$new_path[[i]]
@@ -144,9 +176,14 @@ if (!to_copy) {
         {
           if (!dir_exists(folder)) {
             dir_create(folder, mode = "ug=rwx,o=rx")
-            group_result <- try(file_chown(folder, group_id = "LIST_analytics"), silent = TRUE)
+            group_result <- try(
+              file_chown(folder, group_id = "LIST_analytics"),
+              silent = TRUE
+            )
             if (inherits(group_result, "try-error")) {
-              cli_alert_warning("Created {.path {folder}} but could not set its group.")
+              cli_alert_warning(
+                "Created {.path {folder}} but could not set its group."
+              )
             }
           }
           file_copy(src, dst, overwrite = overwrite)
@@ -154,7 +191,9 @@ if (!to_copy) {
         },
         error = function(e) {
           name <- path_file(src)
-          cli_alert_warning("Could not copy {.file {name}}: {conditionMessage(e)}")
+          cli_alert_warning(
+            "Could not copy {.file {name}}: {conditionMessage(e)}"
+          )
           FALSE
         }
       )
@@ -162,9 +201,14 @@ if (!to_copy) {
       if (copied) {
         key <- if (existed) "overwritten" else "copied"
         totals[[key]] <- totals[[key]] + 1L
-        group_result <- try(file_chown(dst, group_id = "LIST_analytics"), silent = TRUE)
+        group_result <- try(
+          file_chown(dst, group_id = "LIST_analytics"),
+          silent = TRUE
+        )
         if (inherits(group_result, "try-error")) {
-          cli_alert_warning("Copied {.file {path_file(dst)}} but could not set its group.")
+          cli_alert_warning(
+            "Copied {.file {path_file(dst)}} but could not set its group."
+          )
         }
       } else {
         totals[["failed"]] <- totals[["failed"]] + 1L
@@ -179,7 +223,9 @@ if (!to_copy) {
     "{totals[['copied']]} new, {totals[['overwritten']]} overwritten, {totals[['skipped']]} skipped, {totals[['failed']]} failed."
   )
   if (totals[["failed"]]) {
-    cli_alert_warning("Some files could not be copied; check the warnings above.")
+    cli_alert_warning(
+      "Some files could not be copied; check the warnings above."
+    )
   }
   cli_alert_info("Destination: {.path {final_dir}}")
 }
