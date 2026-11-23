@@ -1,7 +1,7 @@
 # Copy checked Locality Profiles and Excel workbooks into the final release folder.
 # Run from the repository root in an interactive R session.
 
-source("Master RMarkdown Document & Render Code/Global Script.R")
+source(file.path("Master RMarkdown Document & Render Code", "Global Script.R"))
 library(cli)
 
 # Release details ----
@@ -49,10 +49,10 @@ cli_h2("Find completed files")
 
 lookup <- read_in_localities() |>
   mutate(
-    hscp_locality = case_match(
-      hscp_locality,
-      "Dumbarton/Alexandria" ~ "Dumbarton-Alexandria",
-      .default = hscp_locality
+    hscp_locality = if_else(
+      hscp_locality == "Dumbarton/Alexandria", # nolint: nonportable_path_linter.
+      "Dumbarton-Alexandria",
+      hscp_locality
     )
   ) |>
   distinct(hscp_locality, hscp2019name)
@@ -61,12 +61,12 @@ word_files <- tibble(
   path = dir_ls(
     profile_dir,
     type = "file",
-    regexp = " - Locality Profile\\.docx$"
+    regexp = " - Locality Profile[.]docx$"
   )
 ) |>
   mutate(
     file_name = path_file(path),
-    hscp_locality = str_remove(file_name, " - Locality Profile\\.docx$"),
+    hscp_locality = str_remove(file_name, " - Locality Profile[.]docx$"),
     type = rep("Word profiles", n())
   ) |>
   filter(!startsWith(file_name, "~$")) |>
@@ -76,14 +76,14 @@ excel_files <- tibble(
   path = dir_ls(
     background_dir,
     type = "file",
-    regexp = " - Locality Profile (SDC highlight|data)\\.xlsx$"
+    regexp = " - Locality Profile (SDC highlight|data)[.]xlsx$"
   )
 ) |>
   mutate(
     file_name = path_file(path),
     hscp2019name = str_remove(
       file_name,
-      " - Locality Profile (SDC highlight|data)\\.xlsx$"
+      " - Locality Profile (SDC highlight|data)[.]xlsx$"
     ),
     type = if_else(
       str_ends(file_name, " SDC highlight.xlsx"),
@@ -137,90 +137,103 @@ cli_alert_info(
 )
 
 # Copy with progress and permission warnings ----
-if (!to_copy) {
-  cli_alert_success("Nothing to copy.")
-} else if (!isTRUE(utils::askYesNo("Proceed with copying?", default = FALSE))) {
-  cli_alert_info("Cancelled. No files copied.")
+if (to_copy) {
+  proceed <- isTRUE(utils::askYesNo("Proceed with copying?", default = FALSE))
 } else {
-  totals <- c(copied = 0L, overwritten = 0L, skipped = 0L, failed = 0L)
+  proceed <- FALSE
+  cli_alert_success("Nothing to copy.")
+}
+if (to_copy && !proceed) {
+  cli_alert_info("Cancelled. No files copied.")
+}
 
-  for (type in c(
-    "Word profiles",
-    "SDC workbooks",
-    "Background data workbooks"
-  )) {
-    stage <- files |> filter(.data$type == .env$type)
-    cli_h2("Copy {type}")
-    if (!nrow(stage)) {
+# Leave the file list empty when cancelled, so no copy operations are attempted.
+if (!proceed) {
+  files <- files[0, ]
+}
+
+totals <- c(copied = 0L, overwritten = 0L, skipped = 0L, failed = 0L)
+
+for (type in c(
+  "Word profiles",
+  "SDC workbooks",
+  "Background data workbooks"
+)) {
+  stage <- filter(files, .data$type == .env$type)
+  if (!nrow(stage)) {
+    next
+  }
+  cli_h2("Copy {type}")
+  progress <- cli_progress_bar(
+    name = type,
+    total = nrow(stage),
+    clear = FALSE
+  )
+  for (i in seq_len(nrow(stage))) {
+    src <- stage$path[[i]]
+    dst <- stage$new_path[[i]]
+    folder <- stage$new_dir[[i]]
+
+    if (file_exists(dst) && !overwrite) {
+      totals[["skipped"]] <- totals[["skipped"]] + 1L
+      cli_progress_update(id = progress)
       next
     }
 
-    progress <- cli_progress_bar(
-      name = type,
-      total = nrow(stage),
-      clear = FALSE
-    )
-    for (i in seq_len(nrow(stage))) {
-      src <- stage$path[[i]]
-      dst <- stage$new_path[[i]]
-      folder <- stage$new_dir[[i]]
-
-      if (file_exists(dst) && !overwrite) {
-        totals[["skipped"]] <- totals[["skipped"]] + 1L
-        cli_progress_update(id = progress)
-        next
-      }
-
-      existed <- file_exists(dst)
-      copied <- tryCatch(
-        {
-          if (!dir_exists(folder)) {
-            dir_create(folder, mode = "ug=rwx,o=rx")
-            group_result <- try(
-              file_chown(folder, group_id = "LIST_analytics"),
-              silent = TRUE
+    existed <- file_exists(dst)
+    copied <- tryCatch(
+      {
+        if (!dir_exists(folder)) {
+          dir_create(folder, mode = "ug=rwx,o=rx")
+          group_result <- try(
+            file_chown(folder, group_id = "LIST_analytics"),
+            silent = TRUE
+          )
+          if (inherits(group_result, "try-error")) {
+            cli_alert_warning(
+              "Created {.path {folder}} but could not set its group."
             )
-            if (inherits(group_result, "try-error")) {
-              cli_alert_warning(
-                "Created {.path {folder}} but could not set its group."
-              )
-            }
           }
-          file_copy(src, dst, overwrite = overwrite)
-          TRUE
-        },
-        error = function(e) {
-          name <- path_file(src)
-          cli_alert_warning(
-            "Could not copy {.file {name}}: {conditionMessage(e)}"
-          )
-          FALSE
         }
-      )
-
-      if (copied) {
-        key <- if (existed) "overwritten" else "copied"
-        totals[[key]] <- totals[[key]] + 1L
-        group_result <- try(
-          file_chown(dst, group_id = "LIST_analytics"),
-          silent = TRUE
+        file_copy(src, dst, overwrite = overwrite)
+        TRUE
+      },
+      error = function(e) {
+        name <- path_file(src)
+        cli_alert_warning(
+          "Could not copy {.file {name}}: {conditionMessage(e)}"
         )
-        if (inherits(group_result, "try-error")) {
-          cli_alert_warning(
-            "Copied {.file {path_file(dst)}} but could not set its group."
-          )
-        }
-      } else {
-        totals[["failed"]] <- totals[["failed"]] + 1L
+        FALSE
       }
-      cli_progress_update(id = progress)
-    }
-    cli_progress_done(id = progress)
-  }
+    )
 
+    if (copied) {
+      key <- if (existed) "overwritten" else "copied"
+      totals[[key]] <- totals[[key]] + 1L
+      group_result <- try(
+        file_chown(dst, group_id = "LIST_analytics"),
+        silent = TRUE
+      )
+      if (inherits(group_result, "try-error")) {
+        cli_alert_warning(
+          "Copied {.file {path_file(dst)}} but could not set its group."
+        )
+      }
+    } else {
+      totals[["failed"]] <- totals[["failed"]] + 1L
+    }
+    cli_progress_update(id = progress)
+  }
+  cli_progress_done(id = progress)
+}
+
+if (proceed) {
   cli_h2("Finished")
   cli_text(
-    "{totals[['copied']]} new, {totals[['overwritten']]} overwritten, {totals[['skipped']]} skipped, {totals[['failed']]} failed."
+    "{totals[['copied']]} new; {totals[['overwritten']]} overwritten."
+  )
+  cli_text(
+    "{totals[['skipped']]} skipped; {totals[['failed']]} failed."
   )
   if (totals[["failed"]]) {
     cli_alert_warning(
