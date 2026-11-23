@@ -1,364 +1,185 @@
-# Publish checked locality profiles, SDC workbooks and background data.
-# Run from the repository root in RStudio (Source) or an interactive R console.
+# Copy checked Locality Profiles and Excel workbooks into the final release folder.
+# Run from the repository root in an interactive R session.
 
 source("Master RMarkdown Document & Render Code/Global Script.R")
 library(cli)
 
-default_release <- "2026-April"
-output_group <- "LIST_analytics"
+# Release details ----
+cli_h1("Copy final Locality Profiles")
+options(cli.progress_show_after = 0)
 
-ask_text <- function(question, default = NULL) {
-  cli::cli_text("{question}")
-  answer <- if (interactive()) {
-    readline("  > ")
-  } else {
-    cat("  > ")
-    flush.console()
-    readLines(stdin(), n = 1L, warn = FALSE)
-  }
-  if (!length(answer)) {
-    cli::cli_abort(
-      "No input received. Run this script in an interactive console."
+release <- readline("Release [2026-April]: ")
+if (!nzchar(release)) release <- "2026-April"
+
+final_dir <- path(lp_path, "Final Profiles", paste0(release, " Final Profiles"))
+background_dir <- path(
+  lp_path,
+  "Master RMarkdown Document & Render Code",
+  "Output",
+  "background data"
+)
+
+# Choose the Word profiles folder (e.g. Profiles Output Apr26).
+profile_dirs <- dir_ls(lp_path, type = "directory")
+profile_dirs <- profile_dirs[startsWith(path_file(profile_dirs), "Profiles Output")]
+if (!length(profile_dirs)) cli_abort("No Profiles Output folder found.")
+
+profile_dir <- if (length(profile_dirs) == 1L) {
+  profile_dirs[[1L]]
+} else {
+  choice <- utils::menu(
+    path_file(profile_dirs),
+    title = "Select the completed Word profiles folder"
+  )
+  if (!choice) cli_abort("No Word profiles folder selected.")
+  profile_dirs[[choice]]
+}
+
+# Find and match files ----
+cli_h2("Find completed files")
+
+lookup <- read_in_localities() |>
+  mutate(
+    hscp_locality = case_match(
+      hscp_locality,
+      "Dumbarton/Alexandria" ~ "Dumbarton-Alexandria",
+      .default = hscp_locality
     )
-  }
-  answer <- trimws(answer)
-  if (!nzchar(answer) && !is.null(default)) default else answer
-}
+  ) |>
+  distinct(hscp_locality, hscp2019name)
 
-ask_yes_no <- function(question, default = FALSE) {
-  hint <- if (default) "[Y/n]" else "[y/N]"
-  repeat {
-    answer <- tolower(ask_text(paste(question, hint), default = ""))
-    if (!nzchar(answer)) {
-      return(default)
-    }
-    if (answer %in% c("y", "yes")) {
-      return(TRUE)
-    }
-    if (answer %in% c("n", "no")) {
-      return(FALSE)
-    }
-    cli::cli_alert_warning("Please answer y or n.")
-  }
-}
+word_files <- tibble(
+  path = dir_ls(profile_dir, type = "file", regexp = " - Locality Profile\\.docx$")
+) |>
+  mutate(
+    file_name = path_file(path),
+    hscp_locality = str_remove(file_name, " - Locality Profile\\.docx$"),
+    type = rep("Word profiles", n())
+  ) |>
+  filter(!startsWith(file_name, "~$")) |>
+  left_join(lookup, by = join_by(hscp_locality))
 
-choose_profile_dir <- function(root) {
-  dirs <- fs::dir_ls(root, type = "directory", recurse = FALSE)
-  dirs <- dirs[grepl("^Profiles Output($| )", fs::path_file(dirs))]
-  dirs <- dirs[vapply(
-    dirs,
-    function(dir) {
-      any(endsWith(
-        fs::path_file(fs::dir_ls(dir, type = "file")),
-        " - Locality Profile.docx"
-      ))
-    },
-    logical(1)
-  )]
-
-  if (!length(dirs)) {
-    cli::cli_abort(c(
-      "No folder containing completed Word locality profiles was found.",
-      "i" = "Expected a {.file Profiles Output} or {.file Profiles Output ...} folder under the locality profiles root."
-    ))
-  }
-  if (length(dirs) == 1L) {
-    return(dirs[[1L]])
-  }
-
-  cli::cli_h2("Choose the Word profile source folder")
-  for (i in seq_along(dirs)) {
-    folder <- fs::path_file(dirs[[i]])
-    cli::cli_text("  {i}. {.file {folder}}")
-  }
-  repeat {
-    choice <- ask_text("Enter the folder number:")
-    if (grepl("^[0-9]+$", choice)) {
-      i <- as.integer(choice)
-      if (!is.na(i) && i >= 1L && i <= length(dirs)) return(dirs[[i]])
-    }
-    cli::cli_alert_warning("Enter a number between 1 and {length(dirs)}.")
-  }
-}
-
-# Identify only expected output filenames, then associate each with an HSCP.
-make_manifest <- function(
-  source,
-  suffix,
-  kind,
-  lookup,
-  destination,
-  by_locality
-) {
-  if (!fs::dir_exists(source)) {
-    cli::cli_abort("Missing source directory for {kind}: {.path {source}}")
-  }
-  paths <- fs::dir_ls(source, type = "file", recurse = FALSE)
-  names <- as.character(fs::path_file(paths))
-  keep <- endsWith(names, suffix) & !startsWith(names, "~$")
-  paths <- as.character(paths[keep])
-  names <- names[keep]
-
-  if (!length(paths)) {
-    cli::cli_alert_warning("No {kind} files found in {.path {source}}")
-    return(data.frame(
-      kind = character(),
-      source = character(),
-      target = character()
-    ))
-  }
-
-  area <- substr(names, 1L, nchar(names) - nchar(suffix))
-  match_against <- if (by_locality) {
-    lookup$hscp_locality
-  } else {
-    unique(lookup$hscp2019name)
-  }
-  hscp <- if (by_locality) {
-    lookup$hscp2019name[match(area, lookup$hscp_locality)]
-  } else {
-    area[match(area, match_against)]
-  }
-
-  unmatched <- is.na(hscp)
-  if (any(unmatched)) {
-    cli::cli_alert_warning(
-      "Skipping {sum(unmatched)} unrecognised {kind} filename{?s}."
-    )
-    for (name in head(names[unmatched], 8L)) {
-      cli::cli_text("  - {.file {name}}")
-    }
-  }
-  valid <- !unmatched
-  data.frame(
-    kind = rep(kind, sum(valid)),
-    source = paths[valid],
-    target = as.character(fs::path(destination, hscp[valid], names[valid])),
-    stringsAsFactors = FALSE
+excel_files <- tibble(
+  path = dir_ls(
+    background_dir,
+    type = "file",
+    regexp = " - Locality Profile (SDC highlight|data)\\.xlsx$"
   )
-}
-
-# Retain the original LIST group setting where the filesystem permits it.
-set_group <- function(path) {
-  if (.Platform$OS.type != "unix") {
-    return(TRUE)
-  }
-  tryCatch(
-    {
-      fs::file_chown(path, group_id = output_group)
-      TRUE
-    },
-    error = function(e) FALSE
-  )
-}
-
-copy_stage <- function(files, label, overwrite) {
-  cli::cli_h2("Copy {label}")
-  if (!nrow(files)) {
-    cli::cli_alert_warning("No matching files to copy.")
-    return(c(
-      copied = 0L,
-      replaced = 0L,
-      skipped = 0L,
-      failed = 0L,
-      group_warnings = 0L
-    ))
-  }
-
-  results <- c(
-    copied = 0L,
-    replaced = 0L,
-    skipped = 0L,
-    failed = 0L,
-    group_warnings = 0L
-  )
-  progress <- cli::cli_progress_bar(
-    name = paste("Processing", label),
-    total = nrow(files),
-    clear = FALSE
-  )
-  for (i in seq_len(nrow(files))) {
-    src <- files$source[[i]]
-    dst <- files$target[[i]]
-    existed <- fs::file_exists(dst)
-    if (existed && !overwrite) {
-      results[["skipped"]] <- results[["skipped"]] + 1L
-      cli::cli_progress_update(id = progress)
-      next
-    }
-
-    success <- tryCatch(
-      {
-        folder <- fs::path_dir(dst)
-        new_folder <- !fs::dir_exists(folder)
-        fs::dir_create(folder, recurse = TRUE, mode = "ug=rwx,o=rx")
-        if (new_folder && !set_group(folder)) {
-          results[["group_warnings"]] <- results[["group_warnings"]] + 1L
-        }
-        fs::file_copy(src, dst, overwrite = overwrite)
-        if (!set_group(dst)) {
-          results[["group_warnings"]] <- results[["group_warnings"]] + 1L
-        }
-        TRUE
-      },
-      error = function(e) {
-        message <- conditionMessage(e)
-        name <- fs::path_file(src)
-        cli::cli_alert_danger("Failed {.file {name}}: {message}")
-        FALSE
-      }
-    )
-    if (success) {
-      key <- if (existed) "replaced" else "copied"
-      results[[key]] <- results[[key]] + 1L
-    } else {
-      results[["failed"]] <- results[["failed"]] + 1L
-    }
-    cli::cli_progress_update(id = progress)
-  }
-  cli::cli_progress_done(id = progress)
-  cli::cli_alert_info(
-    paste0(
-      "{label}: {results[['copied']]} new, {results[['replaced']]} overwritten, ",
-      "{results[['skipped']]} skipped, {results[['failed']]} failed."
-    )
-  )
-  results
-}
-
-main <- function() {
-  cli::cli_h1("Publish final locality profiles")
-  old_progress <- options(cli.progress_show_after = 0)
-  on.exit(options(old_progress), add = TRUE)
-  if (!fs::dir_exists(lp_path)) {
-    cli::cli_abort("Locality profiles root is unavailable: {.path {lp_path}}")
-  }
-  cli::cli_alert_info(
-    "Copying checked files only; source files will not be moved."
-  )
-
-  release <- ask_text(
-    paste0("Release label [", default_release, "]:"),
-    default = default_release
-  )
-  if (!grepl("^[0-9]{4}-[A-Za-z]+$", release)) {
-    cli::cli_abort("Release label must use YYYY-Month, e.g. 2026-April.")
-  }
-  final_dir <- fs::path(
-    lp_path,
-    "Final Profiles",
-    paste0(release, " Final Profiles")
-  )
-  profile_dir <- choose_profile_dir(lp_path)
-  background_dir <- fs::path(
-    lp_path,
-    "Master RMarkdown Document & Render Code",
-    "Output",
-    "background data"
-  )
-
-  cli::cli_h2("Discover files")
-  lookup <- read_in_localities() |>
-    dplyr::distinct(hscp_locality, hscp2019name) |>
-    dplyr::mutate(
-      hscp_locality = dplyr::case_match(
-        hscp_locality,
-        "Dumbarton/Alexandria" ~ "Dumbarton-Alexandria",
-        .default = hscp_locality
-      )
-    )
-  stages <- list(
-    "Word profiles" = make_manifest(
-      profile_dir,
-      " - Locality Profile.docx",
-      "Word profiles",
-      lookup,
-      final_dir,
-      by_locality = TRUE
+) |>
+  mutate(
+    file_name = path_file(path),
+    hscp2019name = str_remove(
+      file_name,
+      " - Locality Profile (SDC highlight|data)\\.xlsx$"
     ),
-    "SDC workbooks" = make_manifest(
-      background_dir,
-      " - Locality Profile SDC highlight.xlsx",
+    type = if_else(
+      str_ends(file_name, " SDC highlight.xlsx"),
       "SDC workbooks",
-      lookup,
-      final_dir,
-      by_locality = FALSE
-    ),
-    "Background data workbooks" = make_manifest(
-      background_dir,
-      " - Locality Profile data.xlsx",
-      "Background data workbooks",
-      lookup,
-      final_dir,
-      by_locality = FALSE
+      "Background data workbooks"
     )
-  )
-  files <- do.call(rbind, stages)
-  if (!nrow(files)) {
-    cli::cli_abort("No eligible files were found; nothing was changed.")
-  }
-  if (anyDuplicated(files$target)) {
-    cli::cli_abort(
-      "Multiple sources would write to the same destination. Nothing was copied."
-    )
-  }
+  ) |>
+  filter(!startsWith(file_name, "~$"))
 
-  cli::cli_h2("Review copy plan")
-  cli::cli_text("Destination: {.path {final_dir}}")
-  cli::cli_text("Word source: {.path {profile_dir}}")
-  cli::cli_text("Excel source: {.path {background_dir}}")
-  for (label in names(stages)) {
-    count <- nrow(stages[[label]])
-    cli::cli_text("  {label}: {count} file{?s}")
-  }
-  existing <- sum(fs::file_exists(files$target))
-  cli::cli_text("Existing destination files: {existing}")
-  overwrite <- ask_yes_no(
-    "Overwrite existing destination files?",
-    default = FALSE
-  )
-  pending <- if (overwrite) nrow(files) else nrow(files) - existing
-  cli::cli_alert_info(
-    "{pending} file{?s} to copy; {if (overwrite) existing else 0L} replacement{?s}."
-  )
-  if (!pending) {
-    cli::cli_alert_success("Everything already exists. No files changed.")
-    return(invisible(NULL))
-  }
-  if (!ask_yes_no("Proceed with copying?", default = FALSE)) {
-    cli::cli_alert_warning("Cancelled; no files changed.")
-    return(invisible(NULL))
-  }
-
-  totals <- c(
-    copied = 0L,
-    replaced = 0L,
-    skipped = 0L,
-    failed = 0L,
-    group_warnings = 0L
-  )
-  for (label in names(stages)) {
-    totals <- totals + copy_stage(stages[[label]], label, overwrite)
-  }
-  cli::cli_h2("Finished")
-  cli::cli_alert_success(
-    paste0(
-      "{totals[['copied']]} new, {totals[['replaced']]} overwritten, ",
-      "{totals[['skipped']]} skipped."
-    )
-  )
-  if (totals[["group_warnings"]] > 0L) {
-    cli::cli_alert_warning(
-      "Could not set LIST_analytics ownership on {totals[['group_warnings']]} path{?s}; check permissions."
-    )
-  }
-  if (totals[["failed"]] > 0L) {
-    cli::cli_abort(
-      "{totals[['failed']]} file{?s} failed to copy. See messages above."
-    )
-  }
-  cli::cli_alert_success("Files are ready in {.path {final_dir}}")
-  invisible(totals)
+files <- bind_rows(word_files, excel_files)
+unmatched <- files |>
+  filter(is.na(hscp2019name) | !hscp2019name %in% lookup$hscp2019name)
+if (nrow(unmatched)) {
+  cli_alert_warning("Skipping {nrow(unmatched)} file(s) with no HSCP match:")
+  for (file in unmatched$file_name) cli_text("  {.file {file}}")
 }
 
-main()
+files <- files |>
+  filter(!is.na(hscp2019name), hscp2019name %in% lookup$hscp2019name) |>
+  mutate(
+    new_dir = path(final_dir, hscp2019name),
+    new_path = path(new_dir, file_name),
+    exists = file_exists(new_path)
+  )
+
+if (!nrow(files)) cli_abort("No matching files to copy.")
+
+# Review and confirm ----
+cli_h2("Review copy plan")
+cli_text("Destination: {.path {final_dir}}")
+cli_text("Word source: {.path {profile_dir}}")
+cli_text("Excel source: {.path {background_dir}}")
+for (type in c("Word profiles", "SDC workbooks", "Background data workbooks")) {
+  count <- sum(files$type == type)
+  cli_text("  {type}: {count} files")
+}
+cli_text("Already in destination: {sum(files$exists)}")
+
+overwrite <- isTRUE(utils::askYesNo("Overwrite existing files?", default = FALSE))
+to_copy <- if (overwrite) nrow(files) else sum(!files$exists)
+replacements <- if (overwrite) sum(files$exists) else 0L
+cli_alert_info("{to_copy} files to copy, including {replacements} replacements.")
+
+# Copy with progress and permission warnings ----
+if (!to_copy) {
+  cli_alert_success("Nothing to copy.")
+} else if (!isTRUE(utils::askYesNo("Proceed with copying?", default = FALSE))) {
+  cli_alert_info("Cancelled. No files copied.")
+} else {
+  totals <- c(copied = 0L, overwritten = 0L, skipped = 0L, failed = 0L)
+
+  for (type in c("Word profiles", "SDC workbooks", "Background data workbooks")) {
+    stage <- files |> filter(.data$type == .env$type)
+    cli_h2("Copy {type}")
+    if (!nrow(stage)) next
+
+    progress <- cli_progress_bar(name = type, total = nrow(stage), clear = FALSE)
+    for (i in seq_len(nrow(stage))) {
+      src <- stage$path[[i]]
+      dst <- stage$new_path[[i]]
+      folder <- stage$new_dir[[i]]
+
+      if (file_exists(dst) && !overwrite) {
+        totals[["skipped"]] <- totals[["skipped"]] + 1L
+        cli_progress_update(id = progress)
+        next
+      }
+
+      existed <- file_exists(dst)
+      copied <- tryCatch(
+        {
+          if (!dir_exists(folder)) {
+            dir_create(folder, mode = "ug=rwx,o=rx")
+            group_result <- try(file_chown(folder, group_id = "LIST_analytics"), silent = TRUE)
+            if (inherits(group_result, "try-error")) {
+              cli_alert_warning("Created {.path {folder}} but could not set its group.")
+            }
+          }
+          file_copy(src, dst, overwrite = overwrite)
+          TRUE
+        },
+        error = function(e) {
+          name <- path_file(src)
+          cli_alert_warning("Could not copy {.file {name}}: {conditionMessage(e)}")
+          FALSE
+        }
+      )
+
+      if (copied) {
+        key <- if (existed) "overwritten" else "copied"
+        totals[[key]] <- totals[[key]] + 1L
+        group_result <- try(file_chown(dst, group_id = "LIST_analytics"), silent = TRUE)
+        if (inherits(group_result, "try-error")) {
+          cli_alert_warning("Copied {.file {path_file(dst)}} but could not set its group.")
+        }
+      } else {
+        totals[["failed"]] <- totals[["failed"]] + 1L
+      }
+      cli_progress_update(id = progress)
+    }
+    cli_progress_done(id = progress)
+  }
+
+  cli_h2("Finished")
+  cli_text(
+    "{totals[['copied']]} new, {totals[['overwritten']]} overwritten, {totals[['skipped']]} skipped, {totals[['failed']]} failed."
+  )
+  if (totals[["failed"]]) {
+    cli_alert_warning("Some files could not be copied; check the warnings above.")
+  }
+  cli_alert_info("Destination: {.path {final_dir}}")
+}
