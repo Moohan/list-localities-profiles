@@ -154,15 +154,11 @@ if (!proceed) {
 
 totals <- c(copied = 0L, overwritten = 0L, skipped = 0L, failed = 0L)
 
-for (type in c(
-  "Word profiles",
-  "SDC workbooks",
-  "Background data workbooks"
+for (type in intersect(
+  c("Word profiles", "SDC workbooks", "Background data workbooks"),
+  files$type
 )) {
   stage <- filter(files, .data$type == .env$type)
-  if (!nrow(stage)) {
-    next
-  }
   cli_h2("Copy {type}")
   progress <- cli_progress_bar(
     name = type,
