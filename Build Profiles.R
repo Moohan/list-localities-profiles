@@ -24,8 +24,10 @@ result <- build_profiles(
   create_sdc = create_sdc,
   create_data_workbook = create_data_workbook,
   progress = function(event) {
-    if (event$type == "locality_profile" &&
-        event$status %in% c("succeeded", "failed")) {
+    if (
+      event$type == "locality_profile" &&
+        event$status %in% c("succeeded", "failed")
+    ) {
       message(sprintf(
         "[%d/%d] %s: %s",
         event$position,
@@ -40,7 +42,9 @@ result <- build_profiles(
 )
 
 print(result$results)
-if (create_sdc || create_data_workbook) print(result$workbook_results)
+if (create_sdc || create_data_workbook) {
+  print(result$workbook_results)
+}
 message(sprintf(
   "Profiles complete: %d succeeded, %d failed.",
   result$succeeded,

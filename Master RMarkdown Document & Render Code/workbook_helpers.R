@@ -195,7 +195,11 @@ write_staged_workbook <- function(output_path, write_file) {
   fs::file_chown(staged_path, group_id = "LIST_analytics")
 
   if (!file.rename(staged_path, output_path)) {
-    stop("Could not replace the existing workbook: ", output_path, call. = FALSE)
+    stop(
+      "Could not replace the existing workbook: ",
+      output_path,
+      call. = FALSE
+    )
   }
 
   output_path

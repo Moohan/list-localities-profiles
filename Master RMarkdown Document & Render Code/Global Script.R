@@ -1017,10 +1017,16 @@ build_profiles <- function(
   create_sdc = FALSE,
   create_data_workbook = FALSE,
   workbook_output_dir = fs::path(
-    lp_path, "Master RMarkdown Document & Render Code", "Output", "background data"
+    lp_path,
+    "Master RMarkdown Document & Render Code",
+    "Output",
+    "background data"
   )
 ) {
-  for (option in list(create_sdc = create_sdc, create_data_workbook = create_data_workbook)) {
+  for (option in list(
+    create_sdc = create_sdc,
+    create_data_workbook = create_data_workbook
+  )) {
     if (!is.logical(option) || length(option) != 1L || is.na(option)) {
       stop("Workbook options must be TRUE or FALSE.", call. = FALSE)
     }
@@ -1039,8 +1045,12 @@ build_profiles <- function(
     }
   }
 
-  if (create_sdc) rlang::check_installed("openxlsx2")
-  if (create_data_workbook) rlang::check_installed("openxlsx")
+  if (create_sdc) {
+    rlang::check_installed("openxlsx2")
+  }
+  if (create_data_workbook) {
+    rlang::check_installed("openxlsx")
+  }
 
   localities <- unique(localities)
   if (length(localities) == 0L) {
@@ -1262,7 +1272,11 @@ build_profiles <- function(
           }
         })()
         status <- if (is.null(build_workbook$error)) "succeeded" else "failed"
-        output_path <- if (status == "succeeded") build_workbook$result else NA_character_
+        output_path <- if (status == "succeeded") {
+          build_workbook$result
+        } else {
+          NA_character_
+        }
         error <- if (status == "succeeded") {
           NA_character_
         } else {
