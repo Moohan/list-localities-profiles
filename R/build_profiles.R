@@ -248,6 +248,13 @@ build_profiles <- function(localities, output_dir,
     analysis_env$HSCP <- item$hscp[[1]]
     analysis_env$LOCALITY <- item$locality[[1]]
 
+    # One existing section script sources another with source()'s default
+    # local = FALSE. Keep nested sources inside this locality's environment
+    # rather than allowing them to write into .GlobalEnv.
+    analysis_env$source <- function(file, local = FALSE, ...) {
+      base::source(file, local = analysis_env, ...)
+    }
+
     # Remove previous output artefacts without removing memoised source data.
     unlink(doc_dir, recursive = TRUE)
     dir.create(doc_dir, recursive = TRUE, showWarnings = FALSE)
