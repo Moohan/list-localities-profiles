@@ -1051,7 +1051,10 @@ top5ltc_loc <- ltc_totals |>
     values_to = "value"
   ) |>
   slice_max(n = 5, order_by = value, with_ties = FALSE) |>
-  mutate(percent = round_half_up((value / ltc_pops_total_loc) * 100, 2)) |>
+  mutate(
+    percent = round_half_up((value / ltc_pops_total_loc) * 100, 2),
+    locality_n = value
+  ) |>
   select(-value) |>
   left_join(ltc_colours, by = join_by(topltc)) |>
   mutate(Prevalence = str_c(topltc, paste(percent, "%"), sep = "\n"))
