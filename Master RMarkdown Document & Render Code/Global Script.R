@@ -1334,10 +1334,8 @@ build_profiles <- function(
 
   results <- purrr::map(hscp_results, "localities") |>
     purrr::list_rbind()
-  workbook_results <- dplyr::bind_rows(
-    empty_workbook_results,
-    purrr::map(hscp_results, "workbooks")
-  )
+  workbook_results <- purrr::map(hscp_results, "workbooks") |>
+    purrr::list_rbind()
 
   list(
     total = nrow(results),
