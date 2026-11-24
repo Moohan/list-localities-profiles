@@ -28,7 +28,7 @@ Here are some important files and scripts to be aware of:
 
 - **`Master RMarkdown Document & Render Code/Global Script.R`**: Loads packages and defines shared functions, including `build_profiles()` and optional data workbook and SDC generation.
   
-- **`Build Profiles.R`**: Selects HSCPs and optionally creates SDC and background data workbooks alongside Word Locality Profiles.
+- **`Build Profiles.R`**: Select HSCPs and set `create_sdc` and `create_data_workbook` (both `FALSE` by default). Word files go to `Profiles Output`, with optional Excel workbooks in its `SDC` and `background data` subdirectories. These require `openxlsx2` and `openxlsx`, respectively.
 
 - **`Master RMarkdown Document & Render Code/Locality Profiles Render Code.R`**: This script runs the analyses and generates the indicators, as well as creates the main profile and summary table outputs. It is the simplest and most effective way to produce the profiles.
 
