@@ -1065,10 +1065,9 @@ build_profiles <- function(
 
     output_filename <- locality_profile$output_filename
     main_title <- sub("\\.docx$", "", output_filename)
-    temp_document <- fs::path(documents_dir, output_filename)
     output_document <- fs::path(output_dir, output_filename)
 
-    bookdown::render_book(
+    temp_document <- bookdown::render_book(
       input = bookdown_dir,
       output_dir = documents_dir,
       output_file = output_filename,
