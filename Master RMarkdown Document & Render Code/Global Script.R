@@ -1041,11 +1041,18 @@ build_profiles <- function(
     locality_environment$HSCP <- locality_profile$hscp
     locality_environment$LOCALITY <- locality_profile$locality
 
-    # Chart helpers must resolve locality variables in their enclosing environment.
-    locality_environment$scotpho_time_trend <- scotpho_time_trend
-    environment(locality_environment$scotpho_time_trend) <- locality_environment
-    locality_environment$scotpho_bar_chart <- scotpho_bar_chart
-    environment(locality_environment$scotpho_bar_chart) <- locality_environment
+    # Ordinary script functions need a locality-specific enclosing environment.
+    # Memoised readers retain their own environments and remain shared.
+    script_environment <- environment(build_profiles)
+    for (function_name in ls(script_environment)) {
+      profile_function <- get(function_name, envir = script_environment)
+      if (is.function(profile_function) &&
+          identical(environment(profile_function), script_environment)) {
+        locality_environment[[function_name]] <- rlang::set_env(
+          profile_function, locality_environment
+        )
+      }
+    }
 
     # Keep nested source() calls in the current locality environment.
     locality_environment$source <- function(file, ...) {
