@@ -1129,7 +1129,9 @@ collect_sdc_workbook_tables <- function(locality_environment) {
       list(
         Long_Term_Conditions = ltc_multimorbidity,
         LTC_Types = ltc_types,
-        LTC_Top_5_Prevalence = top5ltc_loc
+        LTC_Top_5_Prevalence = dplyr::mutate(
+          top5ltc_loc, value = locality_n
+        )
       ),
       \(data, name) {
         small_counts(
@@ -1152,6 +1154,7 @@ collect_sdc_workbook_tables <- function(locality_environment) {
 
 # Stage the workbook beside its destination so failures leave the previous file intact.
 write_hscp_workbook <- function(tables, output_path, type) {
+  fs::dir_create(fs::path_dir(output_path), mode = "u=rwx,g=rwx,o=rx")
   staged_path <- tempfile(
     pattern = ".lp-workbook-",
     tmpdir = fs::path_dir(output_path),
@@ -1183,7 +1186,11 @@ write_hscp_workbook <- function(tables, output_path, type) {
       sheet = "Index",
       x = data.frame(Sheet_name = names(tables))
     )
-    openxlsx::saveWorkbook(wb, staged_path, overwrite = TRUE)
+    if (!isTRUE(openxlsx::saveWorkbook(
+      wb, staged_path, overwrite = TRUE, returnValue = TRUE
+    ))) {
+      stop("Could not save workbook: ", output_path, call. = FALSE)
+    }
   }
 
   fs::file_chown(staged_path, group_id = "LIST_analytics")
@@ -1203,7 +1210,7 @@ write_hscp_workbooks <- function(
   locality_rows,
   create_data_workbook,
   create_sdc,
-  workbook_output_dir,
+  output_dir,
   hscp_count,
   progress
 ) {
@@ -1218,7 +1225,8 @@ write_hscp_workbooks <- function(
     } else {
       " - Locality Profile data.xlsx"
     }
-    target <- fs::path(workbook_output_dir, paste0(hscp, suffix))
+    subdirectory <- if (type == "sdc") "SDC" else "background data"
+    target <- fs::path(output_dir, subdirectory, paste0(hscp, suffix))
 
     if (any(locality_rows$status != "succeeded")) {
       status <- "skipped"
@@ -1248,17 +1256,15 @@ write_hscp_workbooks <- function(
 
         locality_tables <- purrr::map(collected, "result")
         sheet_names <- names(locality_tables[[1L]])
-        tables <- stats::setNames(
-          lapply(sheet_names, function(sheet) {
-            pieces <- lapply(locality_tables, function(x) x[[sheet]])
-            if (type == "sdc") {
-              dplyr::bind_rows(pieces)
-            } else {
-              Reduce(rbind, pieces)
-            }
-          }),
-          sheet_names
-        )
+        tables <- purrr::map(sheet_names, function(sheet) {
+          pieces <- purrr::map(locality_tables, function(x) x[[sheet]])
+          if (type == "sdc") {
+            dplyr::bind_rows(pieces)
+          } else {
+            purrr::reduce(pieces, rbind)
+          }
+        }) |>
+          stats::setNames(sheet_names)
         write_hscp_workbook(tables, target, type)
       })()
       status <- if (is.null(result$error)) "succeeded" else "failed"
