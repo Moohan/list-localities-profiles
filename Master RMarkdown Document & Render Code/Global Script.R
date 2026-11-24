@@ -1315,47 +1315,16 @@ build_profiles <- function(
   output_dir,
   progress = function(event) NULL,
   create_sdc = FALSE,
-  create_data_workbook = FALSE,
-  workbook_output_dir = fs::path(
-    lp_path,
-    "Master RMarkdown Document & Render Code",
-    "Output",
-    "background data"
-  )
+  create_data_workbook = FALSE
 ) {
-  for (option in list(
-    create_sdc = create_sdc,
-    create_data_workbook = create_data_workbook
-  )) {
-    if (!is.logical(option) || length(option) != 1L || is.na(option)) {
-      stop("Workbook options must be TRUE or FALSE.", call. = FALSE)
-    }
+  if (!fs::dir_exists(output_dir)) {
+    stop("Output directory does not exist: ", output_dir, call. = FALSE)
   }
-
-  output_dirs <- c(
-    output_dir,
-    if (create_sdc || create_data_workbook) workbook_output_dir
-  )
-  for (directory in unique(output_dirs)) {
-    if (!fs::dir_exists(directory)) {
-      stop("Output directory does not exist: ", directory, call. = FALSE)
-    }
-    if (!fs::file_access(directory, mode = c("write", "execute"))) {
-      stop("Output directory is not writable: ", directory, call. = FALSE)
-    }
-  }
-
-  if (create_sdc) {
-    rlang::check_installed("openxlsx2")
-  }
-  if (create_data_workbook) {
-    rlang::check_installed("openxlsx")
+  if (!fs::file_access(output_dir, mode = c("write", "execute"))) {
+    stop("Output directory is not writable: ", output_dir, call. = FALSE)
   }
 
   localities <- unique(localities)
-  if (length(localities) == 0L) {
-    stop("Select at least one locality.", call. = FALSE)
-  }
 
   lookup <- read_in_localities()
   unknown_localities <- setdiff(localities, lookup$hscp_locality)
@@ -1391,8 +1360,12 @@ build_profiles <- function(
     }
   }
 
-  # Group localities so HSCP workbooks can be written and released one at a time.
-  profiles <- profiles[order(match(profiles$hscp, hscps)), ]
+  # Preserve the requested order for Word-only builds.
+  groups <- if (create_sdc || create_data_workbook) {
+    split(seq_len(nrow(profiles)), factor(profiles$hscp, levels = hscps))
+  } else {
+    as.list(seq_len(nrow(profiles)))
+  }
 
   # Share memoised readers without sharing locality-specific variables.
   common_environment <- new.env(parent = environment(build_profiles))
@@ -1480,8 +1453,8 @@ build_profiles <- function(
   }
 
   generate_profile_safely <- purrr::safely(generate_profile)
-  hscp_results <- purrr::map(hscps, function(hscp) {
-    row_numbers <- which(profiles$hscp == hscp)
+  hscp_results <- purrr::map(groups, function(row_numbers) {
+    hscp <- profiles$hscp[row_numbers[[1L]]]
 
     locality_results <- purrr::map(row_numbers, function(result_num) {
       locality_profile <- profiles[result_num, ]
@@ -1514,8 +1487,6 @@ build_profiles <- function(
         error = error
       ))
 
-      gc()
-
       list(
         row = tibble::tibble(
           locality = locality_profile$locality,
@@ -1538,7 +1509,7 @@ build_profiles <- function(
       locality_rows = locality_rows,
       create_data_workbook = create_data_workbook,
       create_sdc = create_sdc,
-      workbook_output_dir = workbook_output_dir,
+      output_dir = output_dir,
       hscp_count = length(hscps),
       progress = progress
     )
