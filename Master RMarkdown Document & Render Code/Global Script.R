@@ -1005,28 +1005,55 @@ move_profile_to_stats <- function(document_path, output_path) {
   output_path
 }
 
+source(
+  "Master RMarkdown Document & Render Code/workbook_helpers.R",
+  local = TRUE
+)
+
 build_profiles <- function(
   localities,
   output_dir,
-  progress = function(event) NULL
+  progress = function(event) NULL,
+  create_sdc = FALSE,
+  create_data_workbook = FALSE,
+  workbook_output_dir = fs::path(
+    lp_path, "Master RMarkdown Document & Render Code", "Output", "background data"
+  )
 ) {
-  if (!fs::dir_exists(output_dir)) {
-    stop("Output directory does not exist: ", output_dir, call. = FALSE)
+  for (option in list(create_sdc = create_sdc, create_data_workbook = create_data_workbook)) {
+    if (!is.logical(option) || length(option) != 1L || is.na(option)) {
+      stop("Workbook options must be TRUE or FALSE.", call. = FALSE)
+    }
   }
-  if (!fs::file_access(output_dir, mode = c("write", "execute"))) {
-    stop("Output directory is not writable: ", output_dir, call. = FALSE)
+
+  output_dirs <- c(
+    output_dir,
+    if (create_sdc || create_data_workbook) workbook_output_dir
+  )
+  for (directory in unique(output_dirs)) {
+    if (!fs::dir_exists(directory)) {
+      stop("Output directory does not exist: ", directory, call. = FALSE)
+    }
+    if (!fs::file_access(directory, mode = c("write", "execute"))) {
+      stop("Output directory is not writable: ", directory, call. = FALSE)
+    }
   }
+
+  if (create_sdc) rlang::check_installed("openxlsx2")
+  if (create_data_workbook) rlang::check_installed("openxlsx")
 
   localities <- unique(localities)
-  lookup <- read_in_localities()
+  if (length(localities) == 0L) {
+    stop("Select at least one locality.", call. = FALSE)
+  }
 
+  lookup <- read_in_localities()
   unknown_localities <- setdiff(localities, lookup$hscp_locality)
-  if (length(unknown_localities) > 0) {
+  if (length(unknown_localities) > 0L) {
     stop("Unknown localities: ", toString(unknown_localities), call. = FALSE)
   }
 
   locality_lookup <- dplyr::distinct(lookup, hscp_locality, hscp2019name)
-
   profiles <- tibble::tibble(locality = localities) |>
     dplyr::left_join(locality_lookup, by = c(locality = "hscp_locality")) |>
     dplyr::mutate(
@@ -1039,11 +1066,29 @@ build_profiles <- function(
       .keep = "none"
     )
 
+  hscps <- unique(profiles$hscp)
+  if (create_sdc || create_data_workbook) {
+    required_localities <- lookup$hscp_locality[
+      lookup$hscp2019name %in% hscps
+    ]
+    missing_localities <- setdiff(required_localities, localities)
+    if (length(missing_localities) > 0L) {
+      stop(
+        "HSCP workbooks require all constituent localities. Missing: ",
+        toString(missing_localities),
+        call. = FALSE
+      )
+    }
+  }
+
+  # Group localities so HSCP workbooks can be written and released one at a time.
+  profiles <- profiles[order(match(profiles$hscp, hscps)), ]
+
   # Share memoised readers without sharing locality-specific variables.
   common_environment <- new.env(parent = environment(build_profiles))
   common_environment$lookup <- lookup
   common_environment$output_dir <- output_dir
-  common_environment$hscp_list <- unique(profiles$hscp)
+  common_environment$hscp_list <- hscps
 
   temp_root <- fs::file_temp(pattern = "lp-profile-build-")
   fs::dir_create(temp_root)
@@ -1089,6 +1134,13 @@ build_profiles <- function(
 
     purrr::walk(section_scripts, sys.source, envir = locality_environment)
 
+    data_tables <- if (create_data_workbook) {
+      collect_data_workbook_tables(locality_environment)
+    }
+    sdc_tables <- if (create_sdc) {
+      collect_sdc_workbook_tables(locality_environment)
+    }
+
     output_filename <- locality_profile$output_filename
     main_title <- sub("\\.docx$", "", output_filename)
     output_document <- fs::path(output_dir, output_filename)
@@ -1110,58 +1162,155 @@ build_profiles <- function(
       "OFFICIAL_SENSITIVE_VMO"
     )
 
-    move_profile_to_stats(temp_document, output_document)
+    list(
+      output_path = move_profile_to_stats(temp_document, output_document),
+      data_tables = data_tables,
+      sdc_tables = sdc_tables
+    )
   }
 
   generate_profile_safely <- purrr::safely(generate_profile)
+  empty_workbook_results <- tibble::tibble(
+    hscp = character(),
+    type = character(),
+    status = character(),
+    output_path = character(),
+    error = character()
+  )
 
-  results <- purrr::map(seq_len(nrow(profiles)), function(result_num) {
-    locality_profile <- profiles[result_num, ]
+  hscp_results <- purrr::map(hscps, function(hscp) {
+    row_numbers <- which(profiles$hscp == hscp)
 
-    progress(list(
-      locality = locality_profile$locality,
-      hscp = locality_profile$hscp,
-      position = result_num,
-      total = nrow(profiles),
-      status = "running",
-      output_path = NA_character_,
-      error = NA_character_
-    ))
+    locality_results <- purrr::map(row_numbers, function(result_num) {
+      locality_profile <- profiles[result_num, ]
 
-    result <- generate_profile_safely(locality_profile)
-    succeeded <- is.null(result$error)
+      progress(list(
+        type = "locality_profile",
+        locality = locality_profile$locality,
+        hscp = hscp,
+        position = result_num,
+        total = nrow(profiles),
+        status = "running",
+        output_path = NA_character_,
+        error = NA_character_
+      ))
 
-    status <- if (succeeded) "succeeded" else "failed"
-    output_path <- if (succeeded) result$result else NA_character_
-    error <- if (succeeded) NA_character_ else conditionMessage(result$error)
+      result <- generate_profile_safely(locality_profile)
+      succeeded <- is.null(result$error)
+      status <- if (succeeded) "succeeded" else "failed"
+      output_path <- if (succeeded) result$result$output_path else NA_character_
+      error <- if (succeeded) NA_character_ else conditionMessage(result$error)
 
-    progress(list(
-      locality = locality_profile$locality,
-      hscp = locality_profile$hscp,
-      position = result_num,
-      total = nrow(profiles),
-      status = status,
-      output_path = output_path,
-      error = error
-    ))
+      progress(list(
+        type = "locality_profile",
+        locality = locality_profile$locality,
+        hscp = hscp,
+        position = result_num,
+        total = nrow(profiles),
+        status = status,
+        output_path = output_path,
+        error = error
+      ))
 
-    # Release large per-locality objects before starting the next profile.
-    gc()
+      gc()
 
-    tibble::tibble(
-      locality = locality_profile$locality,
-      hscp = locality_profile$hscp,
-      status = status,
-      output_path = output_path,
-      error = error
+      list(
+        row = tibble::tibble(
+          locality = locality_profile$locality,
+          hscp = hscp,
+          status = status,
+          output_path = output_path,
+          error = error
+        ),
+        data_tables = if (succeeded) result$result$data_tables,
+        sdc_tables = if (succeeded) result$result$sdc_tables
+      )
+    })
+
+    locality_rows <- purrr::map(locality_results, "row") |>
+      purrr::list_rbind()
+
+    workbook_types <- c(
+      if (create_data_workbook) "data_workbook",
+      if (create_sdc) "sdc"
     )
-  }) |>
+
+    workbook_rows <- purrr::map(workbook_types, function(type) {
+      suffix <- if (type == "sdc") {
+        " - Locality Profile SDC highlight.xlsx"
+      } else {
+        " - Locality Profile data.xlsx"
+      }
+      target <- fs::path(workbook_output_dir, paste0(hscp, suffix))
+
+      if (any(locality_rows$status != "succeeded")) {
+        status <- "skipped"
+        output_path <- NA_character_
+        error <- "One or more locality profiles failed; workbook not generated."
+      } else {
+        build_workbook <- purrr::safely(function() {
+          if (type == "sdc") {
+            tables <- combine_sdc_workbook_tables(
+              purrr::map(locality_results, "sdc_tables")
+            )
+            write_sdc_workbook(tables, target)
+          } else {
+            tables <- combine_data_workbook_tables(
+              purrr::map(locality_results, "data_tables")
+            )
+            write_data_workbook(tables, target)
+          }
+        })()
+        status <- if (is.null(build_workbook$error)) "succeeded" else "failed"
+        output_path <- if (status == "succeeded") build_workbook$result else NA_character_
+        error <- if (status == "succeeded") {
+          NA_character_
+        } else {
+          conditionMessage(build_workbook$error)
+        }
+      }
+
+      progress(list(
+        type = type,
+        locality = NA_character_,
+        hscp = hscp,
+        position = NA_integer_,
+        total = length(hscps),
+        status = status,
+        output_path = output_path,
+        error = error
+      ))
+
+      tibble::tibble(
+        hscp = hscp,
+        type = type,
+        status = status,
+        output_path = output_path,
+        error = error
+      )
+    }) |>
+      purrr::list_rbind()
+
+    list(
+      localities = locality_rows,
+      workbooks = dplyr::bind_rows(empty_workbook_results, workbook_rows)
+    )
+  })
+
+  results <- purrr::map(hscp_results, "localities") |>
     purrr::list_rbind()
+  workbook_results <- dplyr::bind_rows(
+    empty_workbook_results,
+    purrr::map(hscp_results, "workbooks")
+  )
 
   list(
     total = nrow(results),
     succeeded = sum(results$status == "succeeded"),
     failed = sum(results$status == "failed"),
-    results = results
+    results = results,
+    workbook_results = workbook_results,
+    workbook_failed = sum(workbook_results$status == "failed"),
+    workbook_skipped = sum(workbook_results$status == "skipped")
   )
 }
