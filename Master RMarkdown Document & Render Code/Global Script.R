@@ -235,6 +235,24 @@ count_localities <- function(locality_lookup, hscp_name) {
   return(sum(locality_lookup[["hscp2019name"]] == hscp_name))
 }
 
+get_hscp_from_locality <- function(
+  locality_name,
+  localities_lookup = read_in_localities()
+) {
+  localities_lookup[["hscp2019name"]][
+    localities_lookup[["hscp_locality"]] == locality_name
+  ]
+}
+
+get_hb_from_locality <- function(
+  locality_name,
+  localities_lookup = read_in_localities()
+) {
+  localities_lookup[["hb2019name"]][
+    localities_lookup[["hscp_locality"]] == locality_name
+  ]
+}
+
 ## Function to read in latest SPD file ----
 
 # No arguments needed, just use read_in_latest_postcodes()
@@ -373,7 +391,6 @@ clean_scotpho_dat <- function(data) {
 # Data must first be cleaned using clean_scotpho_dat function
 # Uses variable "period_short" which must be created - this is a shortened version of the "period" column in ScotPHO data
 # ex: mutate(period_short = gsub("to", "-", substr(period, 1, 12)))
-# Uses objects "LOCALITY", "HSCP" and "HB" to filter - these must be specified earlier in script
 
 # Arguments:
 # data: data to use for chart
@@ -388,9 +405,13 @@ scotpho_time_trend <- function(
   xaxis_title,
   yaxis_title,
   string_wrap,
+  locality,
   rotate_xaxis = FALSE,
   trend_years = 10
 ) {
+  hscp <- get_hscp_from_locality(locality)
+  hb <- get_hb_from_locality(locality)
+
   # rotate axis criteria if T/F
   if (rotate_xaxis) {
     rotation <- element_text(angle = 45, hjust = 1)
@@ -401,9 +422,9 @@ scotpho_time_trend <- function(
   # filter and reorder data
   data |>
     filter(
-      (area_name == LOCALITY & area_type == "Locality") |
-        (area_name == HSCP & area_type == "HSCP") |
-        area_name == HB |
+      (area_name == .env$locality & area_type == "Locality") |
+        (area_name == .env$hscp & area_type == "HSCP") |
+        area_name == .env$hb |
         area_name == "Scotland"
     ) |>
     filter(year >= max(year) - trend_years) |>
@@ -462,8 +483,12 @@ scotpho_time_trend_HSCP <- function(
   xaxis_title,
   yaxis_title,
   string_wrap,
+  locality,
   rotate_xaxis = FALSE
 ) {
+  hscp <- get_hscp_from_locality(locality)
+  hb <- get_hb_from_locality(locality)
+
   # rotate axis criteria if T/F
   if (rotate_xaxis) {
     rotation <- element_text(angle = 45, hjust = 1)
@@ -474,8 +499,8 @@ scotpho_time_trend_HSCP <- function(
   # filter and reorder data
   data |>
     filter(
-      (area_name == HSCP & area_type == "HSCP") |
-        area_name == HB |
+      (area_name == .env$hscp & area_type == "HSCP") |
+        area_name == .env$hb |
         area_name == "Scotland"
     ) |>
     filter(year >= max(year) - 10) |>
@@ -531,26 +556,32 @@ scotpho_time_trend_HSCP <- function(
 # Creates a horizontal bar chart comparing the last time period of data across
 # all localities in a partnership, the HSCP, HB, and Scotland
 # Data must first be cleaned using clean_scotpho_dat function
-# Uses object "LOCALITY" and vector "other_locs" (other localities in HSCP) to filter
-# these must be specified earlier in script
 
 # Arguments:
 # data: data to use for chart
 # chart_title, xaxis_title : titles for chart and x axis
 
-scotpho_bar_chart <- function(data, chart_title, xaxis_title) {
+scotpho_bar_chart <- function(data, chart_title, xaxis_title, locality) {
+  localities_lookup <- read_in_localities()
+  hscp <- get_hscp_from_locality(locality, localities_lookup)
+  hb <- get_hb_from_locality(locality, localities_lookup)
+  hscp_localities <- localities_lookup[["hscp_locality"]][
+    localities_lookup[["hscp2019name"]] == hscp
+  ]
+
+
   data_for_plot <- data |>
     filter(year == max(year)) |>
     filter(
       (area_name %in%
-        c(LOCALITY, other_locs$hscp_locality) &
+        .env$hscp_localities &
         area_type == "Locality") |
-        (area_name == HSCP & area_type == "HSCP") |
-        area_name == HB |
+        (area_name == .env$hscp & area_type == "HSCP") |
+        area_name == .env$hb |
         area_name == "Scotland"
     ) |>
     mutate(
-      text_highlight = area_name == LOCALITY,
+      text_highlight = area_name == .env$locality,
       area_type = factor(
         area_type,
         levels = c("Locality", "HSCP", "Health board", "Scotland")
@@ -585,17 +616,26 @@ scotpho_bar_chart <- function(data, chart_title, xaxis_title) {
 }
 
 
-scotpho_bar_chart_HSCP <- function(data, chart_title, xaxis_title) {
+scotpho_bar_chart_HSCP <- function(data, chart_title, xaxis_title, locality) {
+  localities_lookup <- read_in_localities()
+  hscp <- get_hscp_from_locality(locality, localities_lookup)
+  hb <- get_hb_from_locality(locality, localities_lookup)
+  hscp_localities <- localities_lookup[["hscp_locality"]][
+    localities_lookup[["hscp2019name"]] == hscp &
+      localities_lookup[["hscp_locality"]] != locality
+  ]
+
+
   data_for_plot <- data |>
     filter(year == max(year)) |>
     filter(
-      (area_name %in% c(other_locs$hscp_locality) & area_type == "Locality") |
-        (area_name == HSCP & area_type == "HSCP") |
-        area_name == HB |
+      (area_name %in% .env$hscp_localities & area_type == "Locality") |
+        (area_name == .env$hscp & area_type == "HSCP") |
+        area_name == .env$hb |
         area_name == "Scotland"
     ) |>
     mutate(
-      text_highlight = area_name == HSCP,
+      text_highlight = area_name == .env$hscp,
       area_type = factor(
         area_type,
         levels = c("Locality", "HSCP", "Health board", "Scotland")
@@ -1040,22 +1080,6 @@ build_profiles <- function(
     locality_environment <- new.env(parent = common_environment)
     locality_environment$HSCP <- locality_profile$hscp
     locality_environment$LOCALITY <- locality_profile$locality
-
-    # Ordinary script functions need a locality-specific enclosing environment.
-    # Memoised readers retain their own environments and remain shared.
-    script_environment <- environment(build_profiles)
-    for (function_name in ls(script_environment)) {
-      profile_function <- get(function_name, envir = script_environment)
-      if (
-        is.function(profile_function) &&
-          identical(environment(profile_function), script_environment)
-      ) {
-        locality_environment[[function_name]] <- rlang::set_env(
-          profile_function,
-          locality_environment
-        )
-      }
-    }
 
     # Keep nested source() calls in the current locality environment.
     locality_environment$source <- function(file, ...) {
