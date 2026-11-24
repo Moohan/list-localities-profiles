@@ -26,8 +26,10 @@ This is the code used to produce the Locality Profiles.
 
 Here are some important files and scripts to be aware of:
 
-- **`Master RMarkdown Document & Render Code/Global Script.R`**: This script loads the necessary packages and declares custom functions. It is sourced by most other scripts.
+- **`Master RMarkdown Document & Render Code/Global Script.R`**: Loads packages and defines shared functions, including `build_profiles()` and optional data workbook and SDC generation.
   
+- **`Build Profiles.R`**: Selects HSCPs and optionally creates SDC and background data workbooks alongside Word Locality Profiles.
+
 - **`Master RMarkdown Document & Render Code/Locality Profiles Render Code.R`**: This script runs the analyses and generates the indicators, as well as creates the main profile and summary table outputs. It is the simplest and most effective way to produce the profiles.
 
 - **`Master RMarkdown Document & Render Code/Locality_Profiles_Master_Markdown.Rmd`**: This is the primary RMarkdown file that contains all the content for the profiles, excluding the summary table, which is generated separately.
@@ -36,9 +38,7 @@ Here are some important files and scripts to be aware of:
 
 - **`Summary Table/Summary-Table-Markdown.Rmd`**: This script generates the Summary Table, which is produced separately because it is in landscape orientation, while the rest of the profiles are in portrait orientation.
 
-- **`Master RMarkdown Document & Render Code/make_sdc_output.R`**: This script creates the Statistical Disclosure Control (SDC) Excel workbooks.
 
-- **`Master RMarkdown Document & Render Code/excel_output.R`**: This script generates the background data Excel workbooks.
 
 ## Contributors ✨
 
