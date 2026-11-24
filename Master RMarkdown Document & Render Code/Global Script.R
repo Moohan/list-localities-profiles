@@ -956,7 +956,7 @@ orient <- function(document_path) {
 
 # Stage each completed document beside its destination, then replace the old file.
 # An unsuccessful build leaves the existing profile untouched.
-publish_profile_document <- function(document_path, output_path) {
+move_profile_to_stats <- function(document_path, output_path) {
   fs::dir_create(fs::path_dir(output_path))
 
   staged_path <- tempfile(
@@ -981,35 +981,30 @@ publish_profile_document <- function(document_path, output_path) {
 build_profiles <- function(
   localities,
   output_dir,
-  progress = function(event) NULL,
-  project_root = "."
+  progress = function(event) NULL
 ) {
-  original_directory <- getwd()
-  setwd(project_root)
-  on.exit(setwd(original_directory), add = TRUE)
-
   localities <- unique(localities)
   lookup <- read_in_localities()
 
   # Check only for locality names that are missing from the trusted lookup.
   unknown_localities <- setdiff(localities, lookup$hscp_locality)
   if (length(unknown_localities) > 0) {
-    stop("Unknown localities: ", paste(unknown_localities, collapse = ", "))
+    stop("Unknown localities: ", toString(unknown_localities), call. = FALSE)
   }
 
+  locality_lookup <- lookup |>
+    dplyr::distinct(hscp_locality, hscp2019name)
+
   profiles <- tibble::tibble(locality = localities) |>
-    dplyr::left_join(
-      lookup |>
-        dplyr::distinct(hscp_locality, hscp2019name),
-      by = c("locality" = "hscp_locality")
-    ) |>
-    dplyr::transmute(
-      locality,
+    dplyr::left_join(locality_lookup, by = c(locality = "hscp_locality")) |>
+    dplyr::mutate(
+      locality = locality,
       hscp = hscp2019name,
       output_filename = paste0(
         gsub("[/\\\\]", "-", locality),
         " - Locality Profile.docx"
-      )
+      ),
+      .keep = "none"
     )
 
   # Shared lookup functions stay cached, but each locality gets fresh data.
@@ -1045,10 +1040,10 @@ build_profiles <- function(
     "Master RMarkdown Document & Render Code/Tables for Appendix.R"
   )
 
-  generate_profile <- function(profile) {
+  generate_profile <- function(locality_profile) {
     locality_environment <- new.env(parent = common_environment)
-    locality_environment$HSCP <- profile$hscp
-    locality_environment$LOCALITY <- profile$locality
+    locality_environment$HSCP <- locality_profile$hscp
+    locality_environment$LOCALITY <- locality_profile$locality
 
     # The Services map script sources another script, so keep that source
     # within the same locality environment rather than .GlobalEnv.
@@ -1059,11 +1054,9 @@ build_profiles <- function(
     fs::dir_delete(documents_dir)
     fs::dir_create(documents_dir)
 
-    purrr::walk(section_scripts, function(script) {
-      sys.source(script, envir = locality_environment)
-    })
+    purrr::walk(section_scripts, sys.source, envir = locality_environment)
 
-    output_filename <- profile$output_filename
+    output_filename <- locality_profile$output_filename
     main_title <- sub("\\.docx$", "", output_filename)
     temp_document <- fs::path(documents_dir, output_filename)
     output_document <- fs::path(output_dir, output_filename)
@@ -1085,17 +1078,17 @@ build_profiles <- function(
       "OFFICIAL_SENSITIVE_VMO"
     )
 
-    publish_profile_document(temp_document, output_document)
+    move_profile_to_stats(temp_document, output_document)
   }
 
   generate_profile_safely <- purrr::safely(generate_profile)
 
   results <- purrr::map(seq_len(nrow(profiles)), function(result_num) {
-    profile <- profiles[result_num, ]
+    locality_profile <- profiles[result_num, ]
 
     progress(list(
-      locality = profile$locality,
-      hscp = profile$hscp,
+      locality = locality_profile$locality,
+      hscp = locality_profile$hscp,
       position = result_num,
       total = nrow(profiles),
       status = "running",
@@ -1103,7 +1096,7 @@ build_profiles <- function(
       error = NA_character_
     ))
 
-    result <- generate_profile_safely(profile)
+    result <- generate_profile_safely(locality_profile)
     succeeded <- is.null(result$error)
 
     status <- if (succeeded) "succeeded" else "failed"
@@ -1111,8 +1104,8 @@ build_profiles <- function(
     error <- if (succeeded) NA_character_ else conditionMessage(result$error)
 
     progress(list(
-      locality = profile$locality,
-      hscp = profile$hscp,
+      locality = locality_profile$locality,
+      hscp = locality_profile$hscp,
       position = result_num,
       total = nrow(profiles),
       status = status,
@@ -1123,8 +1116,8 @@ build_profiles <- function(
     gc()
 
     tibble::tibble(
-      locality = profile$locality,
-      hscp = profile$hscp,
+      locality = locality_profile$locality,
+      hscp = locality_profile$hscp,
       status = status,
       output_path = output_path,
       error = error
