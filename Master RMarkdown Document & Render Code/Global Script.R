@@ -572,9 +572,7 @@ scotpho_bar_chart <- function(data, chart_title, xaxis_title, locality) {
   data_for_plot <- data |>
     filter(year == max(year)) |>
     filter(
-      (area_name %in%
-        .env$hscp_localities &
-        area_type == "Locality") |
+      (area_name %in% .env$hscp_localities & area_type == "Locality") |
         (area_name == .env$hscp & area_type == "HSCP") |
         area_name == .env$hb |
         area_name == "Scotland"
