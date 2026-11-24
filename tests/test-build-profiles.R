@@ -63,7 +63,7 @@ stopifnot(
   identical(result$results$status, c("succeeded", "failed", "succeeded")),
   grepl("Illustrative analysis failure", result$results$error[[2]]),
   length(events) == 6L,
-  identical(vapply(events, \`[[\`, character(1), "status"),
+  identical(vapply(events, function(event) event$status, character(1)),
             c("running", "succeeded", "running", "failed",
               "running", "succeeded"))
 )
@@ -73,7 +73,6 @@ stopifnot(
 if (.Platform$OS.type == "unix") {
   temporary <- tempfile("lp-publish-test-")
   dir.create(temporary)
-  on.exit <- NULL
   original <- file.path(temporary, "source.docx")
   target <- file.path(temporary, "existing.docx")
   writeLines("replacement", original)
