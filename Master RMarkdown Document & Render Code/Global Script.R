@@ -960,7 +960,7 @@ move_profile_to_stats <- function(document_path, output_path) {
   fs::dir_create(fs::path_dir(output_path))
 
   staged_path <- tempfile(
-    pattern = "lp-profile-",
+    pattern = ".lp-profile-",
     tmpdir = fs::path_dir(output_path),
     fileext = ".docx"
   )
