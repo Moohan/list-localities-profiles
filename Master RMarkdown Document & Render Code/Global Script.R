@@ -1056,7 +1056,9 @@ build_profiles <- function(
       base::source(file, local = locality_environment, ...)
     }
 
-    fs::dir_delete(documents_dir)
+    if (fs::dir_exists(documents_dir)) {
+      fs::dir_delete(documents_dir)
+    }
     fs::dir_create(documents_dir)
 
     purrr::walk(section_scripts, sys.source, envir = locality_environment)
@@ -1071,7 +1073,7 @@ build_profiles <- function(
       output_dir = documents_dir,
       output_file = output_filename,
       new_session = FALSE,
-      output_format = "bookdown::word_document2",
+      output_format = "officedown::rdocx_document",
       config_file = "_bookdown.yaml",
       envir = locality_environment
     )
