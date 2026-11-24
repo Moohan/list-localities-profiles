@@ -1121,22 +1121,27 @@ collect_sdc_workbook_tables <- function(locality_environment) {
     smr01_age <- purrr::imap(
       list(
         Emergency_Admissions_Age = dplyr::filter(
-          emergency_adm_age, hscp_locality == LOCALITY
+          emergency_adm_age,
+          hscp_locality == LOCALITY
         ),
         Unscheduled_Bed_Days_Age = dplyr::filter(
-          bed_days_age, hscp_locality == LOCALITY
+          bed_days_age,
+          hscp_locality == LOCALITY
         ),
         Readmissions_Age = readmissions_age,
         AE_Attendances_Age = dplyr::filter(
-          ae_att_age, hscp_locality == LOCALITY
+          ae_att_age,
+          hscp_locality == LOCALITY
         ),
         Bed_Days_MH_Age = dplyr::filter(
-          bed_days_mh_age, hscp_locality == LOCALITY
+          bed_days_mh_age,
+          hscp_locality == LOCALITY
         )
       ),
       \(data, name) {
         small_counts(
-          data, name,
+          data,
+          name,
           financial_year,
           age_group,
           n = dplyr::any_of(c("adm", "bed_days", "read_28", "attendances"))
@@ -1152,7 +1157,8 @@ collect_sdc_workbook_tables <- function(locality_environment) {
       ),
       \(data, name) {
         small_counts(
-          data, name,
+          data,
+          name,
           measure = dplyr::any_of(c("total_ltc", "key", "Prevalence")),
           dplyr::any_of("age_group"),
           n = dplyr::any_of(c("people", "value"))
@@ -1197,7 +1203,8 @@ write_hscp_workbook <- function(tables, output_path, type) {
     })
     openxlsx::addWorksheet(wb, sheetName = "Index")
     openxlsx::writeData(
-      wb, sheet = "Index",
+      wb,
+      sheet = "Index",
       x = data.frame(Sheet_name = names(tables))
     )
     openxlsx::saveWorkbook(wb, staged_path, overwrite = TRUE)
@@ -1205,7 +1212,11 @@ write_hscp_workbook <- function(tables, output_path, type) {
 
   fs::file_chown(staged_path, group_id = "LIST_analytics")
   if (!file.rename(staged_path, output_path)) {
-    stop("Could not replace the existing workbook: ", output_path, call. = FALSE)
+    stop(
+      "Could not replace the existing workbook: ",
+      output_path,
+      call. = FALSE
+    )
   }
   output_path
 }
@@ -1237,14 +1248,17 @@ write_hscp_workbooks <- function(
       status <- "skipped"
       result <- list(
         result = NULL,
-        error = simpleError("One or more locality profiles failed; workbook not generated.")
+        error = simpleError(
+          "One or more locality profiles failed; workbook not generated."
+        )
       )
     } else {
       result <- purrr::safely(function() {
         field <- if (type == "sdc") "sdc_tables" else "data_tables"
         collected <- purrr::map(locality_results, function(x) x[[field]])
         failed <- which(purrr::map_lgl(
-          collected, \(x) !is.null(x$error)
+          collected,
+          \(x) !is.null(x$error)
         ))
         if (length(failed) > 0L) {
           stop(
@@ -1275,7 +1289,11 @@ write_hscp_workbooks <- function(
     }
 
     output_path <- if (status == "succeeded") result$result else NA_character_
-    error <- if (status == "succeeded") NA_character_ else conditionMessage(result$error)
+    error <- if (status == "succeeded") {
+      NA_character_
+    } else {
+      conditionMessage(result$error)
+    }
 
     progress(list(
       type = type,
