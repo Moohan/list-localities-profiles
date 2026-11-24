@@ -1007,76 +1007,52 @@ move_profile_to_stats <- function(document_path, output_path) {
 
 collect_data_workbook_tables <- function(locality_environment) {
   with(new.env(parent = locality_environment), {
+    filter_locality <- function(data, column) {
+      dplyr::filter(data, .data[[column]] == .env$LOCALITY)
+    }
+
     tables <- list(
-      Population_Estimates = pops[pops$hscp_locality == LOCALITY, ],
+      Population_Estimates = filter_locality(pops, "hscp_locality"),
       Population_Projections = pop_proj_dat,
       SIMD_Locality_2022 = simd_perc_breakdown,
       SIMD_Domains_2016 = simd2016_dom,
       SIMD_Domains_2022 = simd2020_dom,
-      Care_Home = markers_care_home[
-        markers_care_home$hscp_locality == LOCALITY,
-      ],
-      Emergency_Dep = markers_emergency_dep[
-        markers_emergency_dep$hscp_locality == LOCALITY,
-      ],
-      GP = markers_gp[markers_gp$hscp_locality == LOCALITY, ],
-      Minor_Injuries_Unit = markers_miu[
-        markers_miu$hscp_locality == LOCALITY,
-      ],
+      Care_Home = filter_locality(markers_care_home, "hscp_locality"),
+      Emergency_Dep = filter_locality(markers_emergency_dep, "hscp_locality"),
+      GP = filter_locality(markers_gp, "hscp_locality"),
+      Minor_Injuries_Unit = filter_locality(markers_miu, "hscp_locality"),
       Housing_Data = house_dat1,
       Housing_Council_Tax_Band = house_dat2,
-      Life_Expectancy = life_exp[life_exp$area_name == LOCALITY, ],
-      Deaths_Aged_15_44 = deaths_15_44[deaths_15_44$area_name == LOCALITY, ],
-      Long_Term_Conditions = ltc[ltc$hscp_locality == LOCALITY, ],
-      Cancer_Registrations = cancer_reg[cancer_reg$area_name == LOCALITY, ],
-      Early_Deaths_Cancer = early_deaths_cancer[
-        early_deaths_cancer$area_name == LOCALITY,
-      ],
-      Asthma_Hospitalisations = asthma_hosp[
-        asthma_hosp$area_name == LOCALITY,
-      ],
-      CHD_Hospitalisations = chd_hosp[chd_hosp$area_name == LOCALITY, ],
-      COPD_Hospitalisations = copd_hosp[copd_hosp$area_name == LOCALITY, ],
-      MH_Prescriptions = adp_presc[adp_presc$area_name == LOCALITY, ],
-      Alcohol_Admissions = alcohol_hosp[alcohol_hosp$area_name == LOCALITY, ],
-      Alcohol_Deaths = alcohol_deaths[alcohol_deaths$area_name == LOCALITY, ],
-      Drug_Admissions = drug_hosp[drug_hosp$area_name == LOCALITY, ],
-      Bowel_Screening = bowel_screening[
-        bowel_screening$area_name == LOCALITY,
-      ],
-      Emergency_Admissions = emergency_adm_areas[
-        emergency_adm_areas$location == LOCALITY,
-      ],
-      "Emergency_Admissions_Age " = emergency_adm_age[
-        emergency_adm_age$hscp_locality == LOCALITY,
-      ],
-      Unscheduled_Bed_Days = bed_days_areas[
-        bed_days_areas$location == LOCALITY,
-      ],
-      Unscheduled_Bed_Days_Age = bed_days_age[
-        bed_days_age$hscp_locality == LOCALITY,
-      ],
-      AE_attendances = ae_att_areas[ae_att_areas$location == LOCALITY, ],
-      AE_attendances_Age = ae_att_age[ae_att_age$hscp_locality == LOCALITY, ],
-      Readmissions = readmissions_areas[
-        readmissions_areas$location == LOCALITY,
-      ],
+      Life_Expectancy = filter_locality(life_exp, "area_name"),
+      Deaths_Aged_15_44 = filter_locality(deaths_15_44, "area_name"),
+      Long_Term_Conditions = filter_locality(ltc, "hscp_locality"),
+      Cancer_Registrations = filter_locality(cancer_reg, "area_name"),
+      Early_Deaths_Cancer = filter_locality(early_deaths_cancer, "area_name"),
+      Asthma_Hospitalisations = filter_locality(asthma_hosp, "area_name"),
+      CHD_Hospitalisations = filter_locality(chd_hosp, "area_name"),
+      COPD_Hospitalisations = filter_locality(copd_hosp, "area_name"),
+      MH_Prescriptions = filter_locality(adp_presc, "area_name"),
+      Alcohol_Admissions = filter_locality(alcohol_hosp, "area_name"),
+      Alcohol_Deaths = filter_locality(alcohol_deaths, "area_name"),
+      Drug_Admissions = filter_locality(drug_hosp, "area_name"),
+      Bowel_Screening = filter_locality(bowel_screening, "area_name"),
+      Emergency_Admissions = filter_locality(emergency_adm_areas, "location"),
+      Emergency_Admissions_Age = filter_locality(emergency_adm_age, "hscp_locality"),
+      Unscheduled_Bed_Days = filter_locality(bed_days_areas, "location"),
+      Unscheduled_Bed_Days_Age = filter_locality(bed_days_age, "hscp_locality"),
+      AE_attendances = filter_locality(ae_att_areas, "location"),
+      AE_attendances_Age = filter_locality(ae_att_age, "hscp_locality"),
+      Readmissions = filter_locality(readmissions_areas, "location"),
       Readmissions_Age = readmissions_age,
-      Delayed_Discharge = delayed_disch_areas[
-        delayed_disch_areas$location == LOCALITY,
-      ],
-      Fall_Admissions = falls_areas[falls_areas$location == LOCALITY, ],
-      Preventable_admission_PPA = ppa_areas[ppa_areas$location == LOCALITY, ],
-      psych_admissions = psych_hosp[psych_hosp$area_name == LOCALITY, ],
-      MH_bed_days = bed_days_mh_areas[
-        bed_days_mh_areas$location == LOCALITY,
-      ],
-      bed_days_mh_age = bed_days_mh_age[
-        bed_days_mh_age$hscp_locality == LOCALITY,
-      ]
+      Delayed_Discharge = filter_locality(delayed_disch_areas, "location"),
+      Fall_Admissions = filter_locality(falls_areas, "location"),
+      Preventable_admission_PPA = filter_locality(ppa_areas, "location"),
+      psych_admissions = filter_locality(psych_hosp, "area_name"),
+      MH_bed_days = filter_locality(bed_days_mh_areas, "location"),
+      bed_days_mh_age = filter_locality(bed_days_mh_age, "hscp_locality")
     )
 
-    lapply(tables, function(table) {
+    purrr::map(tables, function(table) {
       table[["locality"]] <- rep(LOCALITY, nrow(table))
       table
     })
