@@ -1,6 +1,5 @@
 # Extract the existing locality-level data tables after the analysis scripts run.
 collect_data_workbook_tables <- function(locality_environment) {
-  locality_name <- locality_environment$LOCALITY
   with(locality_environment, {
     df <- list(
       "Population_Estimates" = pops[pops$hscp_locality == LOCALITY, ],
@@ -72,7 +71,7 @@ collect_data_workbook_tables <- function(locality_environment) {
     )
 
     lapply(df, function(table) {
-      table[["locality"]] <- rep(locality_name, nrow(table))
+      table[["locality"]] <- rep(LOCALITY, nrow(table))
       table
     })
   })
