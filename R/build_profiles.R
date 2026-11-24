@@ -5,8 +5,12 @@
 # environment; the calling process is responsible for job-level isolation.
 
 profile_output_filename <- function(locality) {
-  if (!is.character(locality) || length(locality) != 1L ||
-      is.na(locality) || !nzchar(trimws(locality))) {
+  if (
+    !is.character(locality) ||
+      length(locality) != 1L ||
+      is.na(locality) ||
+      !nzchar(trimws(locality))
+  ) {
     stop("A single non-empty locality name is required.", call. = FALSE)
   }
 
@@ -15,15 +19,21 @@ profile_output_filename <- function(locality) {
 }
 
 validate_profile_selection <- function(localities, lookup) {
-  if (!is.character(localities) || length(localities) == 0L ||
-      anyNA(localities) || any(!nzchar(trimws(localities)))) {
+  if (
+    !is.character(localities) ||
+      length(localities) == 0L ||
+      anyNA(localities) ||
+      any(!nzchar(trimws(localities)))
+  ) {
     stop("localities must be a non-empty character vector.", call. = FALSE)
   }
   if (anyDuplicated(localities)) {
     stop("localities must not contain duplicates.", call. = FALSE)
   }
-  if (!is.data.frame(lookup) ||
-      !all(c("hscp_locality", "hscp2019name") %in% names(lookup))) {
+  if (
+    !is.data.frame(lookup) ||
+      !all(c("hscp_locality", "hscp2019name") %in% names(lookup))
+  ) {
     stop("lookup must contain hscp_locality and hscp2019name.", call. = FALSE)
   }
 
@@ -49,7 +59,10 @@ validate_profile_selection <- function(localities, lookup) {
   matches <- matches[match(localities, matches$hscp_locality), , drop = FALSE]
   filenames <- vapply(localities, profile_output_filename, character(1))
   if (anyDuplicated(filenames)) {
-    stop("Selected localities produce duplicate output filenames.", call. = FALSE)
+    stop(
+      "Selected localities produce duplicate output filenames.",
+      call. = FALSE
+    )
   }
 
   data.frame(
@@ -64,7 +77,11 @@ validate_profile_selection <- function(localities, lookup) {
 # Process all requested localities, recording failures without ending the job.
 # progress(event) receives a named list with locality, hscp, position, total,
 # status (running/succeeded/failed), output_path and error.
-run_profile_items <- function(items, processor, progress = function(event) NULL) {
+run_profile_items <- function(
+  items,
+  processor,
+  progress = function(event) NULL
+) {
   stopifnot(is.data.frame(items), is.function(processor), is.function(progress))
   stopifnot(all(c("locality", "hscp", "output_filename") %in% names(items)))
 
@@ -92,11 +109,19 @@ run_profile_items <- function(items, processor, progress = function(event) NULL)
     outcome <- tryCatch(
       {
         output_path <- processor(items[i, , drop = FALSE])
-        if (!is.character(output_path) || length(output_path) != 1L ||
-            is.na(output_path) || !nzchar(output_path)) {
+        if (
+          !is.character(output_path) ||
+            length(output_path) != 1L ||
+            is.na(output_path) ||
+            !nzchar(output_path)
+        ) {
           stop("Profile processor did not return an output path.")
         }
-        list(status = "succeeded", output_path = output_path, error = NA_character_)
+        list(
+          status = "succeeded",
+          output_path = output_path,
+          error = NA_character_
+        )
       },
       error = function(e) {
         list(
@@ -130,17 +155,25 @@ run_profile_items <- function(items, processor, progress = function(event) NULL)
 # Stage in the destination directory so a rename to the final path stays on
 # the same filesystem. On the Linux server, file.rename() replaces an existing
 # file atomically; if renaming fails, the old file is left untouched.
-publish_profile_document <- function(source_path, destination_path,
-                                     group = "LIST_analytics") {
+publish_profile_document <- function(
+  source_path,
+  destination_path,
+  group = "LIST_analytics"
+) {
   source_info <- file.info(source_path)
-  if (!file.exists(source_path) || is.na(source_info$size) ||
-      source_info$size == 0L) {
+  if (
+    !file.exists(source_path) ||
+      is.na(source_info$size) ||
+      source_info$size == 0L
+  ) {
     stop("Completed Word document is missing or empty.", call. = FALSE)
   }
 
   destination_dir <- dirname(destination_path)
-  if (!dir.exists(destination_dir) &&
-      !dir.create(destination_dir, recursive = TRUE, showWarnings = FALSE)) {
+  if (
+    !dir.exists(destination_dir) &&
+      !dir.create(destination_dir, recursive = TRUE, showWarnings = FALSE)
+  ) {
     stop("Cannot create output directory: ", destination_dir, call. = FALSE)
   }
 
@@ -161,18 +194,27 @@ publish_profile_document <- function(source_path, destination_path,
   }
 
   if (!file.rename(staged_path, destination_path)) {
-    stop("Could not publish Word document; existing output was preserved.",
-         call. = FALSE)
+    stop(
+      "Could not publish Word document; existing output was preserved.",
+      call. = FALSE
+    )
   }
 
   invisible(destination_path)
 }
 
-build_profiles <- function(localities, output_dir,
-                           progress = function(event) NULL,
-                           project_root = ".") {
-  if (!is.character(output_dir) || length(output_dir) != 1L ||
-      is.na(output_dir) || !nzchar(output_dir)) {
+build_profiles <- function(
+  localities,
+  output_dir,
+  progress = function(event) NULL,
+  project_root = "."
+) {
+  if (
+    !is.character(output_dir) ||
+      length(output_dir) != 1L ||
+      is.na(output_dir) ||
+      !nzchar(output_dir)
+  ) {
     stop("output_dir must be a single directory path.", call. = FALSE)
   }
   if (!is.function(progress)) {
@@ -220,7 +262,9 @@ build_profiles <- function(localities, output_dir,
   fs::dir_copy("lp_bookdown", local_lp_bookdown)
 
   cover_page <- file.path(
-    shared_env$lp_path, "templates", "phs-mngtinfo-coverV2.docx"
+    shared_env$lp_path,
+    "templates",
+    "phs-mngtinfo-coverV2.docx"
   )
   local_cover_page <- file.path(input_dir, "phs-mngtinfo-coverV2.docx")
   if (!file.copy(cover_page, local_cover_page, overwrite = TRUE)) {

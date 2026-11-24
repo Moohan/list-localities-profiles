@@ -48,7 +48,9 @@ events <- list()
 result <- run_profile_items(
   items,
   processor = function(item) {
-    if (item$locality == "Area A") stop("Illustrative analysis failure")
+    if (item$locality == "Area A") {
+      stop("Illustrative analysis failure")
+    }
     paste0(item$locality, ".docx")
   },
   progress = function(event) {
@@ -63,9 +65,10 @@ stopifnot(
   identical(result$results$status, c("succeeded", "failed", "succeeded")),
   grepl("Illustrative analysis failure", result$results$error[[2]]),
   length(events) == 6L,
-  identical(vapply(events, function(event) event$status, character(1)),
-            c("running", "succeeded", "running", "failed",
-              "running", "succeeded"))
+  identical(
+    vapply(events, function(event) event$status, character(1)),
+    c("running", "succeeded", "running", "failed", "running", "succeeded")
+  )
 )
 
 # On Linux the staging rename must replace an existing destination without

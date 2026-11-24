@@ -37,7 +37,10 @@ result <- build_profiles(
     if (event$status %in% c("succeeded", "failed")) {
       message(sprintf(
         "[%d/%d] %s: %s",
-        event$position, event$total, event$locality, event$status
+        event$position,
+        event$total,
+        event$locality,
+        event$status
       ))
     }
   }
@@ -46,7 +49,8 @@ result <- build_profiles(
 print(result$results)
 message(sprintf(
   "Profiles complete: %d succeeded, %d failed.",
-  result$succeeded, result$failed
+  result$succeeded,
+  result$failed
 ))
 if (result$failed > 0L) {
   warning("Some Locality Profiles could not be generated.", call. = FALSE)
