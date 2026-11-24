@@ -569,7 +569,6 @@ scotpho_bar_chart <- function(data, chart_title, xaxis_title, locality) {
     localities_lookup[["hscp2019name"]] == hscp
   ]
 
-
   data_for_plot <- data |>
     filter(year == max(year)) |>
     filter(
@@ -624,7 +623,6 @@ scotpho_bar_chart_HSCP <- function(data, chart_title, xaxis_title, locality) {
     localities_lookup[["hscp2019name"]] == hscp &
       localities_lookup[["hscp_locality"]] != locality
   ]
-
 
   data_for_plot <- data |>
     filter(year == max(year)) |>
