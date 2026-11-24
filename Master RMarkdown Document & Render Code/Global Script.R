@@ -1026,7 +1026,11 @@ validate_profile_selection <- function(localities, lookup) {
 
 # Process every selected locality in order, collecting errors without stopping.
 # progress(event) reports locality, hscp, position, total, status and any error.
-run_profile_items <- function(items, processor, progress = function(event) NULL) {
+run_profile_items <- function(
+  items,
+  processor,
+  progress = function(event) NULL
+) {
   stopifnot(is.data.frame(items), is.function(processor), is.function(progress))
   stopifnot(all(c("locality", "hscp", "output_filename") %in% names(items)))
 
