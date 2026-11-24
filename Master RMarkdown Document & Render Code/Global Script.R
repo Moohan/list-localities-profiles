@@ -1274,11 +1274,11 @@ write_hscp_workbooks <- function(
         sheet_names <- names(locality_tables[[1L]])
         tables <- stats::setNames(
           lapply(sheet_names, function(sheet) {
-            data <- lapply(locality_tables, function(x) x[[sheet]])
+            pieces <- lapply(locality_tables, function(x) x[[sheet]])
             if (type == "sdc") {
-              dplyr::bind_rows(data)
+              dplyr::bind_rows(pieces)
             } else {
-              Reduce(rbind, data)
+              Reduce(rbind, pieces)
             }
           }),
           sheet_names
