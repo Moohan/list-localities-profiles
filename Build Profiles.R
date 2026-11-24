@@ -20,15 +20,14 @@ hscp_list <- c("West Lothian", "Angus")
 
 unknown_hscps <- setdiff(hscp_list, lookup$hscp2019name)
 if (length(unknown_hscps) > 0) {
-  stop("Unknown HSCPs: ", paste(unknown_hscps, collapse = ", "))
+  stop("Unknown HSCPs: ", toString(unknown_hscps), call. = FALSE)
 }
 
-localities <- purrr::map(hscp_list, function(HSCP) {
-  lookup |>
-    filter(hscp2019name == HSCP) |>
-    pull(hscp_locality)
-}) |>
-  purrr::list_c()
+# Keep localities grouped in the same order as the selected HSCPs.
+localities <- lookup |>
+  filter(hscp2019name %in% hscp_list) |>
+  arrange(match(hscp2019name, hscp_list)) |>
+  pull(hscp_locality)
 
 result <- build_profiles(
   localities = localities,
