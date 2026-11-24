@@ -1037,7 +1037,10 @@ collect_data_workbook_tables <- function(locality_environment) {
       Drug_Admissions = filter_locality(drug_hosp, "area_name"),
       Bowel_Screening = filter_locality(bowel_screening, "area_name"),
       Emergency_Admissions = filter_locality(emergency_adm_areas, "location"),
-      Emergency_Admissions_Age = filter_locality(emergency_adm_age, "hscp_locality"),
+      Emergency_Admissions_Age = filter_locality(
+        emergency_adm_age,
+        "hscp_locality"
+      ),
       Unscheduled_Bed_Days = filter_locality(bed_days_areas, "location"),
       Unscheduled_Bed_Days_Age = filter_locality(bed_days_age, "hscp_locality"),
       AE_attendances = filter_locality(ae_att_areas, "location"),
@@ -1130,7 +1133,8 @@ collect_sdc_workbook_tables <- function(locality_environment) {
         Long_Term_Conditions = ltc_multimorbidity,
         LTC_Types = ltc_types,
         LTC_Top_5_Prevalence = dplyr::mutate(
-          top5ltc_loc, value = locality_n
+          top5ltc_loc,
+          value = locality_n
         )
       ),
       \(data, name) {
@@ -1186,9 +1190,14 @@ write_hscp_workbook <- function(tables, output_path, type) {
       sheet = "Index",
       x = data.frame(Sheet_name = names(tables))
     )
-    if (!isTRUE(openxlsx::saveWorkbook(
-      wb, staged_path, overwrite = TRUE, returnValue = TRUE
-    ))) {
+    if (
+      !isTRUE(openxlsx::saveWorkbook(
+        wb,
+        staged_path,
+        overwrite = TRUE,
+        returnValue = TRUE
+      ))
+    ) {
       stop("Could not save workbook: ", output_path, call. = FALSE)
     }
   }
