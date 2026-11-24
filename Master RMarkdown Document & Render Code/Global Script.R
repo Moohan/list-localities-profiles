@@ -970,7 +970,7 @@ move_profile_to_stats <- function(document_path, output_path) {
   fs::file_chown(staged_path, group_id = "LIST_analytics")
 
   if (!file.rename(staged_path, output_path)) {
-    stop("Could not replace the existing profile: ", output_path)
+    stop("Could not replace the existing profile: ", output_path, call. = FALSE)
   }
 
   output_path
