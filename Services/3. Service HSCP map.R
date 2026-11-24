@@ -367,7 +367,6 @@ all_markers <- bind_rows(
 ) |>
   select(name, latitude, longitude, type)
 
-rm(markers_care_home, markers_emergency_dep, markers_gp, markers_miu)
 
 service_map_2 <- ggmap(service_map_background) +
   geom_point(
