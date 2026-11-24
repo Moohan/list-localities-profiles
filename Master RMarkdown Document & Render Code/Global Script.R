@@ -898,7 +898,7 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
     output_dir = output_dir,
     output_file = output_doc_name,
     new_session = FALSE,
-    output_format = "bookdown::word_document2",
+    output_format = "officedown::rdocx_document",
     config_file = path(tempdir(), "_practice_chapter_temp.yaml")
   )
 
@@ -951,14 +951,10 @@ orient <- function(document_path) {
   print(doc, target = document_path)
 }
 
-
 #### Word Locality Profile generation #### ----
 
-# Stage each completed document beside its destination, then replace the old file.
-# An unsuccessful build leaves the existing profile untouched.
+# Stage the completed file before replacing any existing profile.
 move_profile_to_stats <- function(document_path, output_path) {
-  fs::dir_create(fs::path_dir(output_path))
-
   staged_path <- tempfile(
     pattern = ".lp-profile-",
     tmpdir = fs::path_dir(output_path),
@@ -976,14 +972,11 @@ move_profile_to_stats <- function(document_path, output_path) {
   output_path
 }
 
-# Generate the selected locality profiles and report successes and errors.
-# progress() is used by the future Shiny app to follow individual localities.
 build_profiles <- function(
   localities,
   output_dir,
   progress = function(event) NULL
 ) {
-  # Check the Stats directory before doing any profile generation.
   if (!fs::dir_exists(output_dir)) {
     stop("Output directory does not exist: ", output_dir, call. = FALSE)
   }
@@ -994,7 +987,6 @@ build_profiles <- function(
   localities <- unique(localities)
   lookup <- read_in_localities()
 
-  # Check only for locality names that are missing from the trusted lookup.
   unknown_localities <- setdiff(localities, lookup$hscp_locality)
   if (length(unknown_localities) > 0) {
     stop("Unknown localities: ", toString(unknown_localities), call. = FALSE)
@@ -1014,7 +1006,7 @@ build_profiles <- function(
       .keep = "none"
     )
 
-  # Shared lookup functions stay cached, but each locality gets fresh data.
+  # Share memoised readers without sharing locality-specific variables.
   common_environment <- new.env(parent = environment(build_profiles))
   common_environment$lookup <- lookup
   common_environment$output_dir <- output_dir
@@ -1052,14 +1044,13 @@ build_profiles <- function(
     locality_environment$HSCP <- locality_profile$hscp
     locality_environment$LOCALITY <- locality_profile$locality
 
-    # These charts use LOCALITY, HSCP, HB and other_locs from each locality.
+    # Chart helpers must resolve locality variables in their enclosing environment.
     locality_environment$scotpho_time_trend <- scotpho_time_trend
     environment(locality_environment$scotpho_time_trend) <- locality_environment
     locality_environment$scotpho_bar_chart <- scotpho_bar_chart
     environment(locality_environment$scotpho_bar_chart) <- locality_environment
 
-    # The Services map script sources another script, so keep that source
-    # within the same locality environment rather than .GlobalEnv.
+    # Keep nested source() calls in the current locality environment.
     locality_environment$source <- function(file, ...) {
       base::source(file, local = locality_environment, ...)
     }
@@ -1127,6 +1118,7 @@ build_profiles <- function(
       error = error
     ))
 
+    # Release large per-locality objects before starting the next profile.
     gc()
 
     tibble::tibble(
