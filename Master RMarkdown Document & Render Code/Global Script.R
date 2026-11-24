@@ -1046,10 +1046,13 @@ build_profiles <- function(
     script_environment <- environment(build_profiles)
     for (function_name in ls(script_environment)) {
       profile_function <- get(function_name, envir = script_environment)
-      if (is.function(profile_function) &&
-          identical(environment(profile_function), script_environment)) {
+      if (
+        is.function(profile_function) &&
+          identical(environment(profile_function), script_environment)
+      ) {
         locality_environment[[function_name]] <- rlang::set_env(
-          profile_function, locality_environment
+          profile_function,
+          locality_environment
         )
       }
     }
