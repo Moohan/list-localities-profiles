@@ -983,6 +983,14 @@ build_profiles <- function(
   output_dir,
   progress = function(event) NULL
 ) {
+  # Check the Stats directory before doing any profile generation.
+  if (!fs::dir_exists(output_dir)) {
+    stop("Output directory does not exist: ", output_dir, call. = FALSE)
+  }
+  write_test <- tempfile(pattern = "lp-write-test-", tmpdir = output_dir)
+  fs::file_create(write_test)
+  fs::file_delete(write_test)
+
   localities <- unique(localities)
   lookup <- read_in_localities()
 
