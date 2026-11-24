@@ -1180,14 +1180,6 @@ build_profiles <- function(
   }
 
   generate_profile_safely <- purrr::safely(generate_profile)
-  empty_workbook_results <- tibble::tibble(
-    hscp = character(),
-    type = character(),
-    status = character(),
-    output_path = character(),
-    error = character()
-  )
-
   hscp_results <- purrr::map(hscps, function(hscp) {
     row_numbers <- which(profiles$hscp == hscp)
 
@@ -1240,95 +1232,20 @@ build_profiles <- function(
     locality_rows <- purrr::map(locality_results, "row") |>
       purrr::list_rbind()
 
-    workbook_types <- c(
-      if (create_data_workbook) "data_workbook",
-      if (create_sdc) "sdc"
+    workbook_rows <- write_hscp_workbooks(
+      hscp = hscp,
+      locality_results = locality_results,
+      locality_rows = locality_rows,
+      create_data_workbook = create_data_workbook,
+      create_sdc = create_sdc,
+      workbook_output_dir = workbook_output_dir,
+      hscp_count = length(hscps),
+      progress = progress
     )
-
-    workbook_rows <- purrr::map(workbook_types, function(type) {
-      suffix <- if (type == "sdc") {
-        " - Locality Profile SDC highlight.xlsx"
-      } else {
-        " - Locality Profile data.xlsx"
-      }
-      target <- fs::path(workbook_output_dir, paste0(hscp, suffix))
-
-      if (any(locality_rows$status != "succeeded")) {
-        status <- "skipped"
-        output_path <- NA_character_
-        error <- "One or more locality profiles failed; workbook not generated."
-      } else {
-        collections <- purrr::map(
-          locality_results,
-          if (type == "sdc") "sdc_tables" else "data_tables"
-        )
-        collection_failed <- purrr::map_lgl(
-          collections,
-          \(collection) !is.null(collection$error)
-        )
-
-        if (any(collection_failed)) {
-          status <- "failed"
-          output_path <- NA_character_
-          error <- paste0(
-            "Could not collect workbook tables for ",
-            toString(locality_rows$locality[collection_failed]),
-            ": ",
-            conditionMessage(collections[[which(collection_failed)[1L]]]$error)
-          )
-        } else {
-          build_workbook <- purrr::safely(function() {
-            local_tables <- purrr::map(collections, "result")
-            if (type == "sdc") {
-              write_sdc_workbook(
-                combine_sdc_workbook_tables(local_tables),
-                target
-              )
-            } else {
-              write_data_workbook(
-                combine_data_workbook_tables(local_tables),
-                target
-              )
-            }
-          })()
-          status <- if (is.null(build_workbook$error)) "succeeded" else "failed"
-          output_path <- if (status == "succeeded") {
-            build_workbook$result
-          } else {
-            NA_character_
-          }
-          error <- if (status == "succeeded") {
-            NA_character_
-          } else {
-            conditionMessage(build_workbook$error)
-          }
-        }
-      }
-
-      progress(list(
-        type = type,
-        locality = NA_character_,
-        hscp = hscp,
-        position = NA_integer_,
-        total = length(hscps),
-        status = status,
-        output_path = output_path,
-        error = error
-      ))
-
-      tibble::tibble(
-        hscp = hscp,
-        type = type,
-        status = status,
-        output_path = output_path,
-        error = error
-      )
-    }) |>
-      purrr::list_rbind()
 
     list(
       localities = locality_rows,
-      workbooks = dplyr::bind_rows(empty_workbook_results, workbook_rows)
+      workbooks = workbook_rows
     )
   })
 
