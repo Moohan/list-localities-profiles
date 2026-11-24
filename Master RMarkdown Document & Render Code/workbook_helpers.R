@@ -59,9 +59,9 @@ collect_data_workbook_tables <- function(locality_environment) {
       Delayed_Discharge = delayed_disch_areas[
         delayed_disch_areas$location == LOCALITY,
       ],
-      Fall_Admissions = falls_areas[falls_areas$location == LOCALITY, ], # Need to add Scotland & HB to this
-      Preventable_admission_PPA = ppa_areas[ppa_areas$location == LOCALITY, ], # Need to add Scotland & HB to this
-      psych_admissions = psych_hosp[psych_hosp$area_name == LOCALITY, ], # Need to add Scotland & HB to this
+      Fall_Admissions = falls_areas[falls_areas$location == LOCALITY, ],
+      Preventable_admission_PPA = ppa_areas[ppa_areas$location == LOCALITY, ],
+      psych_admissions = psych_hosp[psych_hosp$area_name == LOCALITY, ],
       MH_bed_days = bed_days_mh_areas[
         bed_days_mh_areas$location == LOCALITY,
       ],
