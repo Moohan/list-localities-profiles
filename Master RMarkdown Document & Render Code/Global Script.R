@@ -1263,7 +1263,8 @@ build_profiles <- function(
           if (type == "sdc") "sdc_tables" else "data_tables"
         )
         collection_failed <- purrr::map_lgl(
-          collections, \(collection) !is.null(collection$error)
+          collections,
+          \(collection) !is.null(collection$error)
         )
 
         if (any(collection_failed)) {
@@ -1280,11 +1281,13 @@ build_profiles <- function(
             local_tables <- purrr::map(collections, "result")
             if (type == "sdc") {
               write_sdc_workbook(
-                combine_sdc_workbook_tables(local_tables), target
+                combine_sdc_workbook_tables(local_tables),
+                target
               )
             } else {
               write_data_workbook(
-                combine_data_workbook_tables(local_tables), target
+                combine_data_workbook_tables(local_tables),
+                target
               )
             }
           })()
