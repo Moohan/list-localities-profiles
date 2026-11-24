@@ -893,7 +893,7 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
   )
 
   # render test chapter
-  bookdown::render_book(
+  document_path <- bookdown::render_book(
     input = "lp_bookdown",
     output_dir = output_dir,
     output_file = output_doc_name,
@@ -901,8 +901,6 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
     output_format = "officedown::rdocx_document",
     config_file = path(tempdir(), "_practice_chapter_temp.yaml")
   )
-
-  document_path <- path(output_dir, output_doc_name)
 
   if ("Summary-Table.Rmd" %in% chapters_oi) {
     orient(document_path)
