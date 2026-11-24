@@ -987,9 +987,9 @@ build_profiles <- function(
   if (!fs::dir_exists(output_dir)) {
     stop("Output directory does not exist: ", output_dir, call. = FALSE)
   }
-  write_test <- tempfile(pattern = "lp-write-test-", tmpdir = output_dir)
-  fs::file_create(write_test)
-  fs::file_delete(write_test)
+  if (!fs::file_access(output_dir, mode = c("write", "execute"))) {
+    stop("Output directory is not writable: ", output_dir, call. = FALSE)
+  }
 
   localities <- unique(localities)
   lookup <- read_in_localities()
