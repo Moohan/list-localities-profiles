@@ -1,76 +1,76 @@
 # Extract the existing locality-level data tables after the analysis scripts run.
 collect_data_workbook_tables <- function(locality_environment) {
   with(new.env(parent = locality_environment), {
-    df <- list(
-      "Population_Estimates" = pops[pops$hscp_locality == LOCALITY, ],
-      "Population_Projections" = pop_proj_dat,
-      "SIMD_Locality_2022" = simd_perc_breakdown,
-      "SIMD_Domains_2016" = simd2016_dom,
-      "SIMD_Domains_2022" = simd2020_dom,
-      "Care_Home" = markers_care_home[
+    tables <- list(
+      Population_Estimates = pops[pops$hscp_locality == LOCALITY, ],
+      Population_Projections = pop_proj_dat,
+      SIMD_Locality_2022 = simd_perc_breakdown,
+      SIMD_Domains_2016 = simd2016_dom,
+      SIMD_Domains_2022 = simd2020_dom,
+      Care_Home = markers_care_home[
         markers_care_home$hscp_locality == LOCALITY,
       ],
-      "Emergency_Dep" = markers_emergency_dep[
+      Emergency_Dep = markers_emergency_dep[
         markers_emergency_dep$hscp_locality == LOCALITY,
       ],
-      "GP" = markers_gp[markers_gp$hscp_locality == LOCALITY, ],
-      "Minor_Injuries_Unit" = markers_miu[
+      GP = markers_gp[markers_gp$hscp_locality == LOCALITY, ],
+      Minor_Injuries_Unit = markers_miu[
         markers_miu$hscp_locality == LOCALITY,
       ],
-      "Housing_Data" = house_dat1,
-      "Housing_Council_Tax_Band" = house_dat2,
-      "Life_Expectancy" = life_exp[life_exp$area_name == LOCALITY, ],
-      "Deaths_Aged_15_44" = deaths_15_44[deaths_15_44$area_name == LOCALITY, ],
-      "Long_Term_Conditions" = ltc[ltc$hscp_locality == LOCALITY, ],
-      "Cancer_Registrations" = cancer_reg[cancer_reg$area_name == LOCALITY, ],
-      "Early_Deaths_Cancer" = early_deaths_cancer[
+      Housing_Data = house_dat1,
+      Housing_Council_Tax_Band = house_dat2,
+      Life_Expectancy = life_exp[life_exp$area_name == LOCALITY, ],
+      Deaths_Aged_15_44 = deaths_15_44[deaths_15_44$area_name == LOCALITY, ],
+      Long_Term_Conditions = ltc[ltc$hscp_locality == LOCALITY, ],
+      Cancer_Registrations = cancer_reg[cancer_reg$area_name == LOCALITY, ],
+      Early_Deaths_Cancer = early_deaths_cancer[
         early_deaths_cancer$area_name == LOCALITY,
       ],
-      "Asthma_Hospitalisations" = asthma_hosp[
+      Asthma_Hospitalisations = asthma_hosp[
         asthma_hosp$area_name == LOCALITY,
       ],
-      "CHD_Hospitalisations" = chd_hosp[chd_hosp$area_name == LOCALITY, ],
-      "COPD_Hospitalisations" = copd_hosp[copd_hosp$area_name == LOCALITY, ],
-      "MH_Prescriptions" = adp_presc[adp_presc$area_name == LOCALITY, ],
-      "Alcohol_Admissions" = alcohol_hosp[alcohol_hosp$area_name == LOCALITY, ],
-      "Alcohol_Deaths" = alcohol_deaths[alcohol_deaths$area_name == LOCALITY, ],
-      "Drug_Admissions" = drug_hosp[drug_hosp$area_name == LOCALITY, ],
-      "Bowel_Screening" = bowel_screening[
+      CHD_Hospitalisations = chd_hosp[chd_hosp$area_name == LOCALITY, ],
+      COPD_Hospitalisations = copd_hosp[copd_hosp$area_name == LOCALITY, ],
+      MH_Prescriptions = adp_presc[adp_presc$area_name == LOCALITY, ],
+      Alcohol_Admissions = alcohol_hosp[alcohol_hosp$area_name == LOCALITY, ],
+      Alcohol_Deaths = alcohol_deaths[alcohol_deaths$area_name == LOCALITY, ],
+      Drug_Admissions = drug_hosp[drug_hosp$area_name == LOCALITY, ],
+      Bowel_Screening = bowel_screening[
         bowel_screening$area_name == LOCALITY,
       ],
-      "Emergency_Admissions" = emergency_adm_areas[
+      Emergency_Admissions = emergency_adm_areas[
         emergency_adm_areas$location == LOCALITY,
       ],
       "Emergency_Admissions_Age " = emergency_adm_age[
         emergency_adm_age$hscp_locality == LOCALITY,
       ],
-      "Unscheduled_Bed_Days" = bed_days_areas[
+      Unscheduled_Bed_Days = bed_days_areas[
         bed_days_areas$location == LOCALITY,
       ],
-      "Unscheduled_Bed_Days_Age" = bed_days_age[
+      Unscheduled_Bed_Days_Age = bed_days_age[
         bed_days_age$hscp_locality == LOCALITY,
       ],
-      "AE_attendances" = ae_att_areas[ae_att_areas$location == LOCALITY, ],
-      "AE_attendances_Age" = ae_att_age[ae_att_age$hscp_locality == LOCALITY, ],
-      "Readmissions" = readmissions_areas[
+      AE_attendances = ae_att_areas[ae_att_areas$location == LOCALITY, ],
+      AE_attendances_Age = ae_att_age[ae_att_age$hscp_locality == LOCALITY, ],
+      Readmissions = readmissions_areas[
         readmissions_areas$location == LOCALITY,
       ],
-      "Readmissions_Age" = readmissions_age,
-      "Delayed_Discharge" = delayed_disch_areas[
+      Readmissions_Age = readmissions_age,
+      Delayed_Discharge = delayed_disch_areas[
         delayed_disch_areas$location == LOCALITY,
       ],
-      "Fall_Admissions" = falls_areas[falls_areas$location == LOCALITY, ], # Need to add Scotland & HB to this
-      "Preventable_admission_PPA" = ppa_areas[ppa_areas$location == LOCALITY, ], # Need to add Scotland & HB to this
-      "psych_admissions" = psych_hosp[psych_hosp$area_name == LOCALITY, ], # Need to add Scotland & HB to this
-      "MH_bed_days" = bed_days_mh_areas[
+      Fall_Admissions = falls_areas[falls_areas$location == LOCALITY, ], # Need to add Scotland & HB to this
+      Preventable_admission_PPA = ppa_areas[ppa_areas$location == LOCALITY, ], # Need to add Scotland & HB to this
+      psych_admissions = psych_hosp[psych_hosp$area_name == LOCALITY, ], # Need to add Scotland & HB to this
+      MH_bed_days = bed_days_mh_areas[
         bed_days_mh_areas$location == LOCALITY,
       ],
-      "bed_days_mh_age" = bed_days_mh_age[
+      bed_days_mh_age = bed_days_mh_age[
         bed_days_mh_age$hscp_locality == LOCALITY,
       ]
     )
 
-    lapply(df, function(table) {
+    lapply(tables, function(table) {
       table[["locality"]] <- rep(LOCALITY, nrow(table))
       table
     })
@@ -81,14 +81,14 @@ collect_sdc_workbook_tables <- function(locality_environment) {
   with(new.env(parent = locality_environment), {
     smr01_based_loc <- imap(
       list(
-        "Preventable_Admissions_PPA" = ppa_areas,
-        "Emergency_Admissions" = emergency_adm_areas,
-        "Unscheduled_Bed_Days" = bed_days_areas,
-        "Readmissions" = readmissions_areas,
-        "AE_attendances" = ae_att_areas,
-        "Delayed_Discharges" = delayed_disch_areas,
-        "Fall_Admissions" = falls_areas,
-        "MH_bed_days" = bed_days_mh_areas
+        Preventable_Admissions_PPA = ppa_areas,
+        Emergency_Admissions = emergency_adm_areas,
+        Unscheduled_Bed_Days = bed_days_areas,
+        Readmissions = readmissions_areas,
+        AE_attendances = ae_att_areas,
+        Delayed_Discharges = delayed_disch_areas,
+        Fall_Admissions = falls_areas,
+        MH_bed_days = bed_days_mh_areas
       ),
       \(data, name) {
         data |>
@@ -105,17 +105,17 @@ collect_sdc_workbook_tables <- function(locality_environment) {
 
     smr01_age_loc <- imap(
       list(
-        "Emergency_Admissions_Age" = filter(
+        Emergency_Admissions_Age = filter(
           emergency_adm_age,
           hscp_locality == LOCALITY
         ),
-        "Unscheduled_Bed_Days_Age" = filter(
+        Unscheduled_Bed_Days_Age = filter(
           bed_days_age,
           hscp_locality == LOCALITY
         ),
-        "Readmissions_Age" = readmissions_age,
-        "AE_Attendances_Age" = filter(ae_att_age, hscp_locality == LOCALITY),
-        "Bed_Days_MH_Age" = filter(bed_days_mh_age, hscp_locality == LOCALITY)
+        Readmissions_Age = readmissions_age,
+        AE_Attendances_Age = filter(ae_att_age, hscp_locality == LOCALITY),
+        Bed_Days_MH_Age = filter(bed_days_mh_age, hscp_locality == LOCALITY)
       ),
       \(data, name) {
         data |>
@@ -135,9 +135,9 @@ collect_sdc_workbook_tables <- function(locality_environment) {
 
     ltc_loc <- imap(
       list(
-        "Long_Term_Conditions" = ltc_multimorbidity,
-        "LTC_Types" = ltc_types,
-        "LTC_Top_5_Prevalence" = top5ltc_loc
+        Long_Term_Conditions = ltc_multimorbidity,
+        LTC_Types = ltc_types,
+        LTC_Top_5_Prevalence = top5ltc_loc
       ),
       \(data, name) {
         data |>
