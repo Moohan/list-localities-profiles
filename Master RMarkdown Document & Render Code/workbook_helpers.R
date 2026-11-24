@@ -1,6 +1,6 @@
 # Extract the existing locality-level data tables after the analysis scripts run.
 collect_data_workbook_tables <- function(locality_environment) {
-  with(locality_environment, {
+  with(new.env(parent = locality_environment), {
     df <- list(
       "Population_Estimates" = pops[pops$hscp_locality == LOCALITY, ],
       "Population_Projections" = pop_proj_dat,
@@ -78,7 +78,7 @@ collect_data_workbook_tables <- function(locality_environment) {
 }
 
 collect_sdc_workbook_tables <- function(locality_environment) {
-  with(locality_environment, {
+  with(new.env(parent = locality_environment), {
     smr01_based_loc <- imap(
       list(
         "Preventable_Admissions_PPA" = ppa_areas,
