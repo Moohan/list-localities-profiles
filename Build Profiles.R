@@ -18,7 +18,10 @@ lookup <- read_in_localities()
 # hscp_list <- unique(lookup$hscp2019name) # all HSCPs
 hscp_list <- c("West Lothian", "Angus")
 
-stopifnot(all(hscp_list %in% unique(lookup[["hscp2019name"]])))
+unknown_hscps <- setdiff(hscp_list, lookup$hscp2019name)
+if (length(unknown_hscps) > 0) {
+  stop("Unknown HSCPs: ", paste(unknown_hscps, collapse = ", "))
+}
 
 localities <- purrr::map(hscp_list, function(HSCP) {
   lookup |>
