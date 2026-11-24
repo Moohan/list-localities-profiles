@@ -1145,10 +1145,10 @@ build_profiles <- function(
     purrr::walk(section_scripts, sys.source, envir = locality_environment)
 
     data_tables <- if (create_data_workbook) {
-      collect_data_workbook_tables(locality_environment)
+      purrr::safely(collect_data_workbook_tables)(locality_environment)
     }
     sdc_tables <- if (create_sdc) {
-      collect_sdc_workbook_tables(locality_environment)
+      purrr::safely(collect_sdc_workbook_tables)(locality_environment)
     }
 
     output_filename <- locality_profile$output_filename
@@ -1258,29 +1258,47 @@ build_profiles <- function(
         output_path <- NA_character_
         error <- "One or more locality profiles failed; workbook not generated."
       } else {
-        build_workbook <- purrr::safely(function() {
-          if (type == "sdc") {
-            tables <- combine_sdc_workbook_tables(
-              purrr::map(locality_results, "sdc_tables")
-            )
-            write_sdc_workbook(tables, target)
+        collections <- purrr::map(
+          locality_results,
+          if (type == "sdc") "sdc_tables" else "data_tables"
+        )
+        collection_failed <- purrr::map_lgl(
+          collections, \(collection) !is.null(collection$error)
+        )
+
+        if (any(collection_failed)) {
+          status <- "failed"
+          output_path <- NA_character_
+          error <- paste0(
+            "Could not collect workbook tables for ",
+            toString(locality_rows$locality[collection_failed]),
+            ": ",
+            conditionMessage(collections[[which(collection_failed)[1L]]]$error)
+          )
+        } else {
+          build_workbook <- purrr::safely(function() {
+            local_tables <- purrr::map(collections, "result")
+            if (type == "sdc") {
+              write_sdc_workbook(
+                combine_sdc_workbook_tables(local_tables), target
+              )
+            } else {
+              write_data_workbook(
+                combine_data_workbook_tables(local_tables), target
+              )
+            }
+          })()
+          status <- if (is.null(build_workbook$error)) "succeeded" else "failed"
+          output_path <- if (status == "succeeded") {
+            build_workbook$result
           } else {
-            tables <- combine_data_workbook_tables(
-              purrr::map(locality_results, "data_tables")
-            )
-            write_data_workbook(tables, target)
+            NA_character_
           }
-        })()
-        status <- if (is.null(build_workbook$error)) "succeeded" else "failed"
-        output_path <- if (status == "succeeded") {
-          build_workbook$result
-        } else {
-          NA_character_
-        }
-        error <- if (status == "succeeded") {
-          NA_character_
-        } else {
-          conditionMessage(build_workbook$error)
+          error <- if (status == "succeeded") {
+            NA_character_
+          } else {
+            conditionMessage(build_workbook$error)
+          }
         }
       }
 
