@@ -892,7 +892,6 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
     "{LOCALITY} - Locality Profile {chapters_oi_name} Practice Chapter.docx"
   )
 
-  # render test chapter
   document_path <- bookdown::render_book(
     input = "lp_bookdown",
     output_dir = output_dir,
@@ -906,7 +905,7 @@ create_testing_chapter <- function(chapters_oi, locality_oi, output_directory) {
     orient(document_path)
   }
 
-  return(document_path)
+  document_path
 }
 
 
