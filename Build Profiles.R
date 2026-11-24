@@ -1,5 +1,3 @@
-# Standalone entry point for generating Word Locality Profiles.
-
 rlang::check_installed(
   pkg = "phstemplates",
   reason = "v1.3.0 is needed to apply sensitivity labels",
@@ -14,8 +12,6 @@ source("Master RMarkdown Document & Render Code/Global Script.R")
 output_dir <- fs::path(lp_path, "Profiles Output")
 lookup <- read_in_localities()
 
-# Edit this selection for a standalone run:
-# hscp_list <- unique(lookup$hscp2019name) # all HSCPs
 hscp_list <- c("West Lothian", "Angus")
 
 unknown_hscps <- setdiff(hscp_list, lookup$hscp2019name)
@@ -23,7 +19,7 @@ if (length(unknown_hscps) > 0) {
   stop("Unknown HSCPs: ", toString(unknown_hscps), call. = FALSE)
 }
 
-# Keep localities grouped in the same order as the selected HSCPs.
+# Keep localities in the selected HSCP order.
 localities <- lookup |>
   filter(hscp2019name %in% hscp_list) |>
   arrange(match(hscp2019name, hscp_list)) |>
