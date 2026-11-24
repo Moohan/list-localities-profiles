@@ -1044,6 +1044,12 @@ build_profiles <- function(
     locality_environment$HSCP <- locality_profile$hscp
     locality_environment$LOCALITY <- locality_profile$locality
 
+    # These charts use LOCALITY, HSCP, HB and other_locs from each locality.
+    locality_environment$scotpho_time_trend <- scotpho_time_trend
+    environment(locality_environment$scotpho_time_trend) <- locality_environment
+    locality_environment$scotpho_bar_chart <- scotpho_bar_chart
+    environment(locality_environment$scotpho_bar_chart) <- locality_environment
+
     # The Services map script sources another script, so keep that source
     # within the same locality environment rather than .GlobalEnv.
     locality_environment$source <- function(file, ...) {
