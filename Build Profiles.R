@@ -1,6 +1,4 @@
 # Standalone entry point for generating Word Locality Profiles.
-# The reusable generator lives in R/build_profiles.R and can also be called
-# by the future Shiny queue worker with an explicit locality selection.
 
 rlang::check_installed(
   pkg = "phstemplates",
@@ -12,7 +10,6 @@ rlang::check_installed(
 )
 
 source("Master RMarkdown Document & Render Code/Global Script.R")
-source("R/build_profiles.R")
 
 output_dir <- fs::path(lp_path, "Profiles Output")
 lookup <- read_in_localities()
@@ -23,12 +20,12 @@ hscp_list <- c("West Lothian", "Angus")
 
 stopifnot(all(hscp_list %in% unique(lookup[["hscp2019name"]])))
 
-localities <- unlist(
-  lapply(hscp_list, function(hscp) {
-    lookup$hscp_locality[lookup$hscp2019name == hscp]
-  }),
-  use.names = FALSE
-)
+localities <- purrr::map(hscp_list, function(HSCP) {
+  lookup |>
+    filter(hscp2019name == HSCP) |>
+    pull(hscp_locality)
+}) |>
+  purrr::list_c()
 
 result <- build_profiles(
   localities = localities,
