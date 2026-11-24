@@ -992,8 +992,7 @@ build_profiles <- function(
     stop("Unknown localities: ", toString(unknown_localities), call. = FALSE)
   }
 
-  locality_lookup <- lookup |>
-    dplyr::distinct(hscp_locality, hscp2019name)
+  locality_lookup <- dplyr::distinct(lookup, hscp_locality, hscp2019name)
 
   profiles <- tibble::tibble(locality = localities) |>
     dplyr::left_join(locality_lookup, by = c(locality = "hscp_locality")) |>
