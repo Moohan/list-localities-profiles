@@ -38,8 +38,6 @@ Here are some important files and scripts to be aware of:
 
 - **`Summary Table/Summary-Table-Markdown.Rmd`**: This script generates the Summary Table, which is produced separately because it is in landscape orientation, while the rest of the profiles are in portrait orientation.
 
-
-
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
