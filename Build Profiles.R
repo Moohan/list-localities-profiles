@@ -24,10 +24,9 @@ result <- build_profiles(
   create_sdc = create_sdc,
   create_data_workbook = create_data_workbook,
   progress = function(event) {
-    if (
-      event$type == "locality_profile" &&
-        event$status %in% c("succeeded", "failed")
-    ) {
+    if (event$type != "locality_profile") {
+      message(sprintf("%s (%s): %s", event$hscp, event$type, event$status))
+    } else if (event$status %in% c("succeeded", "failed")) {
       message(sprintf(
         "[%d/%d] %s: %s",
         event$position,
@@ -35,8 +34,6 @@ result <- build_profiles(
         event$locality,
         event$status
       ))
-    } else if (event$type != "locality_profile") {
-      message(sprintf("%s (%s): %s", event$hscp, event$type, event$status))
     }
   }
 )
