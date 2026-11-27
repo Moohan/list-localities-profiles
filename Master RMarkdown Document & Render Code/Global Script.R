@@ -1119,7 +1119,8 @@ collect_sdc_workbook_tables <- function(locality_environment) {
         )
       ),
       \(data, name) {
-        count_column <- switch(name,
+        count_column <- switch(
+          name,
           Emergency_Admissions_Age = "adm",
           Unscheduled_Bed_Days_Age = "bed_days",
           Readmissions_Age = "read_28",
@@ -1138,16 +1139,23 @@ collect_sdc_workbook_tables <- function(locality_environment) {
 
     ltc <- list(
       Long_Term_Conditions = small_counts(
-        ltc_multimorbidity, "Long_Term_Conditions",
-        measure = total_ltc, age_group, n = people
+        ltc_multimorbidity,
+        "Long_Term_Conditions",
+        measure = total_ltc,
+        age_group,
+        n = people
       ),
       LTC_Types = small_counts(
-        ltc_types, "LTC_Types",
-        measure = key, n = value
+        ltc_types,
+        "LTC_Types",
+        measure = key,
+        n = value
       ),
       LTC_Top_5_Prevalence = small_counts(
-        top5ltc_loc, "LTC_Top_5_Prevalence",
-        measure = Prevalence, n = locality_n
+        top5ltc_loc,
+        "LTC_Top_5_Prevalence",
+        measure = Prevalence,
+        n = locality_n
       )
     )
 
@@ -1177,9 +1185,11 @@ write_hscp_workbook <- function(tables, output_path, type) {
     )
     if (
       !file.exists(staged_path) ||
-        !("[Content_Types].xml" %in% utils::unzip(
-          staged_path, list = TRUE
-        )$Name)
+        !("[Content_Types].xml" %in%
+          utils::unzip(
+            staged_path,
+            list = TRUE
+          )$Name)
     ) {
       stop("Could not save workbook: ", output_path, call. = FALSE)
     }
@@ -1234,7 +1244,8 @@ write_hscp_workbooks <- function(
   progress
 ) {
   purrr::map(workbook_types, function(type) {
-    settings <- switch(type,
+    settings <- switch(
+      type,
       sdc = list(
         field = "sdc_tables",
         subdirectory = "SDC",
@@ -1247,7 +1258,9 @@ write_hscp_workbooks <- function(
       )
     )
     target <- fs::path(
-      output_dir, settings$subdirectory, paste0(hscp, settings$suffix)
+      output_dir,
+      settings$subdirectory,
+      paste0(hscp, settings$suffix)
     )
 
     if (any(locality_rows$status != "succeeded")) {
@@ -1261,7 +1274,8 @@ write_hscp_workbooks <- function(
     } else {
       result <- purrr::safely(function() {
         collected <- purrr::map(
-          locality_results, function(x) x[[settings$field]]
+          locality_results,
+          function(x) x[[settings$field]]
         )
         failed <- which(purrr::map_lgl(
           collected,
@@ -1543,13 +1557,15 @@ build_profiles <- function(
   results <- purrr::map(hscp_results, "localities") |>
     purrr::list_rbind()
   workbook_results <- purrr::map(hscp_results, "workbooks") |>
-    purrr::list_rbind(ptype = tibble::tibble(
-      hscp = character(),
-      type = character(),
-      status = character(),
-      output_path = character(),
-      error = character()
-    ))
+    purrr::list_rbind(
+      ptype = tibble::tibble(
+        hscp = character(),
+        type = character(),
+        status = character(),
+        output_path = character(),
+        error = character()
+      )
+    )
 
   list(
     total = nrow(results),
