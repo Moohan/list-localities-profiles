@@ -1068,12 +1068,12 @@ collect_sdc_workbook_tables <- function(locality_environment) {
     small_counts <- function(data, name, ...) {
       data |>
         dplyr::select(...) |>
+        dplyr::filter(n < 10L) |>
         dplyr::mutate(
           locality = LOCALITY,
           name = .env$name,
           .before = dplyr::everything()
-        ) |>
-        dplyr::filter(n < 10L)
+        )
     }
 
     smr01_based <- purrr::imap(
@@ -1088,11 +1088,12 @@ collect_sdc_workbook_tables <- function(locality_environment) {
         MH_bed_days = bed_days_mh_areas
       ),
       \(data, name) {
+        count_column <- if (name == "Readmissions") "read_28" else "n"
         small_counts(
           dplyr::filter(data, location == LOCALITY),
           name,
           financial_year,
-          n = dplyr::any_of(c("read_28", "n"))
+          n = dplyr::all_of(count_column)
         )
       }
     )
@@ -1118,34 +1119,36 @@ collect_sdc_workbook_tables <- function(locality_environment) {
         )
       ),
       \(data, name) {
+        count_column <- switch(name,
+          Emergency_Admissions_Age = "adm",
+          Unscheduled_Bed_Days_Age = "bed_days",
+          Readmissions_Age = "read_28",
+          AE_Attendances_Age = "attendances",
+          Bed_Days_MH_Age = "bed_days"
+        )
         small_counts(
           data,
           name,
           financial_year,
           age_group,
-          n = dplyr::any_of(c("adm", "bed_days", "read_28", "attendances"))
+          n = dplyr::all_of(count_column)
         )
       }
     )
 
-    ltc <- purrr::imap(
-      list(
-        Long_Term_Conditions = ltc_multimorbidity,
-        LTC_Types = ltc_types,
-        LTC_Top_5_Prevalence = dplyr::mutate(
-          top5ltc_loc,
-          value = locality_n
-        )
+    ltc <- list(
+      Long_Term_Conditions = small_counts(
+        ltc_multimorbidity, "Long_Term_Conditions",
+        measure = total_ltc, age_group, n = people
       ),
-      \(data, name) {
-        small_counts(
-          data,
-          name,
-          measure = dplyr::any_of(c("total_ltc", "key", "Prevalence")),
-          dplyr::any_of("age_group"),
-          n = dplyr::any_of(c("people", "value"))
-        )
-      }
+      LTC_Types = small_counts(
+        ltc_types, "LTC_Types",
+        measure = key, n = value
+      ),
+      LTC_Top_5_Prevalence = small_counts(
+        top5ltc_loc, "LTC_Top_5_Prevalence",
+        measure = Prevalence, n = locality_n
+      )
     )
 
     list(
@@ -1172,6 +1175,14 @@ write_hscp_workbook <- function(tables, output_path, type) {
       sheet_names = names(tables),
       file_path = staged_path
     )
+    if (
+      !file.exists(staged_path) ||
+        !("[Content_Types].xml" %in% utils::unzip(
+          staged_path, list = TRUE
+        )$Name)
+    ) {
+      stop("Could not save workbook: ", output_path, call. = FALSE)
+    }
   } else {
     wb <- openxlsx::createWorkbook()
     purrr::iwalk(tables, function(data, sheet) {
@@ -1205,7 +1216,7 @@ write_hscp_workbook <- function(tables, output_path, type) {
   fs::file_chown(staged_path, group_id = "LIST_analytics")
   if (!file.rename(staged_path, output_path)) {
     stop(
-      "Could not replace the existing workbook: ",
+      "Could not publish workbook: ",
       output_path,
       call. = FALSE
     )
@@ -1217,25 +1228,27 @@ write_hscp_workbooks <- function(
   hscp,
   locality_results,
   locality_rows,
-  create_data_workbook,
-  create_sdc,
+  workbook_types,
   output_dir,
   hscp_count,
   progress
 ) {
-  types <- c(
-    if (create_data_workbook) "data_workbook",
-    if (create_sdc) "sdc"
-  )
-
-  results <- purrr::map(types, function(type) {
-    suffix <- if (type == "sdc") {
-      " - Locality Profile SDC highlight.xlsx"
-    } else {
-      " - Locality Profile data.xlsx"
-    }
-    subdirectory <- if (type == "sdc") "SDC" else "background data"
-    target <- fs::path(output_dir, subdirectory, paste0(hscp, suffix))
+  purrr::map(workbook_types, function(type) {
+    settings <- switch(type,
+      sdc = list(
+        field = "sdc_tables",
+        subdirectory = "SDC",
+        suffix = " - Locality Profile SDC highlight.xlsx"
+      ),
+      data_workbook = list(
+        field = "data_tables",
+        subdirectory = "background data",
+        suffix = " - Locality Profile data.xlsx"
+      )
+    )
+    target <- fs::path(
+      output_dir, settings$subdirectory, paste0(hscp, settings$suffix)
+    )
 
     if (any(locality_rows$status != "succeeded")) {
       status <- "skipped"
@@ -1247,8 +1260,9 @@ write_hscp_workbooks <- function(
       )
     } else {
       result <- purrr::safely(function() {
-        field <- if (type == "sdc") "sdc_tables" else "data_tables"
-        collected <- purrr::map(locality_results, function(x) x[[field]])
+        collected <- purrr::map(
+          locality_results, function(x) x[[settings$field]]
+        )
         failed <- which(purrr::map_lgl(
           collected,
           \(x) !is.null(x$error)
@@ -1306,17 +1320,6 @@ write_hscp_workbooks <- function(
     )
   }) |>
     purrr::list_rbind()
-
-  dplyr::bind_rows(
-    tibble::tibble(
-      hscp = character(),
-      type = character(),
-      status = character(),
-      output_path = character(),
-      error = character()
-    ),
-    results
-  )
 }
 
 build_profiles <- function(
@@ -1355,7 +1358,11 @@ build_profiles <- function(
     )
 
   hscps <- unique(profiles$hscp)
-  if (create_sdc || create_data_workbook) {
+  workbook_types <- c(
+    if (create_data_workbook) "data_workbook",
+    if (create_sdc) "sdc"
+  )
+  if (length(workbook_types) > 0L) {
     required_localities <- lookup$hscp_locality[
       lookup$hscp2019name %in% hscps
     ]
@@ -1370,11 +1377,13 @@ build_profiles <- function(
   }
 
   # Preserve the requested order for Word-only builds.
-  groups <- if (create_sdc || create_data_workbook) {
+  groups <- if (length(workbook_types) > 0L) {
     split(seq_len(nrow(profiles)), factor(profiles$hscp, levels = hscps))
   } else {
     as.list(seq_len(nrow(profiles)))
   }
+
+  execution_order <- unlist(groups, use.names = FALSE)
 
   # Share memoised readers without sharing locality-specific variables.
   common_environment <- new.env(parent = environment(build_profiles))
@@ -1467,12 +1476,13 @@ build_profiles <- function(
 
     locality_results <- purrr::map(row_numbers, function(result_num) {
       locality_profile <- profiles[result_num, ]
+      position <- match(result_num, execution_order)
 
       progress(list(
         type = "locality_profile",
         locality = locality_profile$locality,
         hscp = hscp,
-        position = result_num,
+        position = position,
         total = nrow(profiles),
         status = "running",
         output_path = NA_character_,
@@ -1489,7 +1499,7 @@ build_profiles <- function(
         type = "locality_profile",
         locality = locality_profile$locality,
         hscp = hscp,
-        position = result_num,
+        position = position,
         total = nrow(profiles),
         status = status,
         output_path = output_path,
@@ -1512,16 +1522,17 @@ build_profiles <- function(
     locality_rows <- purrr::map(locality_results, "row") |>
       purrr::list_rbind()
 
-    workbook_rows <- write_hscp_workbooks(
-      hscp = hscp,
-      locality_results = locality_results,
-      locality_rows = locality_rows,
-      create_data_workbook = create_data_workbook,
-      create_sdc = create_sdc,
-      output_dir = output_dir,
-      hscp_count = length(hscps),
-      progress = progress
-    )
+    workbook_rows <- if (length(workbook_types) > 0L) {
+      write_hscp_workbooks(
+        hscp = hscp,
+        locality_results = locality_results,
+        locality_rows = locality_rows,
+        workbook_types = workbook_types,
+        output_dir = output_dir,
+        hscp_count = length(hscps),
+        progress = progress
+      )
+    }
 
     list(
       localities = locality_rows,
@@ -1532,7 +1543,13 @@ build_profiles <- function(
   results <- purrr::map(hscp_results, "localities") |>
     purrr::list_rbind()
   workbook_results <- purrr::map(hscp_results, "workbooks") |>
-    purrr::list_rbind()
+    purrr::list_rbind(ptype = tibble::tibble(
+      hscp = character(),
+      type = character(),
+      status = character(),
+      output_path = character(),
+      error = character()
+    ))
 
   list(
     total = nrow(results),
