@@ -26,8 +26,10 @@ This is the code used to produce the Locality Profiles.
 
 Here are some important files and scripts to be aware of:
 
-- **`Master RMarkdown Document & Render Code/Global Script.R`**: This script loads the necessary packages and declares custom functions. It is sourced by most other scripts.
+- **`Master RMarkdown Document & Render Code/Global Script.R`**: Loads packages and defines shared functions, including `build_profiles()` and optional data workbook and SDC generation.
   
+- **`Build Profiles.R`**: Select HSCPs and set `create_sdc` and `create_data_workbook` (both `FALSE` by default). Word files go to `Profiles Output`, with optional Excel workbooks in its `SDC` and `background data` subdirectories. These require `openxlsx2` and `openxlsx`, respectively.
+
 - **`Master RMarkdown Document & Render Code/Locality Profiles Render Code.R`**: This script runs the analyses and generates the indicators, as well as creates the main profile and summary table outputs. It is the simplest and most effective way to produce the profiles.
 
 - **`Master RMarkdown Document & Render Code/Locality_Profiles_Master_Markdown.Rmd`**: This is the primary RMarkdown file that contains all the content for the profiles, excluding the summary table, which is generated separately.
@@ -35,10 +37,6 @@ Here are some important files and scripts to be aware of:
   - Note that there are corresponding RMarkdown documents for each chapter. The contents of each 'testing markdown' should mirror the relevant content in the main RMarkdown file exactly. These documents, such as `Demographics/Demographics-Testing-Markdown.Rmd`, are useful for quickly testing changes to an individual chapter.
 
 - **`Summary Table/Summary-Table-Markdown.Rmd`**: This script generates the Summary Table, which is produced separately because it is in landscape orientation, while the rest of the profiles are in portrait orientation.
-
-- **`Master RMarkdown Document & Render Code/make_sdc_output.R`**: This script creates the Statistical Disclosure Control (SDC) Excel workbooks.
-
-- **`Master RMarkdown Document & Render Code/excel_output.R`**: This script generates the background data Excel workbooks.
 
 ## Contributors ✨
 

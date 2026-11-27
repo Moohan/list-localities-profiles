@@ -4,6 +4,8 @@ output_dir <- fs::path(lp_path, "Profiles Output")
 lookup <- read_in_localities()
 
 hscp_list <- c("Orkney Islands")
+create_sdc <- FALSE
+create_data_workbook <- FALSE
 
 unknown_hscps <- setdiff(hscp_list, lookup$hscp2019name)
 if (length(unknown_hscps) > 0) {
@@ -19,8 +21,12 @@ localities <- lookup |>
 result <- build_profiles(
   localities = localities,
   output_dir = output_dir,
+  create_sdc = create_sdc,
+  create_data_workbook = create_data_workbook,
   progress = function(event) {
-    if (event$status %in% c("succeeded", "failed")) {
+    if (event$type != "locality_profile") {
+      message(sprintf("%s (%s): %s", event$hscp, event$type, event$status))
+    } else if (event$status %in% c("succeeded", "failed")) {
       message(sprintf(
         "[%d/%d] %s: %s",
         event$position,
@@ -33,6 +39,9 @@ result <- build_profiles(
 )
 
 print(result$results)
+if (create_sdc || create_data_workbook) {
+  print(result$workbook_results)
+}
 message(sprintf(
   "Profiles complete: %d succeeded, %d failed.",
   result$succeeded,
@@ -40,4 +49,7 @@ message(sprintf(
 ))
 if (result$failed > 0L) {
   warning("Some Locality Profiles could not be generated.", call. = FALSE)
+}
+if (result$workbook_failed + result$workbook_skipped > 0L) {
+  warning("Some HSCP workbooks were not generated.", call. = FALSE)
 }

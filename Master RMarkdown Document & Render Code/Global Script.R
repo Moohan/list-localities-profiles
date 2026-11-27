@@ -1005,10 +1005,343 @@ move_profile_to_stats <- function(document_path, output_path) {
   output_path
 }
 
+collect_data_workbook_tables <- function(locality_environment) {
+  with(new.env(parent = locality_environment), {
+    filter_locality <- function(data, column) {
+      dplyr::filter(data, .data[[column]] == .env$LOCALITY)
+    }
+
+    tables <- list(
+      Population_Estimates = filter_locality(pops, "hscp_locality"),
+      Population_Projections = pop_proj_dat,
+      SIMD_Locality_2022 = simd_perc_breakdown,
+      SIMD_Domains_2016 = simd2016_dom,
+      SIMD_Domains_2022 = simd2020_dom,
+      Care_Home = filter_locality(markers_care_home, "hscp_locality"),
+      Emergency_Dep = filter_locality(markers_emergency_dep, "hscp_locality"),
+      GP = filter_locality(markers_gp, "hscp_locality"),
+      Minor_Injuries_Unit = filter_locality(markers_miu, "hscp_locality"),
+      Housing_Data = house_dat1,
+      Housing_Council_Tax_Band = house_dat2,
+      Life_Expectancy = filter_locality(life_exp, "area_name"),
+      Deaths_Aged_15_44 = filter_locality(deaths_15_44, "area_name"),
+      Long_Term_Conditions = filter_locality(ltc, "hscp_locality"),
+      Cancer_Registrations = filter_locality(cancer_reg, "area_name"),
+      Early_Deaths_Cancer = filter_locality(early_deaths_cancer, "area_name"),
+      Asthma_Hospitalisations = filter_locality(asthma_hosp, "area_name"),
+      CHD_Hospitalisations = filter_locality(chd_hosp, "area_name"),
+      COPD_Hospitalisations = filter_locality(copd_hosp, "area_name"),
+      MH_Prescriptions = filter_locality(adp_presc, "area_name"),
+      Alcohol_Admissions = filter_locality(alcohol_hosp, "area_name"),
+      Alcohol_Deaths = filter_locality(alcohol_deaths, "area_name"),
+      Drug_Admissions = filter_locality(drug_hosp, "area_name"),
+      Bowel_Screening = filter_locality(bowel_screening, "area_name"),
+      Emergency_Admissions = filter_locality(emergency_adm_areas, "location"),
+      Emergency_Admissions_Age = filter_locality(
+        emergency_adm_age,
+        "hscp_locality"
+      ),
+      Unscheduled_Bed_Days = filter_locality(bed_days_areas, "location"),
+      Unscheduled_Bed_Days_Age = filter_locality(bed_days_age, "hscp_locality"),
+      AE_attendances = filter_locality(ae_att_areas, "location"),
+      AE_attendances_Age = filter_locality(ae_att_age, "hscp_locality"),
+      Readmissions = filter_locality(readmissions_areas, "location"),
+      Readmissions_Age = readmissions_age,
+      Delayed_Discharge = filter_locality(delayed_disch_areas, "location"),
+      Fall_Admissions = filter_locality(falls_areas, "location"),
+      Preventable_admission_PPA = filter_locality(ppa_areas, "location"),
+      psych_admissions = filter_locality(psych_hosp, "area_name"),
+      MH_bed_days = filter_locality(bed_days_mh_areas, "location"),
+      bed_days_mh_age = filter_locality(bed_days_mh_age, "hscp_locality")
+    )
+
+    purrr::map(tables, function(table) {
+      table[["locality"]] <- rep(LOCALITY, nrow(table))
+      table
+    })
+  })
+}
+
+# Identify small counts in three existing SDC indicator groups.
+collect_sdc_workbook_tables <- function(locality_environment) {
+  with(new.env(parent = locality_environment), {
+    small_counts <- function(data, name, ...) {
+      data |>
+        dplyr::select(...) |>
+        dplyr::filter(n < 10L) |>
+        dplyr::mutate(
+          locality = LOCALITY,
+          name = .env$name,
+          .before = dplyr::everything()
+        )
+    }
+
+    smr01_based <- purrr::imap(
+      list(
+        Preventable_Admissions_PPA = ppa_areas,
+        Emergency_Admissions = emergency_adm_areas,
+        Unscheduled_Bed_Days = bed_days_areas,
+        Readmissions = readmissions_areas,
+        AE_attendances = ae_att_areas,
+        Delayed_Discharges = delayed_disch_areas,
+        Fall_Admissions = falls_areas,
+        MH_bed_days = bed_days_mh_areas
+      ),
+      \(data, name) {
+        count_column <- if (name == "Readmissions") "read_28" else "n"
+        small_counts(
+          dplyr::filter(data, location == LOCALITY),
+          name,
+          financial_year,
+          n = dplyr::all_of(count_column)
+        )
+      }
+    )
+
+    smr01_age <- purrr::imap(
+      list(
+        Emergency_Admissions_Age = dplyr::filter(
+          emergency_adm_age,
+          hscp_locality == LOCALITY
+        ),
+        Unscheduled_Bed_Days_Age = dplyr::filter(
+          bed_days_age,
+          hscp_locality == LOCALITY
+        ),
+        Readmissions_Age = readmissions_age,
+        AE_Attendances_Age = dplyr::filter(
+          ae_att_age,
+          hscp_locality == LOCALITY
+        ),
+        Bed_Days_MH_Age = dplyr::filter(
+          bed_days_mh_age,
+          hscp_locality == LOCALITY
+        )
+      ),
+      \(data, name) {
+        count_column <- switch(
+          name,
+          Emergency_Admissions_Age = "adm",
+          Unscheduled_Bed_Days_Age = "bed_days",
+          Readmissions_Age = "read_28",
+          AE_Attendances_Age = "attendances",
+          Bed_Days_MH_Age = "bed_days"
+        )
+        small_counts(
+          data,
+          name,
+          financial_year,
+          age_group,
+          n = dplyr::all_of(count_column)
+        )
+      }
+    )
+
+    ltc <- list(
+      Long_Term_Conditions = small_counts(
+        ltc_multimorbidity,
+        "Long_Term_Conditions",
+        measure = total_ltc,
+        age_group,
+        n = people
+      ),
+      LTC_Types = small_counts(
+        ltc_types,
+        "LTC_Types",
+        measure = key,
+        n = value
+      ),
+      LTC_Top_5_Prevalence = small_counts(
+        top5ltc_loc,
+        "LTC_Top_5_Prevalence",
+        measure = Prevalence,
+        n = locality_n
+      )
+    )
+
+    list(
+      SMR01_based = purrr::list_rbind(smr01_based),
+      SMR01_Age_Groups = purrr::list_rbind(smr01_age),
+      LTCs_Age_Groups = purrr::list_rbind(ltc)
+    )
+  })
+}
+
+# Stage the workbook beside its destination so failures leave the previous file intact.
+write_hscp_workbook <- function(tables, output_path, type) {
+  fs::dir_create(fs::path_dir(output_path), mode = "u=rwx,g=rwx,o=rx")
+  staged_path <- tempfile(
+    pattern = ".lp-workbook-",
+    tmpdir = fs::path_dir(output_path),
+    fileext = ".xlsx"
+  )
+  on.exit(unlink(staged_path), add = TRUE)
+
+  if (type == "sdc") {
+    save_dataframes_to_excel(
+      dataframes = unname(tables),
+      sheet_names = names(tables),
+      file_path = staged_path
+    )
+    if (
+      !file.exists(staged_path) ||
+        !("[Content_Types].xml" %in%
+          utils::unzip(
+            staged_path,
+            list = TRUE
+          )$Name)
+    ) {
+      stop("Could not save workbook: ", output_path, call. = FALSE)
+    }
+  } else {
+    wb <- openxlsx::createWorkbook()
+    purrr::iwalk(tables, function(data, sheet) {
+      openxlsx::addWorksheet(wb, sheetName = sheet)
+      openxlsx::writeData(wb, sheet = sheet, x = data)
+      openxlsx::setColWidths(
+        wb,
+        sheet = sheet,
+        cols = seq_len(ncol(data)),
+        widths = "auto"
+      )
+    })
+    openxlsx::addWorksheet(wb, sheetName = "Index")
+    openxlsx::writeData(
+      wb,
+      sheet = "Index",
+      x = data.frame(Sheet_name = names(tables))
+    )
+    if (
+      !isTRUE(openxlsx::saveWorkbook(
+        wb,
+        staged_path,
+        overwrite = TRUE,
+        returnValue = TRUE
+      ))
+    ) {
+      stop("Could not save workbook: ", output_path, call. = FALSE)
+    }
+  }
+
+  fs::file_chown(staged_path, group_id = "LIST_analytics")
+  if (!file.rename(staged_path, output_path)) {
+    stop(
+      "Could not publish workbook: ",
+      output_path,
+      call. = FALSE
+    )
+  }
+  output_path
+}
+
+write_hscp_workbooks <- function(
+  hscp,
+  locality_results,
+  locality_rows,
+  workbook_types,
+  output_dir,
+  hscp_count,
+  progress
+) {
+  purrr::map(workbook_types, function(type) {
+    settings <- switch(
+      type,
+      sdc = list(
+        field = "sdc_tables",
+        subdirectory = "SDC",
+        suffix = " - Locality Profile SDC highlight.xlsx"
+      ),
+      data_workbook = list(
+        field = "data_tables",
+        subdirectory = "background data",
+        suffix = " - Locality Profile data.xlsx"
+      )
+    )
+    target <- fs::path(
+      output_dir,
+      settings$subdirectory,
+      paste0(hscp, settings$suffix)
+    )
+
+    if (any(locality_rows$status != "succeeded")) {
+      status <- "skipped"
+      result <- list(
+        result = NULL,
+        error = simpleError(
+          "One or more locality profiles failed; workbook not generated."
+        )
+      )
+    } else {
+      result <- purrr::safely(function() {
+        collected <- purrr::map(
+          locality_results,
+          function(x) x[[settings$field]]
+        )
+        failed <- which(purrr::map_lgl(
+          collected,
+          \(x) !is.null(x$error)
+        ))
+        if (length(failed) > 0L) {
+          stop(
+            "Could not collect workbook tables for ",
+            toString(locality_rows$locality[failed]),
+            ": ",
+            conditionMessage(collected[[failed[[1L]]]]$error),
+            call. = FALSE
+          )
+        }
+
+        locality_tables <- purrr::map(collected, "result")
+        sheet_names <- names(locality_tables[[1L]])
+        tables <- purrr::map(sheet_names, function(sheet) {
+          pieces <- purrr::map(locality_tables, function(x) x[[sheet]])
+          if (type == "sdc") {
+            dplyr::bind_rows(pieces)
+          } else {
+            purrr::reduce(pieces, rbind)
+          }
+        }) |>
+          stats::setNames(sheet_names)
+        write_hscp_workbook(tables, target, type)
+      })()
+      status <- if (is.null(result$error)) "succeeded" else "failed"
+    }
+
+    output_path <- if (status == "succeeded") result$result else NA_character_
+    error <- if (status == "succeeded") {
+      NA_character_
+    } else {
+      conditionMessage(result$error)
+    }
+
+    progress(list(
+      type = type,
+      locality = NA_character_,
+      hscp = hscp,
+      position = NA_integer_,
+      total = hscp_count,
+      status = status,
+      output_path = output_path,
+      error = error
+    ))
+
+    tibble::tibble(
+      hscp = hscp,
+      type = type,
+      status = status,
+      output_path = output_path,
+      error = error
+    )
+  }) |>
+    purrr::list_rbind()
+}
+
 build_profiles <- function(
   localities,
   output_dir,
-  progress = function(event) NULL
+  progress = function(event) NULL,
+  create_sdc = FALSE,
+  create_data_workbook = FALSE
 ) {
   if (!fs::dir_exists(output_dir)) {
     stop("Output directory does not exist: ", output_dir, call. = FALSE)
@@ -1018,15 +1351,14 @@ build_profiles <- function(
   }
 
   localities <- unique(localities)
-  lookup <- read_in_localities()
 
+  lookup <- read_in_localities()
   unknown_localities <- setdiff(localities, lookup$hscp_locality)
-  if (length(unknown_localities) > 0) {
+  if (length(unknown_localities) > 0L) {
     stop("Unknown localities: ", toString(unknown_localities), call. = FALSE)
   }
 
   locality_lookup <- dplyr::distinct(lookup, hscp_locality, hscp2019name)
-
   profiles <- tibble::tibble(locality = localities) |>
     dplyr::left_join(locality_lookup, by = c(locality = "hscp_locality")) |>
     dplyr::mutate(
@@ -1039,11 +1371,39 @@ build_profiles <- function(
       .keep = "none"
     )
 
+  hscps <- unique(profiles$hscp)
+  workbook_types <- c(
+    if (create_data_workbook) "data_workbook",
+    if (create_sdc) "sdc"
+  )
+  if (length(workbook_types) > 0L) {
+    required_localities <- lookup$hscp_locality[
+      lookup$hscp2019name %in% hscps
+    ]
+    missing_localities <- setdiff(required_localities, localities)
+    if (length(missing_localities) > 0L) {
+      stop(
+        "HSCP workbooks require all constituent localities. Missing: ",
+        toString(missing_localities),
+        call. = FALSE
+      )
+    }
+  }
+
+  # Preserve the requested order for Word-only builds.
+  groups <- if (length(workbook_types) > 0L) {
+    split(seq_len(nrow(profiles)), factor(profiles$hscp, levels = hscps))
+  } else {
+    as.list(seq_len(nrow(profiles)))
+  }
+
+  execution_order <- unlist(groups, use.names = FALSE)
+
   # Share memoised readers without sharing locality-specific variables.
   common_environment <- new.env(parent = environment(build_profiles))
   common_environment$lookup <- lookup
   common_environment$output_dir <- output_dir
-  common_environment$hscp_list <- unique(profiles$hscp)
+  common_environment$hscp_list <- hscps
 
   temp_root <- fs::file_temp(pattern = "lp-profile-build-")
   fs::dir_create(temp_root)
@@ -1089,6 +1449,13 @@ build_profiles <- function(
 
     purrr::walk(section_scripts, sys.source, envir = locality_environment)
 
+    data_tables <- if (create_data_workbook) {
+      purrr::safely(collect_data_workbook_tables)(locality_environment)
+    }
+    sdc_tables <- if (create_sdc) {
+      purrr::safely(collect_sdc_workbook_tables)(locality_environment)
+    }
+
     output_filename <- locality_profile$output_filename
     main_title <- sub("\\.docx$", "", output_filename)
     output_document <- fs::path(output_dir, output_filename)
@@ -1110,58 +1477,103 @@ build_profiles <- function(
       "OFFICIAL_SENSITIVE_VMO"
     )
 
-    move_profile_to_stats(temp_document, output_document)
+    list(
+      output_path = move_profile_to_stats(temp_document, output_document),
+      data_tables = data_tables,
+      sdc_tables = sdc_tables
+    )
   }
 
   generate_profile_safely <- purrr::safely(generate_profile)
+  hscp_results <- purrr::map(groups, function(row_numbers) {
+    hscp <- profiles$hscp[row_numbers[[1L]]]
 
-  results <- purrr::map(seq_len(nrow(profiles)), function(result_num) {
-    locality_profile <- profiles[result_num, ]
+    locality_results <- purrr::map(row_numbers, function(result_num) {
+      locality_profile <- profiles[result_num, ]
+      position <- match(result_num, execution_order)
 
-    progress(list(
-      locality = locality_profile$locality,
-      hscp = locality_profile$hscp,
-      position = result_num,
-      total = nrow(profiles),
-      status = "running",
-      output_path = NA_character_,
-      error = NA_character_
-    ))
+      progress(list(
+        type = "locality_profile",
+        locality = locality_profile$locality,
+        hscp = hscp,
+        position = position,
+        total = nrow(profiles),
+        status = "running",
+        output_path = NA_character_,
+        error = NA_character_
+      ))
 
-    result <- generate_profile_safely(locality_profile)
-    succeeded <- is.null(result$error)
+      result <- generate_profile_safely(locality_profile)
+      succeeded <- is.null(result$error)
+      status <- if (succeeded) "succeeded" else "failed"
+      output_path <- if (succeeded) result$result$output_path else NA_character_
+      error <- if (succeeded) NA_character_ else conditionMessage(result$error)
 
-    status <- if (succeeded) "succeeded" else "failed"
-    output_path <- if (succeeded) result$result else NA_character_
-    error <- if (succeeded) NA_character_ else conditionMessage(result$error)
+      progress(list(
+        type = "locality_profile",
+        locality = locality_profile$locality,
+        hscp = hscp,
+        position = position,
+        total = nrow(profiles),
+        status = status,
+        output_path = output_path,
+        error = error
+      ))
 
-    progress(list(
-      locality = locality_profile$locality,
-      hscp = locality_profile$hscp,
-      position = result_num,
-      total = nrow(profiles),
-      status = status,
-      output_path = output_path,
-      error = error
-    ))
+      list(
+        row = tibble::tibble(
+          locality = locality_profile$locality,
+          hscp = hscp,
+          status = status,
+          output_path = output_path,
+          error = error
+        ),
+        data_tables = if (succeeded) result$result$data_tables,
+        sdc_tables = if (succeeded) result$result$sdc_tables
+      )
+    })
 
-    # Release large per-locality objects before starting the next profile.
-    gc()
+    locality_rows <- purrr::map(locality_results, "row") |>
+      purrr::list_rbind()
 
-    tibble::tibble(
-      locality = locality_profile$locality,
-      hscp = locality_profile$hscp,
-      status = status,
-      output_path = output_path,
-      error = error
+    workbook_rows <- if (length(workbook_types) > 0L) {
+      write_hscp_workbooks(
+        hscp = hscp,
+        locality_results = locality_results,
+        locality_rows = locality_rows,
+        workbook_types = workbook_types,
+        output_dir = output_dir,
+        hscp_count = length(hscps),
+        progress = progress
+      )
+    }
+
+    list(
+      localities = locality_rows,
+      workbooks = workbook_rows
     )
-  }) |>
+  })
+
+  results <- purrr::map(hscp_results, "localities") |>
     purrr::list_rbind()
+  workbook_results <- purrr::map(hscp_results, "workbooks") |>
+    purrr::list_rbind(
+      ptype = tibble::tibble(
+        hscp = character(),
+        type = character(),
+        status = character(),
+        output_path = character(),
+        error = character()
+      )
+    )
 
   list(
     total = nrow(results),
     succeeded = sum(results$status == "succeeded"),
     failed = sum(results$status == "failed"),
-    results = results
+    results = results,
+    workbook_results = workbook_results,
+    workbook_failed = sum(workbook_results$status == "failed"),
+    workbook_skipped = sum(workbook_results$status == "skipped")
   )
 }
