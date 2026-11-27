@@ -15,12 +15,7 @@ lp_path <- path(
 )
 
 # Set paths for the existing / new locations
-output_dir <- path(
-  lp_path,
-  "Master RMarkdown Document & Render Code",
-  "Output",
-  "background data"
-)
+output_dir <- path(lp_path, "Profiles Output", "SDC")
 # The directory will be created automatically.
 final_dir <- path(lp_path, "Final Profiles", str_glue("{year} Final Profiles"))
 
